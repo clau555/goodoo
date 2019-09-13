@@ -1,0 +1,25 @@
+Pixel à 500%
+1px = 1 carré de 5px
+200x120 => 1000x600
+
+Formation de François
+
+Joueur
+ Image/Animation V
+ Contrôles V
+ Limites bords V
+Décor
+ Dessin(s)
+
+Physique
+ Collision joueur/décor
+ Saut
+
+Ennemis
+Taper
+Vagues
+	<= Menu?
+	<= Skin?
+Bonus/armes
+Son
+Musique
