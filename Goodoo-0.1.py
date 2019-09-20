@@ -42,6 +42,7 @@ clock = pygame.time.Clock() #ne sert à rien pour l'instant
 
 """############INITIALISATIONS SURFACES############"""
 
+#FENETRE
 pygame.display.set_caption("Goodoo")
 screen = pygame.display.set_mode(screen_resolution)
 icon = pygame.image.load("goodoo1.png")
@@ -66,7 +67,7 @@ def player_animation():
 
 	global animation_counter
 
-	if counter%30 == 0:
+	if counter%30 == 0: #toute les 30 images
 		animation_counter += 1
 
 	if animation_counter == 2:
@@ -82,21 +83,9 @@ def player_animation():
 		screen.blit(player_right[animation_counter],(x,y))
 
 
-"""############CORPS############"""
+def screen_keys():
 
-launched = True
-
-while launched:
-
-	#EVENTS
-
-	for event in pygame.event.get():
-
-		if event.type == pygame.QUIT:
-			launched = False
-
-	#CONTROLE DES TOUCHES
-	keys = pygame.key.get_pressed()
+	global launched, fullscreen, screen
 
 	if keys[pygame.K_ESCAPE]:
 		launched = False
@@ -112,6 +101,10 @@ while launched:
 		pygame.mouse.set_visible(True)
 		fullscreen = False
 
+
+def player_keys():
+
+	global x, y, right, left
 
 	if keys[pygame.K_LEFT] and x >= velocity:
 		left = True
@@ -129,6 +122,26 @@ while launched:
 	if keys[pygame.K_DOWN] and y < screen_height - player_width:
 		y += velocity
 
+
+"""############CORPS############"""
+
+launched = True
+
+while launched:
+
+	#EVENTS
+
+	for event in pygame.event.get():
+
+		if event.type == pygame.QUIT:
+			launched = False
+
+	#CONTROLE DES TOUCHES
+
+	keys = pygame.key.get_pressed()
+	screen_keys()
+	player_keys()
+
 	#ACTUALISATION VARIABLES
 
 	counter += 1
@@ -137,7 +150,7 @@ while launched:
 
 	screen.fill(black)
 	player_animation()
-	pygame.display.flip()
+	pygame.display.flip() #rafraichit l'écran
 	time.sleep(.016) #60 fps
 
 pygame.quit()
