@@ -5,14 +5,15 @@ Pixel à 500%
 Formation de François
 
 Joueur
- Image/Animation V
- Contrôles V
- Limites bords V
-Décor
+ Image/Animation 	V
+ Contrôles 		V
+ Limites bords 		V
+
+Environnement
  Dessin(s)
 
 Physique
- Collision joueur/décor
+ Collision joueur/environnement
  Saut
 
 Ennemis
