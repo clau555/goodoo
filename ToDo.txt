@@ -1,16 +1,17 @@
-Pixel à 500%
-1px = 1 carré de 5px
+Pixel Ã  500%
+1px = 1 carrÃ© de 5px
 200x120 => 1000x600
 
-Formation de François
+Formation de FranÃ§ois
 
 Joueur
  Image/Animation 	V
- Contrôles 		V
+ ContrÃ´les 		V
  Limites bords 		V
 
 Environnement
- Dessin(s)
+ Dessin(s)		V
+ Outil de conversion	V
 
 Physique
  Collision joueur/environnement
