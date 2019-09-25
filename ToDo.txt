@@ -1,17 +1,17 @@
-Pixel Ã  500%
-1px = 1 carrÃ© de 5px
-200x120 => 1000x600
+Pixel à 500%
+1 bloc = 1 carré de 20px
+64x36 blocs
+resolution = 1280x720px
 
-Formation de FranÃ§ois
+Formation de François
 
 Joueur
  Image/Animation 	V
- ContrÃ´les 		V
+ Contrôles 		V
  Limites bords 		V
 
 Environnement
- Dessin(s)		V
- Outil de conversion	V
+ Dessin(s)
 
 Physique
  Collision joueur/environnement
