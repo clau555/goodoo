@@ -1,9 +1,9 @@
 # VISI_301
 
-Changelog 1 :
-	Fenêtre de 1000x600px
-	Plein écran (curseur caché) sur F11
-	Quitter sur Echap
-	Joueur dirigé par les touches directionelles
-	Joueur animé selon une boucle et les directions
-	Joueur stoppé par les bords de la fenêtre
+Changelog 1 :<br>
+	Fenêtre de 1000x600px<br>
+	Plein écran (curseur caché) sur F11<br>
+	Quitter sur Echap<br>
+	Joueur dirigé par les touches directionelles<br>
+	Joueur animé selon une boucle et les directions<br>
+	Joueur stoppé par les bords de la fenêtre<br>
