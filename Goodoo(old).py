@@ -58,8 +58,8 @@ icon = pygame.image.load("./img/icon.jpg")
 pygame.display.set_icon(icon)
 
 #JOUEUR
-player_right = (pygame.image.load("goodoo1.png"), pygame.image.load("goodoo2.png"))
-player_left = (pygame.image.load("goodoo3.png"), pygame.image.load("goodoo4.png"))
+player_right = (pygame.image.load("img/goodoo_white/goodoo1.png"), pygame.image.load("img/goodoo_white/goodoo2.png"))
+player_left = (pygame.image.load("img/goodoo_white/goodoo3.png"), pygame.image.load("img/goodoo_white/goodoo4.png"))
 screen.blit(player_right[0],(x,y))
 
 player_rect = pygame.Rect((x*ratio,y*ratio), (player_width*ratio,player_width*ratio))
