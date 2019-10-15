@@ -1,7 +1,8 @@
 # VISI_301
 
 Changelog 3:<br>
-	WIP<br>
+	Collision entre le joueur et le décor<br>
+	Passage en programmation orienté objet -- IMPORTANT<br>
 <br>
 Changelog 2:<br>
 	Fenêtre de 1280x720px<br>
