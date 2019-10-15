@@ -46,23 +46,15 @@ class Player(object):
 
 	def __init__(self):
 
-		self.x = 45.0
-		self.y = 17.0
 		self.width = 1
-		self.rect = pygame.Rect((self.x*ratio, self.y*ratio), (self.width*ratio,self.width*ratio)) # hitbox
-		self.sprites = [ pygame.image.load("img/goodoo_white/goodoo1.png"),
-						pygame.image.load("img/goodoo_white/goodoo2.png"),
-						pygame.image.load("img/goodoo_white/goodoo3.png"),
-						pygame.image.load("img/goodoo_white/goodoo4.png") ]
+		self.rect = pygame.Rect((45.0*ratio, 17.0*ratio), (self.width*ratio,self.width*ratio)) # hitbox
+		self.sprites = [ pygame.image.load("img/goodoo_rainbow/goodoo1.png"),
+						pygame.image.load("img/goodoo_rainbow/goodoo2.png"),
+						pygame.image.load("img/goodoo_rainbow/goodoo3.png"),
+						pygame.image.load("img/goodoo_rainbow/goodoo4.png") ]
 		self.sprite = self.sprites[0] # sprite courant
 		self.last_move = "right"
 		self.velocity = 0.2
-
-
-	def coord_to_real(x, y):
-		"""Convertis les coords de la grille en coords de pixels"""
-
-		return (x*ratio , y*ratio)
 
 
 	def move(self, vx, vy):
@@ -76,24 +68,26 @@ class Player(object):
 
 	def move_single_axis(self, vx, vy):
 
-		self.x += vx
-		self.y += vy
+		# bouge le rect
+		self.rect.x += vx*ratio
+		self.rect.y += vy*ratio
 
-		"""
 		# If you collide with a wall, move out based on velocity
-		for wall in walls:
-			if self.rect.colliderect(wall.rect):
-				if vx > 0: # Moving right; Hit the left side of the wall
-					self.rect.right = wall.rect.left
-				if vx < 0: # Moving left; Hit the right side of the wall
-					self.rect.left = wall.rect.right
-				if vy > 0: # Moving down; Hit the top side of the wall
-					self.rect.bottom = wall.rect.top
-				if vy < 0: # Moving up; Hit the bottom side of the wall
-					self.rect.top = wall.rect.bottom
-		"""
+		for block in blocks:
+			if self.rect.colliderect(block.rect):
+				if vx > 0:
+					self.rect.right = block.rect.left
+				if vx < 0:
+					self.rect.left = block.rect.right
+				if vy > 0:
+					self.rect.bottom = block.rect.top
+				if vy < 0:
+					self.rect.top = block.rect.bottom
+		
 
 	def animation(self, last_move):
+		"""Oriente le joueur selon son dernier mouvement"""
+
 		if last_move=="right" :
 			self.sprite = self.sprites[0]
 
@@ -103,10 +97,12 @@ class Player(object):
 
 
 class Block(object): #######inutile pour l'instant
-    
-    def __init__(self, pos):
-        blocks.append(self)
-        self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
+
+	def __init__(self, pos):
+
+		blocks.append(self) # est ajouté à la liste de tout les blocs
+		self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
+
 
 
 
@@ -120,10 +116,20 @@ pygame.display.set_caption("Goodoo")
 screen = Screen()
 
 clock = pygame.time.Clock()
-walls = [] # List to hold the walls
 player = Player()
 
+
+#========== DESSIN DE L'ENVIRONNEMENT ==========
+
 tab = tab0 # tableau de 1 et 0 du niveau, cf envirronements.py
+blocks = [] # liste qui sitock des blocs de l'environnement
+
+# créer tout les blocs de l'environnement
+for i in range(0,len(tab)):
+	for j in range(0,len(tab[0])):
+		if tab[i][j]==1:
+			Block( (j*ratio , i*ratio) )
+
 
 
 #========== CORPS DU PROGRAMME ==========
@@ -170,9 +176,12 @@ while launched:
 
 	# DESSIN DES SURFACES
 	screen.surface.fill(black)
-	#pygame.draw.rect(screen.surface, white, player.rect) # hitbox
+	# dessine tout les blocs de la liste blocks
+	for block in blocks:
+		pygame.draw.rect(screen.surface, white, block.rect)
+	pygame.draw.rect(screen.surface, red, player.rect) # hitbox
 	player.animation(player.last_move)
-	screen.surface.blit(player.sprite, (player.x*ratio, player.y*ratio) )
+	screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
 
 	pygame.display.flip() #actualisation de l'écran
 
