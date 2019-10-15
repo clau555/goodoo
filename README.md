@@ -1,5 +1,8 @@
 # VISI_301
 
+Changelog 3:<br>
+	WIP<br>
+<br>
 Changelog 2:<br>
 	Fenêtre de 1280x720px<br>
 	Environnement en grille 64x36 blocs<br>
