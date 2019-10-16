@@ -27,17 +27,26 @@ purple = (255,0,255)
 
 #========== OBJETS ==========
 
-class Screen(object):
+class Screen():
 
 	def __init__(self):
 
 		self.resolution = (1280,720)
-		self.surface = pygame.display.set_mode((1280,720))
+		self.surface = pygame.display.set_mode((self.resolution))
 		self.fullscreen = False
 
 
 
-class Player(object):
+class Block():
+
+	def __init__(self, pos):
+
+		blocks.append(self) # est ajouté à la liste de tout les blocs
+		self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
+
+
+
+class Player():
 
 	def __init__(self):
 
@@ -100,15 +109,6 @@ class Player(object):
 
 
 
-class Block(object):
-
-	def __init__(self, pos):
-
-		blocks.append(self) # est ajouté à la liste de tout les blocs
-		self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
-
-
-
 #========== INITIALISATION PYGAME ==========
 
 pygame.init()
@@ -120,8 +120,8 @@ pygame.display.set_caption("Goodoo")
 screen = Screen()
 
 # ENVIRONNEMENT
-tab = tab3 # tableau de 1 et 0 du niveau, cf envirronements.py
-blocks = [] # liste qui sitock des blocs de l'environnement
+tab = tab3 # tableau du niveau, cf envirronements.py
+blocks = [] # liste qui stock des blocs de l'environnement
 # créer tout les blocs de l'environnement
 for i in range(0,len(tab)):
 	for j in range(0,len(tab[0])):
@@ -132,7 +132,7 @@ for i in range(0,len(tab)):
 player = Player()
 
 # MUSIQUE
-#pygame.mixer.music.load("ressources/S.Rachmaninov - prelude op 23 no 5.wav")
+pygame.mixer.music.load("ressources/S.Rachmaninov - prelude op 23 no 5.wav")
 
 # HORLOGE
 clock = pygame.time.Clock()
@@ -140,7 +140,7 @@ clock = pygame.time.Clock()
 
 #========== CORPS DU PROGRAMME ==========
 
-#pygame.mixer.music.play()
+pygame.mixer.music.play()
 launched = True
 
 while launched:
@@ -198,5 +198,6 @@ while launched:
 
 	counter += 1
 	clock.tick(60) # 60 fps
+
 
 pygame.quit()
