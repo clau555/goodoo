@@ -120,7 +120,7 @@ pygame.display.set_caption("Goodoo")
 screen = Screen()
 
 # ENVIRONNEMENT
-tab = tab3 # tableau du niveau, cf envirronements.py
+tab = tab4 # tableau du niveau, cf envirronements.py
 blocks = [] # liste qui stock des blocs de l'environnement
 # créer tout les blocs de l'environnement
 for i in range(0,len(tab)):
