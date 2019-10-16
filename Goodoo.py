@@ -132,7 +132,7 @@ for i in range(0,len(tab)):
 player = Player()
 
 # MUSIQUE
-pygame.mixer.music.load("ressources/S.Rachmaninov - prelude op 23 no 5.wav")
+#pygame.mixer.music.load("ressources/S.Rachmaninov - prelude op 23 no 5.wav")
 
 # HORLOGE
 clock = pygame.time.Clock()
@@ -140,7 +140,7 @@ clock = pygame.time.Clock()
 
 #========== CORPS DU PROGRAMME ==========
 
-pygame.mixer.music.play()
+#pygame.mixer.music.play()
 launched = True
 
 while launched:
