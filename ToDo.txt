@@ -6,15 +6,15 @@ resolution = 1280x720px
 Formation de François
 
 Joueur
- Image/Animation 	V
- Contrôles 		V
- Limites bords 		V
+ Image/Animation 			V
+ Contrôles	 			V
+ Limites bords 				V
 
 Environnement
  Dessin(s)
 
 Physique
- Collision joueur/environnement
+ Collision joueur/environnement		V
  Saut
 
 Ennemis
