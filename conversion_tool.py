@@ -30,5 +30,8 @@ def convert_to_tab(im):
     return(tab)
 
 
-tab1 = Image.open('Tableau_Template.jpg')
-print(convert_to_tab(tab1))
+tab1 = Image.open('ressources/tab3.jpg')
+res = convert_to_tab(tab1)
+
+for i in range(0, len(res)):
+    print(str(res[i]) + ",\n")

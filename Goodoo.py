@@ -2,13 +2,6 @@ import pygame
 from environnements import *
 
 """
-Changelog 2:
-	Fenêtre de 1280x720px
-	Environnement en grille 64x36 blocs
-	1 bloc = 20 px
-	Grille de 64x36 blocs
-	Nouvelle taille du joueur (1 bloc)
-
 Changelog 3:
 	Collision entre le joueur et le décor
 	Passage en programmation orienté objet -- IMPORTANT
@@ -18,6 +11,7 @@ Changelog 3:
 #========== INITIALISATION VARIABLES GLOBALES ==========
 
 ratio = 20 # ratio écran/grille
+counter = 0 # compteur de boucle
 
 # COULEURS
 white = (255,255,255)
@@ -30,6 +24,7 @@ blue = (0,0,255)
 purple = (255,0,255)
 
 
+
 #========== OBJETS ==========
 
 class Screen(object):
@@ -39,7 +34,7 @@ class Screen(object):
 		self.resolution = (1280,720)
 		self.surface = pygame.display.set_mode((1280,720))
 		self.fullscreen = False
-		
+
 
 
 class Player(object):
@@ -47,14 +42,15 @@ class Player(object):
 	def __init__(self):
 
 		self.width = 1
-		self.rect = pygame.Rect((45.0*ratio, 17.0*ratio), (self.width*ratio,self.width*ratio)) # hitbox
-		self.sprites = [ pygame.image.load("img/goodoo_rainbow/goodoo1.png"),
-						pygame.image.load("img/goodoo_rainbow/goodoo2.png"),
-						pygame.image.load("img/goodoo_rainbow/goodoo3.png"),
-						pygame.image.load("img/goodoo_rainbow/goodoo4.png") ]
-		self.sprite = self.sprites[0] # sprite courant
+		self.rect = pygame.Rect((42.0*ratio, 20.0*ratio), (self.width*ratio,self.width*ratio)) # hitbox
+		self.sprites_right = [ pygame.image.load("ressources/goodoo_white/goodoo1.png"),
+							pygame.image.load("ressources/goodoo_white/goodoo2.png")]
+		self.sprites_left = [ pygame.image.load("ressources/goodoo_white/goodoo3.png"),
+							pygame.image.load("ressources/goodoo_white/goodoo4.png")]
+		self.animation_counter = 0
+		self.sprite = self.sprites_right[self.animation_counter] # sprite courant
 		self.last_move = "right"
-		self.velocity = 0.2
+		self.velocity = 0.2 # blocs par image
 
 
 	def move(self, vx, vy):
@@ -67,12 +63,13 @@ class Player(object):
 
 
 	def move_single_axis(self, vx, vy):
+		"""Bouge en fonction de vx et vy"""
 
 		# bouge le rect
 		self.rect.x += vx*ratio
 		self.rect.y += vy*ratio
 
-		# If you collide with a wall, move out based on velocity
+		# Si collision avec un bloc, se repositionne
 		for block in blocks:
 			if self.rect.colliderect(block.rect):
 				if vx > 0:
@@ -83,20 +80,27 @@ class Player(object):
 					self.rect.bottom = block.rect.top
 				if vy < 0:
 					self.rect.top = block.rect.bottom
-		
+
 
 	def animation(self, last_move):
 		"""Oriente le joueur selon son dernier mouvement"""
 
+		# on passe au sprite suivant toute les 30 images
+		if counter%30 == 0:
+			self.animation_counter += 1
+		# on revient au premier sprite une fois le 2e sprite passé
+		if self.animation_counter >= len(self.sprites_right):
+			self.animation_counter = 0
+
 		if last_move=="right" :
-			self.sprite = self.sprites[0]
+			self.sprite = self.sprites_right[self.animation_counter]
 
 		elif last_move=="left" :
-			self.sprite = self.sprites[2]
-		
+			self.sprite = self.sprites_left[self.animation_counter]
 
 
-class Block(object): #######inutile pour l'instant
+
+class Block(object):
 
 	def __init__(self, pos):
 
@@ -105,36 +109,40 @@ class Block(object): #######inutile pour l'instant
 
 
 
-
-
 #========== INITIALISATION PYGAME ==========
 
+pygame.init()
+
 # FENETRE
-icon = pygame.image.load("./img/icon.jpg")
+icon = pygame.image.load("ressources/icon.jpg")
 pygame.display.set_icon(icon)
 pygame.display.set_caption("Goodoo")
 screen = Screen()
 
-clock = pygame.time.Clock()
-player = Player()
-
-
-#========== DESSIN DE L'ENVIRONNEMENT ==========
-
-tab = tab0 # tableau de 1 et 0 du niveau, cf envirronements.py
+# ENVIRONNEMENT
+tab = tab3 # tableau de 1 et 0 du niveau, cf envirronements.py
 blocks = [] # liste qui sitock des blocs de l'environnement
-
 # créer tout les blocs de l'environnement
 for i in range(0,len(tab)):
 	for j in range(0,len(tab[0])):
 		if tab[i][j]==1:
 			Block( (j*ratio , i*ratio) )
 
+# JOUEUR
+player = Player()
+
+# MUSIQUE
+#pygame.mixer.music.load("ressources/S.Rachmaninov - prelude op 23 no 5.wav")
+
+# HORLOGE
+clock = pygame.time.Clock()
 
 
 #========== CORPS DU PROGRAMME ==========
 
+#pygame.mixer.music.play()
 launched = True
+
 while launched:
 
 
@@ -146,15 +154,14 @@ while launched:
 
 
 	keys = pygame.key.get_pressed()
+
 	# CONTROLE TOUCHES FENETRE
 	if keys[pygame.K_ESCAPE]:
 		launched = False
-
 	if keys[pygame.K_F11] and screen.fullscreen==False:
 		screen.surface = pygame.display.set_mode(screen.resolution, pygame.FULLSCREEN)
 		pygame.mouse.set_visible(False)
 		screen.fullscreen = True
-
 	elif keys[pygame.K_F11] and screen.fullscreen==True:
 		screen.surface = pygame.display.set_mode(screen.resolution)
 		pygame.mouse.set_visible(True)
@@ -162,10 +169,12 @@ while launched:
 
 	# CONTROLE TOUCHES JOUEUR
 	if keys[pygame.K_LEFT]:
-		player.last_move = "left"
+		if not(keys[pygame.K_RIGHT]):
+			player.last_move = "left"
 		player.move(-player.velocity, 0)
 	if keys[pygame.K_RIGHT]:
-		player.last_move = "right"
+		if not(keys[pygame.K_LEFT]):
+			player.last_move = "right"
 		player.move(player.velocity, 0)
 	if keys[pygame.K_UP]:
 		player.move(0, -player.velocity)
@@ -179,14 +188,15 @@ while launched:
 	# dessine tout les blocs de la liste blocks
 	for block in blocks:
 		pygame.draw.rect(screen.surface, white, block.rect)
-	pygame.draw.rect(screen.surface, red, player.rect) # hitbox
+	#pygame.draw.rect(screen.surface, red, player.rect) # hitbox
 	player.animation(player.last_move)
 	screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
 
-	pygame.display.flip() #actualisation de l'écran
+	pygame.display.flip() # actualisation de l'écran
 
 
 
-	clock.tick(60) #60 fps
+	counter += 1
+	clock.tick(60) # 60 fps
 
 pygame.quit()
