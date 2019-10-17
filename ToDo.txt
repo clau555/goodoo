@@ -5,9 +5,9 @@ resolution = 1280x720px
 
 
 Joueur
- Image/Animation					V
- Contrôles							V
- Limites bords 						X
+ Image/Animation			V
+ Contrôles				V
+ Limites bords 				X
 
 Environnement
  Dessin(s)
