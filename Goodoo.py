@@ -4,13 +4,14 @@ from environnements import *
 """
 Changelog 3:
 	Collision entre le joueur et le décor
-	Passage en programmation orienté objet -- IMPORTANT
+	Passage en programmation orientée objet -- IMPORTANT
 """
 
 
 #========== INITIALISATION VARIABLES GLOBALES ==========
 
 ratio = 20 # ratio écran/grille
+fps = 60 # images par seconde
 counter = 0 # compteur de boucle
 
 # COULEURS
@@ -34,6 +35,9 @@ class Screen():
 		self.resolution = (1280,720)
 		self.surface = pygame.display.set_mode((self.resolution))
 		self.fullscreen = False
+		self.icon = pygame.image.load("ressources/icon.jpg")
+		pygame.display.set_icon(self.icon) # icône de la fenêtre
+		pygame.display.set_caption("Goodoo") # titre de la fenêtre
 
 
 
@@ -92,12 +96,13 @@ class Player():
 
 
 	def animation(self, last_move):
-		"""Oriente le joueur selon son dernier mouvement"""
+		"""Oriente le joueur selon son dernier mouvement
+			Anime le joueur selon 2 sprites"""
 
-		# on passe au sprite suivant toute les 30 images
-		if counter%30 == 0:
+		# on passe au sprite suivant toute les 0.5s
+		if counter%(fps/2) == 0:
 			self.animation_counter += 1
-		# on revient au premier sprite une fois le 2e sprite passé
+		# on revient au 1er sprite une fois le 2e sprite passé
 		if self.animation_counter >= len(self.sprites_right):
 			self.animation_counter = 0
 
@@ -114,14 +119,11 @@ class Player():
 pygame.init()
 
 # FENETRE
-icon = pygame.image.load("ressources/icon.jpg")
-pygame.display.set_icon(icon)
-pygame.display.set_caption("Goodoo")
 screen = Screen()
 
 # ENVIRONNEMENT
 tab = tab4 # tableau du niveau, cf envirronements.py
-blocks = [] # liste qui stock des blocs de l'environnement
+blocks = [] # liste qui stoque des blocs de l'environnement
 # créer tout les blocs de l'environnement
 for i in range(0,len(tab)):
 	for j in range(0,len(tab[0])):
@@ -148,7 +150,6 @@ while launched:
 
 	# EVENTS
 	for event in pygame.event.get():
-
 		if event.type == pygame.QUIT:
 			launched = False
 
@@ -170,11 +171,11 @@ while launched:
 	# CONTROLE TOUCHES JOUEUR
 	if keys[pygame.K_LEFT]:
 		if not(keys[pygame.K_RIGHT]):
-			player.last_move = "left"
+			player.last_move = "left" # sert pour l'animation
 		player.move(-player.velocity, 0)
 	if keys[pygame.K_RIGHT]:
 		if not(keys[pygame.K_LEFT]):
-			player.last_move = "right"
+			player.last_move = "right" # sert pour l'animation
 		player.move(player.velocity, 0)
 	if keys[pygame.K_UP]:
 		player.move(0, -player.velocity)
@@ -197,7 +198,7 @@ while launched:
 
 
 	counter += 1
-	clock.tick(60) # 60 fps
+	clock.tick(fps) # 60 fps
 
 
 pygame.quit()
