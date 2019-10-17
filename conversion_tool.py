@@ -4,7 +4,7 @@ def convert_to_tab(im):
     """
     Entrée : Fichier image
     Sortie : Tableau à deux dimensions
-    Chaque pixels blancs deviennent des 1 dans le tableau, sinon des 0.
+    Chaque pixels blancs devient un 1 dans le tableau, sinon un 0.
     La deuxième dimension du tableau correspond aux lignes de pixels.
     """
 
@@ -12,11 +12,11 @@ def convert_to_tab(im):
     size = ( im_RGB.size[0], im_RGB.size[1] )
     tab = []
 
-    for j in range(0, size[1],1):
+    for j in range(0, size[1], 1):
 
         line = []
 
-        for i in range(0, size[0],1):
+        for i in range(0, size[0], 1):
 
             pix = im_RGB.getpixel((i, j))
 
