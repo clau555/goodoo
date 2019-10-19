@@ -12,6 +12,8 @@ Changelog 3:
 
 ratio = 20 # ratio écran/grille
 counter = 0 # compteur de boucle
+velocity = list([(i / 10.0) - 1 for i in range(0, 20)])
+
 
 # COULEURS
 white = (255,255,255)
@@ -51,6 +53,9 @@ class Player(object):
 		self.sprite = self.sprites_right[self.animation_counter] # sprite courant
 		self.last_move = "right"
 		self.velocity = 0.2 # blocs par image
+		self.isjump = False
+		self.velocity_index = 0
+		
 
 
 	def move(self, vx, vy):
@@ -76,8 +81,7 @@ class Player(object):
 					self.rect.right = block.rect.left
 				if vx < 0:
 					self.rect.left = block.rect.right
-				if vy > 0:
-					self.rect.bottom = block.rect.top
+
 				if vy < 0:
 					self.rect.top = block.rect.bottom
 
@@ -98,7 +102,19 @@ class Player(object):
 		elif last_move=="left" :
 			self.sprite = self.sprites_left[self.animation_counter]
 
-
+	def jump(self):
+		global velocity
+		if self.isjump:
+			self.move_single_axis(0, velocity[self.velocity_index]) 
+			self.velocity_index += 1
+			if (self.velocity_index >= len(velocity)-1):
+				self.velocity_index = len(velocity)-1
+			for block in blocks:
+				if self.rect.colliderect(block.rect):
+					if self.rect.bottom >= block.rect.top:
+						self.rect.bottom = block.rect.top
+						self.isjump = False
+						self.velocity_index = 0
 
 class Block(object):
 
@@ -180,6 +196,10 @@ while launched:
 		player.move(0, -player.velocity)
 	if keys[pygame.K_DOWN]:
 		player.move(0, player.velocity)
+	if keys[pygame.K_SPACE] and player.isjump == False:
+		player.isjump = True
+	if player.isjump == True:
+		player.jump()
 
 
 
