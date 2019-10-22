@@ -53,7 +53,7 @@ class Player(object):
 		self.last_move = "right"
 		self.velocity = list([(i / 10.0) - 1 for i in range(0, 20)]) # plage des vitesses
 		self.velocity_index = 0 # rang de la plage de vitesse, permet l'accélération
-		self.velocity_fixed = 2*len(self.velocity)//3 # rang fixe de la plage de vitesse -- DOIT ETRE SUPERIEUR A 0.5
+		self.velocity_fixed = self.velocity[2*len(self.velocity)//3] # rang fixe de la plage de vitesse -- DOIT ETRE SUPERIEUR A 0.5
 		self.isjump = False
 		self.iscollide = False
 		
@@ -196,15 +196,15 @@ while launched:
 	if keys[pygame.K_LEFT]:
 		if not(keys[pygame.K_RIGHT]):
 			player.last_move = "left"
-		player.move(-player.velocity[player.velocity_fixed], 0)
+		player.move(-player.velocity_fixed, 0)
 	if keys[pygame.K_RIGHT]:
 		if not(keys[pygame.K_LEFT]):
 			player.last_move = "right"
-		player.move(player.velocity[player.velocity_fixed], 0)
+		player.move(player.velocity_fixed, 0)
 	if keys[pygame.K_UP]:
-		player.move(0, -player.velocity[player.velocity_fixed])
+		player.move(0, -player.velocity_fixed)
 	if keys[pygame.K_DOWN]:
-		player.move(0, player.velocity[player.velocity_fixed])
+		player.move(0, player.velocity_fixed)
 	if keys[pygame.K_SPACE] and player.isjump == False:
 		player.isjump = True
 	if player.isjump == True:
