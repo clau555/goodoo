@@ -4,15 +4,15 @@ from environnements import *
 """
 Changelog 3:
 	Collision entre le joueur et le décor
-	Passage en programmation orienté objet -- IMPORTANT
+	Passage en programmation orientée objet -- IMPORTANT
 """
 
 
 #========== INITIALISATION VARIABLES GLOBALES ==========
 
 ratio = 20 # ratio écran/grille
+fps = 60 # images par seconde
 counter = 0 # compteur de boucle
-
 
 # COULEURS
 white = (255,255,255)
@@ -28,22 +28,36 @@ purple = (255,0,255)
 
 #========== OBJETS ==========
 
-class Screen(object):
+class Screen():
 
 	def __init__(self):
 
 		self.resolution = (1280,720)
-		self.surface = pygame.display.set_mode((1280,720))
+		self.surface = pygame.display.set_mode((self.resolution))
 		self.fullscreen = False
+		self.icon = pygame.image.load("ressources/icon.jpg")
+		pygame.display.set_icon(self.icon) # icône de la fenêtre
+		pygame.display.set_caption("Goodoo") # titre de la fenêtre
 
 
 
-class Player(object):
+class Block():
+
+	def __init__(self, pos):
+
+		blocks.append(self) # est ajouté à la liste de tout les blocs
+		self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
+
+
+
+class Player():
 
 	def __init__(self):
 
 		self.width = 1
-		self.rect = pygame.Rect((42.0*ratio, 20.0*ratio), (self.width*ratio,self.width*ratio)) # hitbox
+		self.x = x
+		self.y = y
+		self.rect = pygame.Rect((self.x*ratio, self.y*ratio), (self.width*ratio,self.width*ratio)) # hitbox
 		self.sprites_right = [ pygame.image.load("ressources/goodoo_white/goodoo1.png"),
 							pygame.image.load("ressources/goodoo_white/goodoo2.png")]
 		self.sprites_left = [ pygame.image.load("ressources/goodoo_white/goodoo3.png"),
@@ -125,23 +139,11 @@ class Player(object):
 
 
 
-class Block(object):
-
-	def __init__(self, pos):
-
-		blocks.append(self) # est ajouté à la liste de tout les blocs
-		self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
-
-
-
 #========== INITIALISATION PYGAME ==========
 
 pygame.init()
 
 # FENETRE
-icon = pygame.image.load("ressources/icon.jpg")
-pygame.display.set_icon(icon)
-pygame.display.set_caption("Goodoo")
 screen = Screen()
 
 # ENVIRONNEMENT
@@ -173,7 +175,6 @@ while launched:
 
 	# EVENTS
 	for event in pygame.event.get():
-
 		if event.type == pygame.QUIT:
 			launched = False
 
@@ -226,6 +227,7 @@ while launched:
 
 
 	counter += 1
-	clock.tick(60) # 60 fps
+	clock.tick(fps) # 60 fps
+
 
 pygame.quit()
