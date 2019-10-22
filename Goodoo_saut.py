@@ -52,7 +52,7 @@ class Block():
 
 class Player():
 
-	def __init__(self):
+	def __init__(self, x, y):
 
 		self.width = 1
 		self.x = x
@@ -156,7 +156,7 @@ for i in range(0,len(tab)):
 			Block( (j*ratio , i*ratio) )
 
 # JOUEUR
-player = Player()
+player = Player(42.0,20.0)
 
 # MUSIQUE
 #pygame.mixer.music.load("ressources/S.Rachmaninov - prelude op 23 no 5.wav")
