@@ -12,7 +12,6 @@ Changelog 3:
 
 ratio = 20 # ratio écran/grille
 counter = 0 # compteur de boucle
-velocity = list([(i / 10.0) - 1 for i in range(0, 20)])
 
 
 # COULEURS
@@ -52,9 +51,10 @@ class Player(object):
 		self.animation_counter = 0
 		self.sprite = self.sprites_right[self.animation_counter] # sprite courant
 		self.last_move = "right"
-		self.velocity = 0.2 # blocs par image
+		self.velocity = list([(i / 10.0) - 1 for i in range(0, 20)]) # plage des vitesses
+		self.velocity_index = 0 # rang de la plage de vitesse, permet l'accélération
+		self.velocity_fixed = 2*len(self.velocity)//3 # rang fixe de la plage de vitesse -- DOIT ETRE SUPERIEUR A 0.5
 		self.isjump = False
-		self.velocity_index = 0
 		self.iscollide = False
 		
 
@@ -110,14 +110,12 @@ class Player(object):
 
 	def jump(self):
 
-		global velocity
-
 		if self.isjump:
-			self.move_single_axis(0, velocity[self.velocity_index]) 
+			self.move_single_axis(0, self.velocity[self.velocity_index])
 			self.velocity_index += 1
 
-			if (self.velocity_index >= len(velocity)-1):
-				self.velocity_index = len(velocity)-1
+			if (self.velocity_index >= len(self.velocity)-1):
+				self.velocity_index = len(self.velocity)-1
 
 			for block in blocks:
 				if self.iscollide == True:
@@ -198,15 +196,15 @@ while launched:
 	if keys[pygame.K_LEFT]:
 		if not(keys[pygame.K_RIGHT]):
 			player.last_move = "left"
-		player.move(-player.velocity, 0)
+		player.move(-player.velocity[player.velocity_fixed], 0)
 	if keys[pygame.K_RIGHT]:
 		if not(keys[pygame.K_LEFT]):
 			player.last_move = "right"
-		player.move(player.velocity, 0)
+		player.move(player.velocity[player.velocity_fixed], 0)
 	if keys[pygame.K_UP]:
-		player.move(0, -player.velocity)
+		player.move(0, -player.velocity[player.velocity_fixed])
 	if keys[pygame.K_DOWN]:
-		player.move(0, player.velocity)
+		player.move(0, player.velocity[player.velocity_fixed])
 	if keys[pygame.K_SPACE] and player.isjump == False:
 		player.isjump = True
 	if player.isjump == True:
