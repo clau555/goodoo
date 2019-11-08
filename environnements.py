@@ -193,3 +193,11 @@ tab4 = [
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
+
+tab = tab4 # tableau de 1 et 0 du niveau, cf envirronements.py
+blocks = [] # liste qui sitock des blocs de l'environnement
+# créer tout les blocs de l'environnement
+for i in range(0,len(tab)):
+	for j in range(0,len(tab[0])):
+		if tab[i][j]==1:
+			blocks.append( Block( (j*self.ratio , i*self.ratio) ) ) # est ajouté à la liste de tout les blocs
