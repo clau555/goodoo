@@ -1,8 +1,8 @@
 # VISI_301
 
 <h3>Changelog 4 </h3>
-  Saut
-  Gravité
+  Saut<br>
+  Gravité<br>
 
 <h3>Changelog 3</h3><br>
 	Collision entre le joueur et le décor<br>
