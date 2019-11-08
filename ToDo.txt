@@ -3,18 +3,18 @@ Pixel à 500%
 64x36 blocs
 resolution = 1280x720px
 
-Formation de François
 
 Joueur
- Image/Animation 			V
- Contrôles	 			V
- Limites bords 				V
+ Image/Animation			V
+ Contrôles				V
+ Limites bords 				X
 
 Environnement
  Dessin(s)
 
 Physique
- Collision joueur/environnement		V
+ Collision joueur/Environnement		V
+ Gravité
  Saut
 
 Ennemis
