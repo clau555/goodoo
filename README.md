@@ -1,5 +1,9 @@
 # VISI_301
 
+<h3>Changelog 4 </h3>
+  Saut
+  Gravité
+
 <h3>Changelog 3</h3><br>
 	Collision entre le joueur et le décor<br>
 	Passage en programmation orienté objet -- IMPORTANT<br>
