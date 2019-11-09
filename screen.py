@@ -1,4 +1,5 @@
 import pygame
+from globals import *
 
 class Screen():
 

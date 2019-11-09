@@ -1,16 +1,15 @@
 import pygame
+import random
 from block import Block
 from globals import *
 
-
-class Player(Block):
-
-
+class Enemy(Block):
 
 	def __init__(self, x, y):
 
+		enemies.append(self)
 
-		self.width = 1
+		self.width = 0.6
 
 		# ne servent qu'à l'initialisation
 		self.x = x
@@ -22,20 +21,20 @@ class Player(Block):
 		self.vy = list([(i / 20.0) - 1 for i in range(0, 40)]) # plage des vitesses en y
 		self.vx_index = len(self.vx)//2 # rang de la plage de vitesse en x, permet l'accélération
 		self.vy_index = len(self.vy)//2 # rang de la plage de vitesse en y, permet l'accélération
-		self.v_fixed = 0.2 # vélocité fixée lors des déplacements gauche/droite de l'utilisateur
+		self.v_fixed = random.uniform(0.05, 0.2) # vélocité fixée lors des déplacements gauche/droite de l'utilisateur
+		print(self.v_fixed)
+
+		self.sprites = [ pygame.image.load("./ressources/enemy1/1.png"),
+						pygame.image.load("./ressources/enemy1/2.png")]
+		self.animation_counter = 0
+		self.sprite = self.sprites[self.animation_counter] # sprite courant
 
 		self.isjump = False
 		self.onground = False
 		self.iscollide = False
 		self.blockcollide = pygame.Rect( (0, 0) , (0, 0) )
 
-		self.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
-							pygame.image.load("./ressources/goodoo_white/2.png")]
-		self.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
-							pygame.image.load("./ressources/goodoo_white/4.png")]
 		self.animation_counter = 0
-		self.sprite = self.sprites_right[self.animation_counter] # sprite courant
-		self.last_move = "right"
 		
 
 
@@ -62,7 +61,6 @@ class Player(Block):
 		self.rect.y += vy*ratio
 
 		# Si collision avec un bloc, se repositionne
-		
 		for block in blocks:
 			if self.rect.colliderect(block.rect):
 
@@ -111,19 +109,15 @@ class Player(Block):
 
 
 
-	def animation(self, last_move):
+	def animation(self):
 		"""Oriente le sprite joueur selon son dernier mouvement"""
 
-		# passe au sprite suivant toute les 30 images
-		if counter%30 == 0:
+		# passe au sprite suivant toute les 20 images
+		if counter%20 == 0:
 			self.animation_counter += 1
 		# revient au premier sprite une fois le 2e sprite passé
-		if self.animation_counter >= len(self.sprites_right):
+		if self.animation_counter >= len(self.sprites):
 			self.animation_counter = 0
 
-		# oriente le sprite
-		if last_move=="right" :
-			self.sprite = self.sprites_right[self.animation_counter]
-
-		elif last_move=="left" :
-			self.sprite = self.sprites_left[self.animation_counter]
+		# dessine le sprite
+		self.sprite = self.sprites[self.animation_counter]

@@ -1,11 +1,9 @@
 import pygame
-from environnements import *
-from mother import Mother
+from globals import * 
 
-class Block(Mother):
+class Block():
 
 
 	def __init__(self, pos):
 
-		Mother.__init__(self)
-		self.rect = pygame.Rect((pos[0], pos[1]),(self.ratio,self.ratio))
+		self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
