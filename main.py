@@ -7,12 +7,12 @@ Changelog 5:
 
 import pygame
 import random
-from environnements import *
 
 
 #========== OBJETS ==========
 
 from gl0bals import *
+from environnements import *
 from screen import *
 from block import *
 from entity import *
@@ -28,11 +28,11 @@ pygame.init()
 screen = Screen()
 
 # ENVIRONNEMENT
-tab = tab4 # tableau de 1 et 0 du niveau, cf envirronements.py
+TAB = Environnements.TAB4 # tableau de 1 et 0 du niveau, cf envirronements.py
 # créer tout les blocs de l'environnement
-for i in range(0,len(tab)):
-	for j in range(0,len(tab[0])):
-		if tab[i][j]==1:
+for i in range(0,len(TAB)):
+	for j in range(0,len(TAB[0])):
+		if TAB[i][j]==1:
 			# est ajouté à la liste de tout les blocs
 			Globals.blocks.append( Block( (j * Globals.RATIO , i * Globals.RATIO) ) )
 
