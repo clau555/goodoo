@@ -3,14 +3,14 @@ from environnements import *
 
 """
 Changelog 4:
-	Gravité du joueur
+	GravitÃ© du joueur
 	Saut du joueur
 """
 
 
 #========== INITIALISATION VARIABLES GLOBALES ==========
 
-ratio = 20 # ratio écran / grille
+ratio = 20 # ratio Ã©cran / grille
 fps = 60 # images/boucles par seconde
 counter = 0 # compteur de boucle
 
@@ -36,7 +36,7 @@ class Screen():
 		self.surface = pygame.display.set_mode((self.resolution))
 		self.fullscreen = False
 		self.icon = pygame.image.load("ressources/icon.jpg")
-		pygame.display.set_icon(self.icon) # icône de la fenÃªtre
+		pygame.display.set_icon(self.icon) # icÃ´ne de la fenÃªtre
 		pygame.display.set_caption("Goodoo") # titre de la fenÃªtre
 
 
@@ -44,9 +44,10 @@ class Screen():
 class Block():
 
 	def __init__(self, pos):
-    
-		blocks.append(self) # est ajouté à  la liste de tout les blocs
+
+		blocks.append(self) # est ajoutÃ© Ã  la liste de tout les blocs
 		self.rect = pygame.Rect((pos[0], pos[1]),(ratio,ratio))
+
 
 
 class Player():
@@ -55,7 +56,7 @@ class Player():
 
 		self.width = 1
 
-		# ne servent qu'à  l'initialisation
+		# ne servent qu'Ã  l'initialisation
 		self.x = x
 		self.y = y
 
