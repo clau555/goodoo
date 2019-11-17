@@ -1,5 +1,5 @@
 import pygame
-from globals import *
+from gl0bals import *
 
 class Screen():
 
