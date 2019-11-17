@@ -5,15 +5,16 @@ from block import *
 
 class Entity:
 
-	def __init__(self, x:float, y:float, width:float, vx:float, vy:float, v_fixed:float, sprites_right:list, sprites_left:list):
+	def __init__(self, x:float, y:float, width:float, height:float, vx:float, vy:float, v_fixed:float, sprites_right:list, sprites_left:list):
 
 		# ne servent qu'à l'initialisation
 		self.x = x
 		self.y = y
 
 		self.width = width
+		self.height = height
 
-		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width*Globals.RATIO,self.width*Globals.RATIO)) # hitbox
+		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width*Globals.RATIO,self.height*Globals.RATIO)) # hitbox
 
 		self.vx = vx # plage des vitesses en x
 		self.vy = vy # plage des vitesses en y
@@ -32,7 +33,7 @@ class Entity:
 		self.isjump = False
 		self.onground = False
 		self.iscollide = False
-		self.blockcollide = pygame.Rect( (0, 0) , (0, 0) )
+		self.blockcollide = None
 
 
 	def move(self, vx, vy):

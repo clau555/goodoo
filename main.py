@@ -17,7 +17,8 @@ from screen import *
 from block import *
 from entity import *
 from player import *
-from enemy import *
+from enemy1 import *
+from enemy2 import *
 
 
 #========== INITIALISATION PYGAME ==========
@@ -28,7 +29,7 @@ pygame.init()
 screen = Screen()
 
 # ENVIRONNEMENT
-TAB = Environnements.TAB4 # tableau de 1 et 0 du niveau, cf envirronements.py
+TAB = Environnements.TAB5 # tableau de 1 et 0 du niveau, cf envirronements.py
 # créer tout les blocs de l'environnement
 for i in range(0,len(TAB)):
 	for j in range(0,len(TAB[0])):
@@ -40,11 +41,12 @@ for i in range(0,len(TAB)):
 player = Player(30.0,20.0)
 
 # ENNEMIES
-enemy0 = Enemy(30.0, 25.0)
-enemy1 = Enemy(40.0,0.0)
-enemy2 = Enemy(42.0,0.0)
-enemy3 = Enemy(43.0,0.0)
-enemy4 = Enemy(45.0,0.0)
+enemy0 = Enemy1(30.0, 25.0)
+enemy1 = Enemy1(40.0, 0.0)
+enemy2 = Enemy1(42.0, 0.0)
+enemy3 = Enemy1(43.0, 0.0)
+enemy4 = Enemy1(45.0, 0.0)
+enemy5 = Enemy2(25.0, 0.0)
 
 # MUSIQUE
 #pygame.mixer.music.load("./ressources/music/S.Rachmaninov - prelude op 23 no 5.wav")
@@ -62,20 +64,20 @@ launched = True
 while launched:
 
 
-	# EVENTS
+	# ========== EVENTS
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			launched = False
 
 
-	# OUT OF BOUND
+	# ========== OUT OF BOUND
 	if player.rect.y > screen.resolution[1]:
 		launched = False
 
+
 	keys = pygame.key.get_pressed()
 
-
-	# CONTROLE TOUCHES FENETRE
+	# ========== CONTROLE TOUCHES FENETRE
 	if keys[pygame.K_ESCAPE]:
 		launched = False
 	if keys[pygame.K_F11] and screen.fullscreen==False:
@@ -88,7 +90,7 @@ while launched:
 		screen.fullscreen = False
 
 
-	# JOUEUR
+	# ========== JOUEUR
 
 	# déplacement gauche
 	if keys[pygame.K_LEFT]:
@@ -114,9 +116,9 @@ while launched:
 		player.gravity()
 
 
-	# ENNEMIE
+	# ========== ENNEMIES 1
 
-	for enemy in Globals.enemies:
+	for enemy in Globals.enemies1:
 
 		# déplacement gauche
 		if enemy.rect.x > player.rect.x:
@@ -137,29 +139,61 @@ while launched:
 		if not enemy.isjump:
 			enemy.gravity()
 
+	# ========== ENNEMIES 2
 
-	# DESSIN DES SURFACES
+	for enemy in Globals.enemies2:
 
+		# déplacement gauche
+		if enemy.rect.x > player.rect.x:
+			enemy.last_move = "left"
+			enemy.move(-enemy.v_fixed, 0)
+
+		# déplacement droit
+		if enemy.rect.x < player.rect.x:
+			enemy.last_move = "right"
+			enemy.move(enemy.v_fixed, 0)
+			
+		# gravité
+		if not enemy.isjump:
+			enemy.gravity()
+
+	# ========== ENNEMIES 3
+
+	# vide
+
+
+	# ========== DESSIN DES SURFACES
+
+	# fond
 	screen.surface.fill(Globals.BLACK)
 
-	# dessine tout les blocs de la liste blocks
+	# blocs du décor
 	for block in Globals.blocks:
 		pygame.draw.rect(screen.surface, Globals.WHITE, block.rect)
 
-	# dessine le joueur
-	#pygame.draw.rect(screen.surface, purple, player.blockcollide) # bloc de collision
-	#pygame.draw.rect(screen.surface, red, player.rect) # hitbox
-	player.animation(player.last_move)
-	screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
-
-	# dessine les ennemis
-	for enemy in Globals.enemies:
-		#pygame.draw.rect(screen.surface, red, enemy.rect)
+	# ennemis type 1
+	for enemy in Globals.enemies1:
 		enemy.animation("right")
 		screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
+		#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
 
-	pygame.display.flip() # actualisation de l'écran
+	# ennemis type 2
+	for enemy in Globals.enemies2:
+		enemy.animation(enemy.last_move)
+		screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
+		#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
 
+	# joueur
+	player.animation(player.last_move)
+	screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
+	#pygame.draw.rect(screen.surface, Globals.PURPLE, player.blockcollide) # bloc de collision
+	#pygame.draw.rect(screen.surface, Globals.RED, player.rect) # hitbox
+
+	# actualisation de l'écran
+	pygame.display.flip()
+
+
+	# ========== MISE A JOUR
 
 	Globals.counter += 1
 	clock.tick(Globals.FPS)

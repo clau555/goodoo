@@ -30,7 +30,7 @@ def convert_to_tab(im):
     return(tab)
 
 
-tab = Image.open('tab4.jpg') # entrer le fichier à convertir
+tab = Image.open('tab5.jpg') # entrer le fichier à convertir
 res = convert_to_tab(tab)
 
 print("[\n")
