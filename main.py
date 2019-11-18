@@ -131,7 +131,7 @@ while launched:
 		# saut
 		if enemy.onground and not enemy.isjump:
 			enemy.isjump = True
-			enemy.vy_index = len(enemy.vy)//6 # rang de vélocité d'impulsion initiale
+			enemy.vy_index = len(enemy.vy)//random.randint(3,6) # rang de vélocité d'impulsion initiale
 		if enemy.isjump:
 			enemy.jump()
 
@@ -152,7 +152,7 @@ while launched:
 		if enemy.rect.x < player.rect.x:
 			enemy.last_move = "right"
 			enemy.move(enemy.v_fixed, 0)
-			
+
 		# gravité
 		if not enemy.isjump:
 			enemy.gravity()
