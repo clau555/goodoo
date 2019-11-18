@@ -9,10 +9,10 @@ import pygame
 import random
 
 
-#========== OBJETS ==========
+# ========== OBJETS ==========
 
 from gl0bals import *
-from environnements import *
+from levels import *
 from screen import *
 from block import *
 from entity import *
@@ -21,7 +21,7 @@ from enemy1 import *
 from enemy2 import *
 
 
-#========== INITIALISATION PYGAME ==========
+# ========== INITIALISATION ==========
 
 pygame.init()
 
@@ -29,7 +29,7 @@ pygame.init()
 screen = Screen()
 
 # ENVIRONNEMENT
-TAB = Environnements.TAB5 # tableau de 1 et 0 du niveau, cf envirronements.py
+TAB = Levels.TAB5 # tableau de 1 et 0 du niveau, cf envirronements.py
 # créer tout les blocs de l'environnement
 for i in range(0,len(TAB)):
 	for j in range(0,len(TAB[0])):
@@ -56,7 +56,7 @@ enemy5 = Enemy2(25.0, 0.0)
 clock = pygame.time.Clock()
 
 
-#========== CORPS DU PROGRAMME ==========
+# ========== CORPS ==========
 
 #pygame.mixer.music.play()
 launched = True
@@ -65,21 +65,27 @@ while launched:
 
 
 	# ========== EVENTS
+
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			launched = False
 
 
 	# ========== OUT OF BOUND
+
 	if player.rect.y > screen.resolution[1]:
 		launched = False
 
 
 	keys = pygame.key.get_pressed()
 
-	# ========== CONTROLE TOUCHES FENETRE
+	# ========== FENETRE
+
+	# quitter
 	if keys[pygame.K_ESCAPE]:
 		launched = False
+
+	# plein écran
 	if keys[pygame.K_F11] and screen.fullscreen==False:
 		screen.surface = pygame.display.set_mode(screen.resolution, pygame.FULLSCREEN)
 		pygame.mouse.set_visible(False)
@@ -122,11 +128,11 @@ while launched:
 
 		# déplacement gauche
 		if enemy.rect.x > player.rect.x:
-			enemy.move(-enemy.v_fixed, 0)
+			enemy.move(-random.uniform(0.05, 0.2), 0) # vitesse aléatoire
 
 		# déplacement droit
 		if enemy.rect.x < player.rect.x:
-			enemy.move(enemy.v_fixed, 0)
+			enemy.move(random.uniform(0.05, 0.2), 0) # vitesse aléatoire
 
 		# saut
 		if enemy.onground and not enemy.isjump:
@@ -171,14 +177,8 @@ while launched:
 	for block in Globals.blocks:
 		pygame.draw.rect(screen.surface, Globals.WHITE, block.rect)
 
-	# ennemis type 1
-	for enemy in Globals.enemies1:
-		enemy.animation("right")
-		screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
-		#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
-
 	# ennemis type 2
-	for enemy in Globals.enemies2:
+	for enemy in Globals.enemies:
 		enemy.animation(enemy.last_move)
 		screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
 		#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox

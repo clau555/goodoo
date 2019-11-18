@@ -1,4 +1,4 @@
-Pixel à 500%
+﻿Pixel à 500%
 1 bloc = 1 carré de 20px
 64x36 blocs
 resolution = 1280x720px
@@ -18,17 +18,26 @@ Physique
  Saut					V
 
 Ennemis
- Classe mère
- Ennemy1
- Ennemy2
+ Classe mère				V
+ Ennemy1				V
+ Ennemy2				V
  Ennemy3
- Ennemy4
+ Ennemy4 ?
 
+Programmation niveau
+ Spawn ennemies
+ Game Over
+ Objet arme
+ Joueur frapper
+ Différents niveau
 
-Taper
-Vagues
-	<= Menu?
-	<= Skin?
-Bonus/armes
+Menu
+ Ecran principal
+ Ecran sélection
+  Skin?
+ Ecran règles
+
 Son
-Musique
+ Joueur
+ Ennemies
+ Musique

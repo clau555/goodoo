@@ -1,5 +1,8 @@
 from PIL import Image
 
+
+# ===== FONCTION
+
 def convert_to_tab(im):
     """
     Entrée : Fichier image
@@ -29,6 +32,8 @@ def convert_to_tab(im):
 
     return(tab)
 
+
+# ===== EXECUTION
 
 tab = Image.open('tab5.jpg') # entrer le fichier à convertir
 res = convert_to_tab(tab)
