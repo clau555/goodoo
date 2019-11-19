@@ -22,4 +22,7 @@ class Globals:
 	enemies2 = [] # liste des ennemies de type 2
 	enemies3 = [] # liste des ennemies de type 3
 	enemies = [] # liste de tout les ennemies
+
+	#PROJECTILES
+	projectiles = [] # liste de tous les projectiles
 		

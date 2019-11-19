@@ -19,6 +19,7 @@ from entity import *
 from player import *
 from enemy1 import *
 from enemy2 import *
+from projectile import *
 
 
 # ========== INITIALISATION ==========
@@ -163,10 +164,18 @@ while launched:
 		if not enemy.isjump:
 			enemy.gravity()
 
+		# tir
+		if Globals.counter%60 == 0:
+			Projectile(enemy.rect.x, enemy.rect.y, player.rect.x, player.rect.y)
+			print("hey")
+
+
 	# ========== ENNEMIES 3
 
 	# vide
-
+	#=========== PROJECTILES
+	for projectile in Globals.projectiles:
+		projectile.move_single_axis(0,0)
 
 	# ========== DESSIN DES SURFACES
 
@@ -188,6 +197,10 @@ while launched:
 	screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
 	#pygame.draw.rect(screen.surface, Globals.PURPLE, player.blockcollide) # bloc de collision
 	#pygame.draw.rect(screen.surface, Globals.RED, player.rect) # hitbox
+
+	#projectile
+	for projectile in Globals.projectiles:
+		pygame.draw.rect(screen.surface, Globals.WHITE, projectile.rect)
 
 	# actualisation de l'écran
 	pygame.display.flip()
