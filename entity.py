@@ -1,7 +1,5 @@
 import pygame
 from gl0bals import *
-from entity import *
-from block import *
 
 class Entity:
 
@@ -10,11 +8,11 @@ class Entity:
 		# ne servent qu'à l'initialisation
 		self.x = x
 		self.y = y
+		
+		self.width = width * Globals.RATIO
+		self.height = height * Globals.RATIO
 
-		self.width = width
-		self.height = height
-
-		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width*Globals.RATIO,self.height*Globals.RATIO)) # hitbox
+		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width,self.height)) # hitbox
 
 		self.vx = vx # plage des vitesses en x
 		self.vy = vy # plage des vitesses en y
@@ -34,6 +32,7 @@ class Entity:
 		self.onground = False
 		self.iscollide = False
 		self.blockcollide = None
+		self.killed = False
 
 
 	def move(self, vx, vy):

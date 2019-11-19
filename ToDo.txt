@@ -1,5 +1,4 @@
-﻿
-Pixel à 500%
+﻿Pixel à 500%
 1 bloc = 1 carré de 20px
 64x36 blocs
 resolution = 1280x720px
@@ -21,7 +20,7 @@ Physique
 Ennemis
  Classe mère				V
  Enemy1					V
- Enemy2
+ Enemy2					V
  Enemy3
  Enemy4 ?
 

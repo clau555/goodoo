@@ -25,4 +25,3 @@ class Globals:
 
 	#PROJECTILES
 	projectiles = [] # liste de tous les projectiles
-		
