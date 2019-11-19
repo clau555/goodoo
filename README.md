@@ -1,8 +1,16 @@
 # VISI_301
 
+<h3>Changelog 5:</h3>
+	Répartition des classes en fichiers<br>
+	Ennemies 1 et 2<br>
+	Projectiles<br>
+	Vagues<br>
+	Arme<br>
+	Frappe du joueur<br>
+<br>
 <h3>Changelog 4 </h3>
-  Saut<br>
-  Gravité<br>
+	  Saut<br>
+	  Gravité<br>
 
 <h3>Changelog 3</h3><br>
 	Collision entre le joueur et le décor<br>
