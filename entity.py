@@ -1,5 +1,6 @@
 import pygame
 from gl0bals import *
+from screen import *
 
 class Entity:
 
@@ -75,6 +76,12 @@ class Entity:
 					self.rect.top = self.blockcollide.bottom
 					self.isjump = False
 					self.vy_index = len(self.vy)//2
+
+		# out of bounds
+		if self.rect.left <= 0:
+			self.rect.left = 0
+		elif self.rect.right >= Globals.resolution[0]:
+			self.rect.right = Globals.resolution[0]
 
 
 

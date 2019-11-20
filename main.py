@@ -1,19 +1,19 @@
 """
 -- EN COURS
-Changelog 5:
-	Répartition des classes en fichiers
-	Ennemies 1 et 2
-	Projectiles
-	Vagues
-	Arme
-	Frappe du joueur
+Changelog 6:
+	Corrections diverses
+	Amélioration IA
+	Ennemies 3 et 4?
+	Transition vagues
+	Niveaux 1, 2 et 3
+	Menu et sélections niveau
 """
 
 import pygame
 import random
 
 
-# ========== OBJETS ==========
+# ============================== OBJETS ==============================
 
 from gl0bals import *
 from levels import *
@@ -23,18 +23,37 @@ from entity import *
 from player import *
 from enemy1 import *
 from enemy2 import *
+from enemy3 import *
 from weapon import *
 from projectile import *
 
-# ========== INITIALISATION ==========
+# ============================== INITIALISATION ==============================
 
 pygame.init()
 
-# FENETRE
+
+# ========== FENETRE
+
 screen = Screen()
 
-# NIVEAU
-TAB = Levels.TAB5 # tableau de 1 et 0 du niveau, cf envirronements.py
+
+# ========== NIVEAU
+
+# selection du niveau
+if Globals.level == 0:
+	from level0 import *
+	level = Level0()
+elif Globals.level == 2: # /!\ n'existe pas
+	from level2 import *
+	level = Level2()
+elif Globals.level == 3: # /!\ n'existe pas
+	from level3 import *
+	level = Level3()
+
+TAB = level.TAB # tableau de 1 et 0 du niveau
+player = level.player # initialisation du joueur
+weapon = level.weapon # initialisation de l'arme
+
 # créer tout les blocs de l'environnement
 for i in range(0,len(TAB)):
 	for j in range(0,len(TAB[0])):
@@ -42,83 +61,34 @@ for i in range(0,len(TAB)):
 			# est ajouté à la liste de tout les blocs
 			Globals.blocks.append( Block( (j * Globals.RATIO , i * Globals.RATIO) ) )
 
-# VAGUES
-def Wave1():
 
-	global player, weapon
+# ========== TEXTE
 
-	# JOUEUR
-	player = Player(19.0, 17.0)
+pygame.font.init()
+FONT = pygame.font.SysFont("", 30)
 
-	# ENNEMIES
-	Enemy1(16.0, 33.0)
-	Enemy1(18.0, 33.0)
-	Enemy1(20.0, 33.0)
-	Enemy1(22.0, 33.0)
-	Enemy1(24.0, 33.0)
-	Enemy2(35.0, 32.0)
 
-	# ARME
-	weapon = Weapon(44.0, 16.0)
+# ========== MUSIQUE
 
-def Wave2():
-
-	global player, weapon
-
-	# JOUEUR
-	player.weaponized = False
-	player.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
-							pygame.image.load("./ressources/goodoo_white/2.png") ]
-	player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
-							pygame.image.load("./ressources/goodoo_white/4.png") ]
-
-	# ENNEMIES
-	Enemy2(20.0, 32.0)
-	Enemy2(24.0, 32.0)
-	Enemy2(28.0, 32.0)
-	Enemy2(32.0, 32.0)
-	Enemy2(36.0, 32.0)
-	Enemy2(40.0, 32.0)
-
-	# ARME
-	weapon = Weapon(19.0, 16.0)
-
-def Wave3():
-
-	global player, weapon
-
-	# JOUEUR
-	player.weaponized = False
-	player.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
-							pygame.image.load("./ressources/goodoo_white/2.png") ]
-	player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
-							pygame.image.load("./ressources/goodoo_white/4.png") ]
-
-	# ENNEMIES
-	Enemy2(37.0, 5.0)
-	Enemy2(42.0, 32.0)
-	Enemy2(28.0, 32.0)
-	Enemy2(32.0, 32.0)
-	Enemy2(46.0, 3.0)
-	Enemy2(11.0, 1.0)
-
-	# ARME
-	weapon = Weapon(47.0, 3.0)
-
-# MUSIQUE
 #pygame.mixer.music.load("./ressources/music/S.Rachmaninov - prelude op 23 no 5.wav")
 
-# HORLOGE
+
+# ========== HORLOGE
+
 clock = pygame.time.Clock()
 
 
-# ========== CORPS ==========
+# ============================== CORPS ==============================
 
 #pygame.mixer.music.play()
 over = False
 launched = True
 wave = 1
-Wave1()
+
+# première vague
+level.Wave1()
+player = level.player
+weapon = level.weapon
 
 while launched:
 
@@ -149,21 +119,40 @@ while launched:
 		screen.fullscreen = False
 
 
-	# ========== ENNEMIES (GLOBAL)
-
-	for enemy in Globals.enemies:
-		if enemy.killed:
-			del Globals.enemies[Globals.enemies.index(enemy)]
-
-
 	# ========== VAGUES
 
 	if wave == 1 and Globals.enemies == []:
 		wave = 2
-		Wave2()
+		level.Wave2()
+		player = level.player
+		weapon = level.weapon
+
 	elif wave == 2 and Globals.enemies == []:
 		wave = 3
-		Wave3()
+		level.Wave3()
+		player = level.player
+		weapon = level.weapon
+
+
+	# ========== ENNEMIES (GLOBAL)
+
+	for enemy in Globals.enemies:
+
+		if player.rect.colliderect(enemy.rect):
+			over = True
+
+		if enemy.killed or enemy.rect.top > screen.resolution[1]:
+
+			del Globals.enemies[Globals.enemies.index(enemy)]
+
+			if enemy in Globals.enemies1:
+				del Globals.enemies1[Globals.enemies1.index(enemy)]
+
+			elif enemy in Globals.enemies2:
+				del Globals.enemies2[Globals.enemies2.index(enemy)]
+
+			elif enemy in Globals.enemies3:
+				del Globals.enemies3[Globals.enemies3.index(enemy)]
 
 
 	# ========== ENNEMIES 1
@@ -210,14 +199,13 @@ while launched:
 
 		# tir
 		if Globals.counter%180 == 0 and not enemy.killed:
-			Projectile(enemy.rect.x, enemy.rect.y, player.rect.x + 0.5*Globals.RATIO, player.rect.y + 1.0*Globals.RATIO)
+			Projectile(enemy.rect.x, enemy.rect.y, player.rect.x, player.rect.y + 1.0*Globals.RATIO)
 
 
 	#=========== PROJECTILES
 
 	for projectile in Globals.projectiles:
 		projectile.move_single_axis()
-		projectile.animation()
 		if projectile.rect.x > screen.resolution[0] or projectile.rect.x < 0 or projectile.rect.y < 0 or projectile.rect.y > screen.resolution[1]:
 			del Globals.projectiles[Globals.projectiles.index(projectile)]
 
@@ -261,6 +249,7 @@ while launched:
 
 	# ========== ARME
 
+	# changement d'apparence du joueur
 	if player.rect.colliderect(weapon.rect) and not player.weaponized:
 		player.weaponized = True
 		player.sprites_right = [ pygame.image.load("./ressources/goodoo_gold/1.png"),
@@ -269,22 +258,16 @@ while launched:
 								pygame.image.load("./ressources/goodoo_gold/4.png") ]
 
 
-	# ========== GAME OVER
-
-	for enemy in Globals.enemies:
-		if player.rect.colliderect(enemy.rect):
-			over = True
-
-
 	# ========== DESSIN DES SURFACES
 
 	# fond
 	screen.surface.fill(Globals.BLACK)
+	#screen.surface.blit(screen.sprite, (0,0)) # /!\ Chute de fps
 
 
 	# blocs
 	for block in Globals.blocks:
-		pygame.draw.rect(screen.surface, Globals.WHITE, block.rect)
+		pygame.draw.rect(screen.surface, Globals.WHITE, block.rect) # hitbox
 		#screen.surface.blit(block.sprite, (block.rect.x, block.rect.y) )
 
 
@@ -292,32 +275,39 @@ while launched:
 	for enemy in Globals.enemies:
 		if not enemy.killed :
 			enemy.animation(enemy.last_move)
-			screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
 			#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
+			screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
 
 
 	# arme
 	if not player.weaponized:
-		screen.surface.blit(weapon.sprite, (weapon.rect.x, weapon.rect.y) )
 		#pygame.draw.rect(screen.surface, Globals.YELLOW, weapon.rect) # hitbox
+		screen.surface.blit(weapon.sprite, (weapon.rect.x, weapon.rect.y) )
 
 
 	# joueur
 	player.animation(player.last_move)
+	#pygame.draw.rect(screen.surface, Globals.RED, player.rect) # hitbox
 	screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
 	#pygame.draw.rect(screen.surface, Globals.PURPLE, player.blockcollide) # bloc de collision
-	#pygame.draw.rect(screen.surface, Globals.RED, player.rect) # hitbox
 
+
+	# arme
 	if player.cooldown == player.COOLDOWN and player.last_move == "right":
 		screen.surface.blit(player.hit_sprite_right, (player.rect.x, player.rect.y - Globals.RATIO) )
-
 	elif player.cooldown == player.COOLDOWN and player.last_move == "left":
 		screen.surface.blit(player.hit_sprite_left, (player.rect.x - Globals.RATIO, player.rect.y - Globals.RATIO) )
 
+
 	#projectiles
 	for projectile in Globals.projectiles:
+		projectile.animation()
 		#pygame.draw.rect(screen.surface, Globals.RED, projectile.rect) # hitbox
 		screen.surface.blit(projectile.sprite, (projectile.rect.x, projectile.rect.y) )
+
+	#texte
+	fps_text = FONT.render(f"{ int(clock.get_fps()) } FPS", False, Globals.RED)
+	screen.surface.blit(fps_text, (0, 0) )
 
 
 	# actualisation de l'écran

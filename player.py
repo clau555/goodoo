@@ -31,33 +31,17 @@ class Player(Entity):
 	def hit(self):
 
 		self.cooldown = 30
+		decalage = 0.3*Globals.RATIO
 
 		# oriente la zone de frappe
 		if self.last_move=="right" :
-			self.hit_rect = pygame.Rect((self.rect.x, self.rect.y - Globals.RATIO), (2*self.width, 2*self.height))
+			self.hit_rect = pygame.Rect((self.rect.x, self.rect.y - Globals.RATIO), (2*self.width + decalage, 2*self.height))
 
 		elif self.last_move=="left" :
-			self.hit_rect = pygame.Rect((self.rect.x - Globals.RATIO, self.rect.y - Globals.RATIO), (2*self.width, 2*self.height))
+			self.hit_rect = pygame.Rect((self.rect.x - Globals.RATIO - decalage, self.rect.y - Globals.RATIO), (2*self.width + decalage, 2*self.height))
 		
 		# tue les ennemies dans la zone
 		for enemy in Globals.enemies:
 
 			if self.hit_rect.colliderect(enemy.rect):
 				enemy.killed = True
-	"""
-	def hit_animation(self, last_move):
-
-		# passe au sprite suivant toute les 2 images
-		if Globals.counter%2 == 0:
-			self.animation_counter += 1
-		# revient au premier sprite une fois le 2e sprite passé
-		if self.animation_counter >= len(self.sprites_right):
-			self.animation_counter = 0
-
-		# oriente le sprite
-		if last_move=="right" :
-			self.sprite = self.sprites_right[self.animation_counter]
-
-		elif last_move=="left" :
-			self.sprite = self.sprites_left[self.animation_counter]
-	"""

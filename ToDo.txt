@@ -9,8 +9,8 @@ Joueur
  Contrôles				V
  Limites bords 				V
 
-Environnement
- Dessin(s)
+Tableau
+ blocks					V
 
 Physique
  Collision joueur/Environnement		V
@@ -25,10 +25,11 @@ Ennemis
  Enemy4 ?
 
 Programmation niveau
- Spawn ennemies
+ Spawn ennemies				V
+  Transition
  Game Over
- Objet arme
- Joueur frapper
+ Objet arme				V
+ Joueur frapper				V
  Différents niveau
 
 Menu
@@ -40,4 +41,10 @@ Menu
 Son
  Joueur
  Ennemies
+ Sons
+
+Si on a le temps
  Musique
+ Animations
+ Blocks de différents type
+ Dessin(s) intangibles
