@@ -201,6 +201,35 @@ while launched:
 		if Globals.counter%180 == 0 and not enemy.killed:
 			Projectile(enemy.rect.x, enemy.rect.y, player.rect.x, player.rect.y + 1.0*Globals.RATIO)
 
+	# ========== ENNEMIES 3
+
+	for enemy in Globals.enemies3:
+
+		# tir
+		if Globals.counter%180 == 0 and not enemy.killed:
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y)
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width/2, enemy.rect.y)
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y)
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width/2)
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width)
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width /2, enemy.rect.y + enemy.width)
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width)
+			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width/2)
+		if (player.rect.top <= enemy.rect.top and player.rect.top >= enemy.rect.bottom) or (player.rect.bottom <= enemy.rect.top and player.rect.top >= enemy.rect.bottom):
+				if ((player.rect.left +player.width/2) <= enemy.rect.left):
+					Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width/2)
+				else:
+					Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width/2)
+
+
+ 
+
+
+
+
+
+
+
 
 	#=========== PROJECTILES
 
