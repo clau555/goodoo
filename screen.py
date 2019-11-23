@@ -5,7 +5,7 @@ class Screen():
 
 	def __init__(self):
 
-		self.resolution = Globals.resolution
+		self.resolution = Globals.RESOLUTION
 		self.surface = pygame.display.set_mode((self.resolution))
 		self.fullscreen = False
 		self.icon = pygame.image.load("ressources/icon.jpg")

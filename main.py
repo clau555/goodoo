@@ -2,11 +2,11 @@
 -- EN COURS
 Changelog 6:
 	Corrections diverses
-	Amélioration IA
+	Transition entre les vagues
 	Ennemies 3 et 4?
-	Transition vagues
-	Niveaux 1, 2 et 3
-	Menu et sélections niveau
+	Amélioration IA
+	Setup niveaux 1, 2 et 3
+	Menu et sélection des niveaux
 """
 
 import pygame
@@ -26,6 +26,7 @@ from enemy2 import *
 from enemy3 import *
 from weapon import *
 from projectile import *
+from mist import *
 
 # ============================== INITIALISATION ==============================
 
@@ -68,10 +69,10 @@ pygame.font.init()
 FONT = pygame.font.SysFont("", 30)
 
 
-# ========== MUSIQUE
+# ========== MUSIQUE / SON
 
 #pygame.mixer.music.load("./ressources/music/S.Rachmaninov - prelude op 23 no 5.wav")
-
+#sound_pickup = pygame.mixer.Sound("./ressources/sounds/pickup.wav")
 
 # ========== HORLOGE
 
@@ -80,15 +81,16 @@ clock = pygame.time.Clock()
 
 # ============================== CORPS ==============================
 
+pygame.mixer.init()
 #pygame.mixer.music.play()
 over = False
 launched = True
-wave = 1
+wave = 0
 
-# première vague
-level.Wave1()
+# init du joueur
 player = level.player
-weapon = level.weapon
+
+Mist(28.0, 6.0)
 
 while launched:
 
@@ -121,17 +123,47 @@ while launched:
 
 	# ========== VAGUES
 
-	if wave == 1 and Globals.enemies == []:
-		wave = 2
-		level.Wave2()
-		player = level.player
-		weapon = level.weapon
+	if wave == 0 :
+		Globals.transition -= 1
+		# ne s'execute qu'une fois au début
+		if Globals.transition == Globals.TRANSITION -1:
+			level.pre_wave1()
+		# initialisation de la prochaine vague
+		if Globals.transition == 0:
+			wave = 1
+			level.wave1()
+			player = level.player
+			weapon = level.weapon
+			Globals.mists = []
+			Globals.transition = Globals.TRANSITION
+
+	elif wave == 1 and Globals.enemies == []:
+		Globals.transition -= 1
+		# ne s'execute qu'une fois au début
+		if Globals.transition == Globals.TRANSITION -1:
+			level.pre_wave2()
+		# initialisation de la prochaine vague
+		if Globals.transition == 0:
+			wave = 2
+			level.wave2()
+			player = level.player
+			weapon = level.weapon
+			Globals.mists = []
+			Globals.transition = Globals.TRANSITION
 
 	elif wave == 2 and Globals.enemies == []:
-		wave = 3
-		level.Wave3()
-		player = level.player
-		weapon = level.weapon
+		Globals.transition -= 1
+		# ne s'execute qu'une fois au début
+		if Globals.transition == Globals.TRANSITION -1:
+			level.pre_wave3()
+		# initialisation de la prochaine vague
+		if Globals.transition == 0:
+			wave = 3
+			level.wave3()
+			player = level.player
+			weapon = level.weapon
+			Globals.mists = []
+			Globals.transition = Globals.TRANSITION
 
 
 	# ========== ENNEMIES (GLOBAL)
@@ -199,43 +231,41 @@ while launched:
 
 		# tir
 		if Globals.counter%180 == 0 and not enemy.killed:
-			Projectile(enemy.rect.x, enemy.rect.y, player.rect.x, player.rect.y + 1.0*Globals.RATIO)
+			Projectile(enemy.rect.x, enemy.rect.y, player.rect.x + player.width/2, player.rect.y + player.height/2)
+
 
 	# ========== ENNEMIES 3
 
 	for enemy in Globals.enemies3:
 
-		# tir
-		if Globals.counter%180 == 0 and not enemy.killed:
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y)
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width/2, enemy.rect.y)
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y)
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width/2)
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width)
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width /2, enemy.rect.y + enemy.width)
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width)
-			Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width/2)
-		if (player.rect.top <= enemy.rect.top and player.rect.top >= enemy.rect.bottom) or (player.rect.bottom <= enemy.rect.top and player.rect.top >= enemy.rect.bottom):
-				if ((player.rect.left +player.width/2) <= enemy.rect.left):
+		if not enemy.killed:
+			# tir horizontal
+			if Globals.counter%40 == 0 and player.rect.top >= enemy.rect.top and player.rect.bottom <= enemy.rect.bottom:
+				# tir à gauche
+				if (player.rect.right <= enemy.rect.left):
 					Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width/2)
-				else:
+				# tir à droite
+				elif (player.rect.left >= enemy.rect.right):
 					Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width/2)
+			# tir polydirectionnel
+			elif Globals.counter%180 == 0:
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y)
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width/2, enemy.rect.y)
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y)
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width/2)
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width, enemy.rect.y + enemy.width)
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x + enemy.width /2, enemy.rect.y + enemy.width)
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width)
+				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width/2)
 
 
- 
-
-
-
-
-
-
-
-
-	#=========== PROJECTILES
+	# ========== PROJECTILES
 
 	for projectile in Globals.projectiles:
+		# déplacement
 		projectile.move_single_axis()
-		if projectile.rect.x > screen.resolution[0] or projectile.rect.x < 0 or projectile.rect.y < 0 or projectile.rect.y > screen.resolution[1]:
+		# out of bounds
+		if projectile.rect.left > screen.resolution[0] or projectile.rect.right < 0 or projectile.rect.bottom < 0 or projectile.rect.top > screen.resolution[1]:
 			del Globals.projectiles[Globals.projectiles.index(projectile)]
 
 
@@ -268,7 +298,7 @@ while launched:
 	if not player.isjump:
 		player.gravity()
 
-	# taper
+	# frappe
 	if player.weaponized and keys[pygame.K_x] and player.cooldown == 0:
 		player.hit()
 		player.cooldown = player.COOLDOWN + 1
@@ -279,7 +309,7 @@ while launched:
 	# ========== ARME
 
 	# changement d'apparence du joueur
-	if player.rect.colliderect(weapon.rect) and not player.weaponized:
+	if weapon != None and player.rect.colliderect(weapon.rect) and not player.weaponized:
 		player.weaponized = True
 		player.sprites_right = [ pygame.image.load("./ressources/goodoo_gold/1.png"),
 								pygame.image.load("./ressources/goodoo_gold/2.png") ]
@@ -301,7 +331,17 @@ while launched:
 
 
 	# ennemis
-	for enemy in Globals.enemies:
+	for enemy in Globals.enemies3:
+		if not enemy.killed :
+			enemy.animation(enemy.last_move)
+			#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
+			screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
+	for enemy in Globals.enemies2:
+		if not enemy.killed :
+			enemy.animation(enemy.last_move)
+			#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
+			screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
+	for enemy in Globals.enemies1:
 		if not enemy.killed :
 			enemy.animation(enemy.last_move)
 			#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
@@ -309,9 +349,15 @@ while launched:
 
 
 	# arme
-	if not player.weaponized:
+	if weapon != None and not player.weaponized:
 		#pygame.draw.rect(screen.surface, Globals.YELLOW, weapon.rect) # hitbox
 		screen.surface.blit(weapon.sprite, (weapon.rect.x, weapon.rect.y) )
+
+	# brouillard
+	for mist in Globals.mists:
+		mist.animation()
+		#pygame.draw.rect(screen.surface, Globals.PURPLE, mist.rect) # hitbox
+		screen.surface.blit(mist.sprite, (mist.rect.x, mist.rect.y) )
 
 
 	# joueur
@@ -321,7 +367,7 @@ while launched:
 	#pygame.draw.rect(screen.surface, Globals.PURPLE, player.blockcollide) # bloc de collision
 
 
-	# arme
+	# frappe
 	if player.cooldown == player.COOLDOWN and player.last_move == "right":
 		screen.surface.blit(player.hit_sprite_right, (player.rect.x, player.rect.y - Globals.RATIO) )
 	elif player.cooldown == player.COOLDOWN and player.last_move == "left":
@@ -335,7 +381,7 @@ while launched:
 		screen.surface.blit(projectile.sprite, (projectile.rect.x, projectile.rect.y) )
 
 	#texte
-	fps_text = FONT.render(f"{ int(clock.get_fps()) } FPS", False, Globals.RED)
+	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.RED)
 	screen.surface.blit(fps_text, (0, 0) )
 
 

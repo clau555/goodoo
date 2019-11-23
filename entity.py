@@ -80,8 +80,8 @@ class Entity:
 		# out of bounds
 		if self.rect.left <= 0:
 			self.rect.left = 0
-		elif self.rect.right >= Globals.resolution[0]:
-			self.rect.right = Globals.resolution[0]
+		elif self.rect.right >= Globals.RESOLUTION[0]:
+			self.rect.right = Globals.RESOLUTION[0]
 
 
 

@@ -2,8 +2,8 @@ class Globals:
 
 	RATIO = 20 # ratio écran / grille
 	FPS = 60 # images/boucles par seconde
+	RESOLUTION = (1280,720)
 	counter = 0 # compteur de boucle
-	resolution = (1280,720)
 
 	# COULEURS
 	WHITE = (255,255,255)
@@ -26,5 +26,10 @@ class Globals:
 	enemies3 = [] # liste des ennemies de type 3
 	enemies = [] # liste de tout les ennemies
 
-	#PROJECTILES
+	# PROJECTILES
 	projectiles = [] # liste de tous les projectiles
+
+	# BROUILLARD
+	TRANSITION = 60 # attente entre deux vagues (en image/sec)
+	transition = TRANSITION # compteur entre deux vagues
+	mists = []

@@ -4,6 +4,7 @@ from weapon import *
 from enemy1 import *
 from enemy2 import *
 from enemy3 import *
+from mist import *
 
 # ========== VAGUES
 
@@ -51,11 +52,22 @@ class Level0:
 		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 		]
 
-	def Wave1(self):
+	def pre_wave1(self):
+
+		Mist(16.0, 33.0)
+		Mist(18.0, 33.0)
+		Mist(20.0, 33.0)
+		Mist(22.0, 33.0)
+		Mist(24.0, 33.0)
+		Mist(35.0, 32.0)
+		Mist(33.0, 27.0)
+
+
+	def wave1(self):
 		# JOUEUR
-		self.player = Player(19.0, 17.0)
+		self.player.weaponized = False
 		# ARME
-		self.weapon = Weapon(44.0, 16.0)
+		self.weapon = Weapon(30.0, 32.0)
 		# ENNEMIES
 		Enemy1(16.0, 33.0)
 		Enemy1(18.0, 33.0)
@@ -66,7 +78,13 @@ class Level0:
 		Enemy3(33.0, 27.0)
 
 
-	def Wave2(self):
+	def pre_wave2(self):
+
+		for i in range(0,50):
+			Mist(i, 0.0)
+
+
+	def wave2(self):
 		# JOUEUR
 		self.player.weaponized = False
 		self.player.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
@@ -80,7 +98,17 @@ class Level0:
 			Enemy2(i, 0.0)
 
 
-	def Wave3(self):
+	def pre_wave3(self):
+
+		Mist(37.0, 5.0)
+		Mist(42.0, 32.0)
+		Mist(28.0, 32.0)
+		Mist(32.0, 32.0)
+		Mist(46.0, 3.0)
+		Mist(11.0, 1.0)
+
+
+	def wave3(self):
 		# JOUEUR
 		self.player.weaponized = False
 		self.player.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
@@ -88,7 +116,7 @@ class Level0:
 		self.player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
 								pygame.image.load("./ressources/goodoo_white/4.png") ]
 		# ARME
-		self.weapon = Weapon(47.0, 3.0)
+		self.weapon = Weapon(4.0, 4.0)
 		# ENNEMIES
 		Enemy2(37.0, 5.0)
 		Enemy2(42.0, 32.0)

@@ -24,13 +24,12 @@ class Player(Entity):
 		self.hit_rect = None
 		self.hit_sprite_right = pygame.image.load("./ressources/hit/1.png")
 		self.hit_sprite_left = pygame.image.load("./ressources/hit/2.png")
-		self.cooldown = 0
 		self.COOLDOWN = 10
+		self.cooldown = 0
 
 
 	def hit(self):
 
-		self.cooldown = 30
 		decalage = 0.3*Globals.RATIO
 
 		# oriente la zone de frappe
