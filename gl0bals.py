@@ -30,6 +30,6 @@ class Globals:
 	projectiles = [] # liste de tous les projectiles
 
 	# BROUILLARD
-	TRANSITION = 60 # attente entre deux vagues (en image/sec)
+	TRANSITION = 120 # attente entre deux vagues (en image/sec)
 	transition = TRANSITION # compteur entre deux vagues
 	mists = []

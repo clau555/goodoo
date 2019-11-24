@@ -90,8 +90,6 @@ wave = 0
 # init du joueur
 player = level.player
 
-Mist(28.0, 6.0)
-
 while launched:
 
 
@@ -123,48 +121,20 @@ while launched:
 
 	# ========== VAGUES
 
-	if wave == 0 :
-		Globals.transition -= 1
-		# ne s'execute qu'une fois au début
-		if Globals.transition == Globals.TRANSITION -1:
-			level.pre_wave1()
-		# initialisation de la prochaine vague
-		if Globals.transition == 0:
-			wave = 1
-			level.wave1()
-			player = level.player
-			weapon = level.weapon
-			Globals.mists = []
-			Globals.transition = Globals.TRANSITION
-
-	elif wave == 1 and Globals.enemies == []:
-		Globals.transition -= 1
-		# ne s'execute qu'une fois au début
-		if Globals.transition == Globals.TRANSITION -1:
-			level.pre_wave2()
-		# initialisation de la prochaine vague
-		if Globals.transition == 0:
-			wave = 2
-			level.wave2()
-			player = level.player
-			weapon = level.weapon
-			Globals.mists = []
-			Globals.transition = Globals.TRANSITION
-
-	elif wave == 2 and Globals.enemies == []:
-		Globals.transition -= 1
-		# ne s'execute qu'une fois au début
-		if Globals.transition == Globals.TRANSITION -1:
-			level.pre_wave3()
-		# initialisation de la prochaine vague
-		if Globals.transition == 0:
-			wave = 3
-			level.wave3()
-			player = level.player
-			weapon = level.weapon
-			Globals.mists = []
-			Globals.transition = Globals.TRANSITION
-
+	for i in range(0, len(level.waves)):
+		if wave == i and Globals.enemies == []:
+			Globals.transition -= 1
+			# ne s'execute qu'une fois au début
+			if Globals.transition == Globals.TRANSITION -1:
+				level.pre_waves[i](level)
+			# initialisation de la prochaine vague
+			if Globals.transition == 0:
+				wave = i+1
+				level.waves[i](level)
+				player = level.player
+				weapon = level.weapon
+				Globals.mists = []
+				Globals.transition = Globals.TRANSITION
 
 	# ========== ENNEMIES (GLOBAL)
 
