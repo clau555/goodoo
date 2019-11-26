@@ -28,12 +28,11 @@ class Player(Entity):
 		self.COOLDOWN = 10 # temps de recharge d'une frappe
 		self.cooldown_counter = 0
 
-		self.HEART = 3 # barre de vie
+		self.HEART = 5 # barre de vie
 		self.heart = self.HEART
 		self.INVINCIBLE = 320 # temps d'invicibilité après être touché
 		self.invincible_counter = 0
 		self.hurted = False # vrai si touché
-		self.life = 5 # nombre de vie restante
 
 
 	def hit(self):

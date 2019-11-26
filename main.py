@@ -97,7 +97,7 @@ while launched:
 	# ======================================== EVENTS
 
 	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
+		if event.type == pygame.QUIT or over:
 			launched = False
 	
 
@@ -124,7 +124,7 @@ while launched:
 
 	for i in range(0, len(level.waves)):
 		# début de la transition
-		if wave == i and Globals.enemies == [] or over:
+		if wave == i and Globals.enemies == []:
 			Globals.transition -= 1
 			weapon = None
 			player.weaponized = False
@@ -145,11 +145,12 @@ while launched:
 
 	for enemy in Globals.enemies:
 
-		# over
+		# joueur touché
 		if player.rect.colliderect(enemy.rect) and not player.hurted:
 			player.heart -= 1
 			player.hurted = True
 			player.invincible_counter = player.INVINCIBLE
+			# game over
 			if player.heart == 0:
 				over = True
 				player.heart = player.HEART
@@ -175,11 +176,11 @@ while launched:
 
 		# déplacement gauche
 		if enemy.rect.x > player.rect.x:
-			enemy.move(-random.uniform(0.05, 0.2), 0) # vitesse aléatoire
+			enemy.move(-random.uniform(0.05, 0.1), 0) # vitesse aléatoire
 
 		# déplacement droit
 		if enemy.rect.x < player.rect.x:
-			enemy.move(random.uniform(0.05, 0.2), 0) # vitesse aléatoire
+			enemy.move(random.uniform(0.05, 0.1), 0) # vitesse aléatoire
 
 		# saut
 		if enemy.onground and not enemy.isjump:
@@ -313,21 +314,9 @@ while launched:
 
 	# ======================================== GAME OVER
 
-	# défaite d'une vague
-	if over:
-		Globals.enemies = []
-		Globals.enemies1 = []
-		Globals.enemies2 = []
-		Globals.enemies3 = []
-		player.rect.x = player.x
-		player.rect.y = player.y
-		player.life -= 1
-		wave -= 1
-		over = False
-
 	# défaite d'un niveau
-	if player.life <= 0:
-		game_over = True
+	if player.heart <= 0:
+		over = True
 		# écran de game over
 
 
@@ -400,12 +389,10 @@ while launched:
 	#texte
 	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.RED)
 	wave_text = FONT.render(f"WAVE : { wave }", False, Globals.RED)
-	life_text = FONT.render(f"LIFE : { player.life }", False, Globals.RED)
 	heart_text = FONT.render(f"HEART : { player.heart }", False, Globals.RED)
 	screen.surface.blit(fps_text, (5, 5) )
 	screen.surface.blit(wave_text, (5, 30) )
-	screen.surface.blit(life_text, (5, 55) )
-	screen.surface.blit(heart_text, (5, 80) )
+	screen.surface.blit(heart_text, (5, 55) )
 
 
 	# actualisation de l'écran
