@@ -44,6 +44,12 @@ Menu
  Ecran Game Over
   Retour sélection
 
+Game Over
+ Chronomètre
+ donne écran de Game Over
+  Quand vie = 0
+  Quand chronomètre = 0
+
 Confort
  Popup indicatifs
  Chronomètre de vague

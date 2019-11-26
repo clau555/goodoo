@@ -54,6 +54,8 @@ class Level1:
 		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 		]
 
+		# ==================== VAGUE 1
+
 		def pre_wave1(self):
 
 			Mist(50.0, 30.0)
@@ -67,6 +69,8 @@ class Level1:
 			# ENNEMIES
 			Enemy1(50.0, 30.0)
 
+
+		# ==================== VAGUE 2
 
 		def pre_wave2(self):
 
@@ -89,6 +93,8 @@ class Level1:
 			Enemy1(31.0, 32.0)
 			Enemy1(34.0, 32.0)
 
+
+		# ==================== VAGUE 3
 
 		def pre_wave3(self):
 
@@ -116,6 +122,9 @@ class Level1:
 			Enemy1(32.0, 32.0)
 			Enemy1(46.0, 3.0)
 			Enemy1(11.0, 1.0)
+
+
+		# ==================== REPERTOIRE DES FONCTIONS
 
 		self.pre_waves = [ pre_wave1, pre_wave2, pre_wave3 ]
 		self.waves = [ wave1, wave2, wave3 ]

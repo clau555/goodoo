@@ -3,10 +3,11 @@
 Changelog 6:
 	Corrections diverses
 	Transition entre les vagues
-	Ennemies 3 et 4?
-	Amélioration IA
-	Setup niveaux 1, 2 et 3
 	Menu et sélection des niveaux
+	Game over
+	Setup niveaux 1, 2 et 3
+	Amélioration IA
+	Ennemies 3 et 4?
 """
 
 import pygame
@@ -16,7 +17,6 @@ import random
 # ============================== OBJETS ==============================
 
 from gl0bals import *
-from levels import *
 from screen import *
 from block import *
 from entity import *
@@ -40,7 +40,7 @@ screen = Screen()
 
 # ========== NIVEAU
 
-# selection du niveau
+# séléction du niveau
 if Globals.level == 0:
 	from level0 import *
 	level = Level0()
@@ -83,12 +83,13 @@ clock = pygame.time.Clock()
 
 pygame.mixer.init()
 #pygame.mixer.music.play()
-over = False
-launched = True
-wave = 0
 
-# init du joueur
-player = level.player
+# variables globales
+game_over = False
+over = False
+wave = 0
+launched = True
+
 
 while launched:
 
@@ -122,11 +123,12 @@ while launched:
 	# ======================================== VAGUES
 
 	for i in range(0, len(level.waves)):
+		# début de la transition
 		if wave == i and Globals.enemies == [] or over:
 			Globals.transition -= 1
 			weapon = None
 			player.weaponized = False
-			# ne s'execute qu'une fois au début
+			# brouillard indicateur des positions ennemies
 			if Globals.transition == Globals.TRANSITION -1:
 				level.pre_waves[i](level)
 			# initialisation de la prochaine vague
@@ -144,9 +146,13 @@ while launched:
 	for enemy in Globals.enemies:
 
 		# over
-		if player.rect.colliderect(enemy.rect):
-			over = True
-
+		if player.rect.colliderect(enemy.rect) and not player.hurted:
+			player.heart -= 1
+			player.hurted = True
+			player.invincible_counter = player.INVINCIBLE
+			if player.heart == 0:
+				over = True
+				player.heart = player.HEART
 
 		# out of bounds
 		if enemy.killed or enemy.rect.top > screen.resolution[1]:
@@ -247,7 +253,7 @@ while launched:
 
 	# ======================================== JOUEUR
 
-	# out of bound
+	# out of bounds
 	if player.rect.y > screen.resolution[1]:
 		launched = False
 
@@ -275,17 +281,23 @@ while launched:
 		player.gravity()
 
 	# frappe
-	if player.weaponized and keys[pygame.K_x] and player.cooldown == 0:
+	if player.weaponized and keys[pygame.K_x] and player.cooldown_counter == 0:
 		player.hit()
-		player.cooldown = player.COOLDOWN + 1
-	if player.cooldown != 0:
-		player.cooldown -= 1
+		player.cooldown_counter = player.COOLDOWN + 1
+	if player.cooldown_counter > 0:
+		player.cooldown_counter -= 1
 
+	# touché
+	if player.hurted and player.invincible_counter > 0:
+		player.invincible_counter -= 1
+	elif player.hurted and player.invincible_counter == 0:
+		player.hurted = False
 
 	# ======================================== ARME
 
 	if weapon != None and player.rect.colliderect(weapon.rect):
 		player.weaponized = True
+
 	# changement d'apparence du joueur
 	if player.weaponized:
 		player.sprites_right = [ pygame.image.load("./ressources/goodoo_gold/1.png"),
@@ -301,6 +313,7 @@ while launched:
 
 	# ======================================== GAME OVER
 
+	# défaite d'une vague
 	if over:
 		Globals.enemies = []
 		Globals.enemies1 = []
@@ -312,6 +325,7 @@ while launched:
 		wave -= 1
 		over = False
 
+	# défaite d'un niveau
 	if player.life <= 0:
 		game_over = True
 		# écran de game over
@@ -363,14 +377,17 @@ while launched:
 	# joueur
 	player.animation(player.last_move)
 	#pygame.draw.rect(screen.surface, Globals.RED, player.rect) # hitbox
-	screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
+	if not player.hurted:
+		screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
+	elif player.hurted and Globals.counter%5 == 0:
+		screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
 	#pygame.draw.rect(screen.surface, Globals.PURPLE, player.blockcollide) # bloc de collision
 
 
 	# frappe
-	if player.cooldown == player.COOLDOWN and player.last_move == "right":
+	if player.cooldown_counter == player.COOLDOWN and player.last_move == "right":
 		screen.surface.blit(player.hit_sprite_right, (player.rect.x, player.rect.y - Globals.RATIO) )
-	elif player.cooldown == player.COOLDOWN and player.last_move == "left":
+	elif player.cooldown_counter == player.COOLDOWN and player.last_move == "left":
 		screen.surface.blit(player.hit_sprite_left, (player.rect.x - Globals.RATIO, player.rect.y - Globals.RATIO) )
 
 
@@ -384,9 +401,11 @@ while launched:
 	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.RED)
 	wave_text = FONT.render(f"WAVE : { wave }", False, Globals.RED)
 	life_text = FONT.render(f"LIFE : { player.life }", False, Globals.RED)
+	heart_text = FONT.render(f"HEART : { player.heart }", False, Globals.RED)
 	screen.surface.blit(fps_text, (5, 5) )
 	screen.surface.blit(wave_text, (5, 30) )
 	screen.surface.blit(life_text, (5, 55) )
+	screen.surface.blit(heart_text, (5, 80) )
 
 
 	# actualisation de l'écran

@@ -20,13 +20,20 @@ class Player(Entity):
 						[ pygame.image.load("./ressources/goodoo_white/3.png"), pygame.image.load("./ressources/goodoo_white/4.png") ] # sprites de gauche
 						)
 
-		self.weaponized = False
-		self.hit_rect = None
+		self.weaponized = False # vrai si possède l'arme (weapon)
+		self.hit_rect = None # zone de dégât d'une frappe
 		self.hit_sprite_right = pygame.image.load("./ressources/hit/1.png")
 		self.hit_sprite_left = pygame.image.load("./ressources/hit/2.png")
-		self.COOLDOWN = 10
-		self.cooldown = 0
-		self.life = 3
+
+		self.COOLDOWN = 10 # temps de recharge d'une frappe
+		self.cooldown_counter = 0
+
+		self.HEART = 3 # barre de vie
+		self.heart = self.HEART
+		self.INVINCIBLE = 320 # temps d'invicibilité après être touché
+		self.invincible_counter = 0
+		self.hurted = False # vrai si touché
+		self.life = 5 # nombre de vie restante
 
 
 	def hit(self):
