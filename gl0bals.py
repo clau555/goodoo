@@ -17,7 +17,7 @@ class Globals:
 	PURPLE = (255,0,255)
 
 	# NIVEAU
-	level = 0
+	level = 1 # sélectionne le niveau
 	blocks = [] # liste qui stock des blocs de l'environnement
 
 	# ENNEMIES
@@ -30,6 +30,6 @@ class Globals:
 	projectiles = [] # liste de tous les projectiles
 
 	# BROUILLARD
-	TRANSITION = 120 # attente entre deux vagues (en image/sec)
+	TRANSITION = 180 # attente entre deux vagues (en image/sec)
 	transition = TRANSITION # compteur entre deux vagues
 	mists = []

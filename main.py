@@ -44,10 +44,10 @@ screen = Screen()
 if Globals.level == 0:
 	from level0 import *
 	level = Level0()
+elif Globals.level == 1:
+	from level1 import *
+	level = Level1()
 elif Globals.level == 2: # /!\ n'existe pas
-	from level2 import *
-	level = Level2()
-elif Globals.level == 3: # /!\ n'existe pas
 	from level3 import *
 	level = Level3()
 
@@ -66,7 +66,7 @@ for i in range(0,len(TAB)):
 # ========== TEXTE
 
 pygame.font.init()
-FONT = pygame.font.SysFont("", 30)
+FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 15)
 
 
 # ========== MUSIQUE / SON
@@ -93,7 +93,7 @@ player = level.player
 while launched:
 
 
-	# ========== EVENTS
+	# ======================================== EVENTS
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -102,7 +102,7 @@ while launched:
 
 	keys = pygame.key.get_pressed()
 
-	# ========== FENETRE
+	# ======================================== FENETRE
 
 	# quitter
 	if keys[pygame.K_ESCAPE]:
@@ -119,11 +119,13 @@ while launched:
 		screen.fullscreen = False
 
 
-	# ========== VAGUES
+	# ======================================== VAGUES
 
 	for i in range(0, len(level.waves)):
-		if wave == i and Globals.enemies == []:
+		if wave == i and Globals.enemies == [] or over:
 			Globals.transition -= 1
+			weapon = None
+			player.weaponized = False
 			# ne s'execute qu'une fois au début
 			if Globals.transition == Globals.TRANSITION -1:
 				level.pre_waves[i](level)
@@ -136,13 +138,17 @@ while launched:
 				Globals.mists = []
 				Globals.transition = Globals.TRANSITION
 
-	# ========== ENNEMIES (GLOBAL)
+
+	# ======================================== ENNEMIES (GLOBAL)
 
 	for enemy in Globals.enemies:
 
+		# over
 		if player.rect.colliderect(enemy.rect):
 			over = True
 
+
+		# out of bounds
 		if enemy.killed or enemy.rect.top > screen.resolution[1]:
 
 			del Globals.enemies[Globals.enemies.index(enemy)]
@@ -157,7 +163,7 @@ while launched:
 				del Globals.enemies3[Globals.enemies3.index(enemy)]
 
 
-	# ========== ENNEMIES 1
+	# ====================================== ENNEMIES 1
 
 	for enemy in Globals.enemies1:
 
@@ -181,7 +187,7 @@ while launched:
 			enemy.gravity()
 
 
-	# ========== ENNEMIES 2
+	# ======================================== ENNEMIES 2
 
 	for enemy in Globals.enemies2:
 
@@ -204,7 +210,7 @@ while launched:
 			Projectile(enemy.rect.x, enemy.rect.y, player.rect.x + player.width/2, player.rect.y + player.height/2)
 
 
-	# ========== ENNEMIES 3
+	# ====================================== ENNEMIES 3
 
 	for enemy in Globals.enemies3:
 
@@ -229,7 +235,7 @@ while launched:
 				Projectile(enemy.rect.x + enemy.width/2, enemy.rect.y + enemy.width/2, enemy.rect.x, enemy.rect.y + enemy.width/2)
 
 
-	# ========== PROJECTILES
+	# ======================================== PROJECTILES
 
 	for projectile in Globals.projectiles:
 		# déplacement
@@ -239,7 +245,7 @@ while launched:
 			del Globals.projectiles[Globals.projectiles.index(projectile)]
 
 
-	# ========== JOUEUR
+	# ======================================== JOUEUR
 
 	# out of bound
 	if player.rect.y > screen.resolution[1]:
@@ -276,18 +282,42 @@ while launched:
 		player.cooldown -= 1
 
 
-	# ========== ARME
+	# ======================================== ARME
 
-	# changement d'apparence du joueur
-	if weapon != None and player.rect.colliderect(weapon.rect) and not player.weaponized:
+	if weapon != None and player.rect.colliderect(weapon.rect):
 		player.weaponized = True
+	# changement d'apparence du joueur
+	if player.weaponized:
 		player.sprites_right = [ pygame.image.load("./ressources/goodoo_gold/1.png"),
 								pygame.image.load("./ressources/goodoo_gold/2.png") ]
 		player.sprites_left = [ pygame.image.load("./ressources/goodoo_gold/3.png"),
 								pygame.image.load("./ressources/goodoo_gold/4.png") ]
+	else:
+		player.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
+								pygame.image.load("./ressources/goodoo_white/2.png") ]
+		player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
+								pygame.image.load("./ressources/goodoo_white/4.png") ]
 
 
-	# ========== DESSIN DES SURFACES
+	# ======================================== GAME OVER
+
+	if over:
+		Globals.enemies = []
+		Globals.enemies1 = []
+		Globals.enemies2 = []
+		Globals.enemies3 = []
+		player.rect.x = player.x
+		player.rect.y = player.y
+		player.life -= 1
+		wave -= 1
+		over = False
+
+	if player.life <= 0:
+		game_over = True
+		# écran de game over
+
+
+	# ======================================== DESSIN DES SURFACES
 
 	# fond
 	screen.surface.fill(Globals.BLACK)
@@ -352,7 +382,11 @@ while launched:
 
 	#texte
 	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.RED)
-	screen.surface.blit(fps_text, (0, 0) )
+	wave_text = FONT.render(f"WAVE : { wave }", False, Globals.RED)
+	life_text = FONT.render(f"LIFE : { player.life }", False, Globals.RED)
+	screen.surface.blit(fps_text, (5, 5) )
+	screen.surface.blit(wave_text, (5, 30) )
+	screen.surface.blit(life_text, (5, 55) )
 
 
 	# actualisation de l'écran

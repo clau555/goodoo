@@ -26,17 +26,28 @@ Ennemis
 
 Programmation niveau
  Spawn ennemies				V
-  Transition
+  Transition				V
  Game Over
  Objet arme				V
  Joueur frapper				V
- Différents niveau
+ Différents niveau			V
+ Système de vie				V
 
 Menu
  Ecran principal
+  Jouer
+  Quitter
  Ecran sélection
+  Contrôles
   Skin?
- Ecran règles
+  Niveaux
+ Ecran Game Over
+  Retour sélection
+
+Confort
+ Popup indicatifs
+ Chronomètre de vague
+ Faisage des niveaux (game design)
 
 Son
  Joueur

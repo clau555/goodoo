@@ -7,13 +7,13 @@ class Entity:
 	def __init__(self, x:float, y:float, width:float, height:float, vx:float, vy:float, v_fixed:float, sprites_right:list, sprites_left:list):
 
 		# ne servent qu'à l'initialisation
-		self.x = x
-		self.y = y
+		self.x = x * Globals.RATIO
+		self.y = y * Globals.RATIO
 		
 		self.width = width * Globals.RATIO
 		self.height = height * Globals.RATIO
 
-		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width,self.height)) # hitbox
+		self.rect = pygame.Rect((self.x, self.y), (self.width,self.height)) # hitbox
 
 		self.vx = vx # plage des vitesses en x
 		self.vy = vy # plage des vitesses en y

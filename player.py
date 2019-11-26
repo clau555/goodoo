@@ -26,6 +26,7 @@ class Player(Entity):
 		self.hit_sprite_left = pygame.image.load("./ressources/hit/2.png")
 		self.COOLDOWN = 10
 		self.cooldown = 0
+		self.life = 3
 
 
 	def hit(self):
