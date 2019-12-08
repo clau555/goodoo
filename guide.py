@@ -11,17 +11,9 @@ from screen import *
 
 def guide_initialize():
 
-	global screen, FONT, TITLE_FONT, clock
+	global FONT, TITLE_FONT, clock
 
 	# ============================== INITIALISATION ==============================
-
-	pygame.init()
-
-
-	# ========== FENETRE
-
-	screen = Screen()
-
 
 	# ========== TEXTE
 
@@ -72,9 +64,9 @@ def guide_body():
 
 # ==================================================================================================================================
 
-def guide_display():
+def guide_display(screen):
 
-	global screen, FONT, TITLE_FONT, clock
+	global FONT, TITLE_FONT, clock
 
 	# ======================================== DESSIN DES SURFACES
 

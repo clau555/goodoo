@@ -12,17 +12,9 @@ from big_button import *
 
 def select_initialize():
 
-	global screen, FONT, TITLE_FONT, clock, selection, big_buttons
+	global FONT, TITLE_FONT, clock, selection, big_buttons
 
 	# ============================== INITIALISATION ==============================
-
-	pygame.init()
-
-
-	# ========== FENETRE
-
-	screen = Screen()
-
 
 	# ========== TEXTE
 
@@ -52,7 +44,7 @@ def select_initialize():
 
 def select_body():
 
-	global screen, FONT, TITLE_FONT, clock, selection, big_buttons
+	global selection
 
 
 	# ======================================== EVENTS
@@ -126,9 +118,9 @@ def select_body():
 
 # ==================================================================================================================================
 
-def select_display():
+def select_display(screen):
 
-	global screen, FONT, TITLE_FONT, clock, selection, big_buttons
+	global FONT, TITLE_FONT, clock, selection, big_buttons
 
 	# ======================================== DESSIN DES SURFACES
 
@@ -152,7 +144,7 @@ def select_display():
 	screen.surface.blit(back_button, (1*Globals.RATIO, 4*Globals.RATIO) )
 
 	# sélection
-	select_button = FONT.render("<- PLAY ->", False, Globals.WHITE)
+	select_button = FONT.render("<- START ->", False, Globals.WHITE)
 	if selection == 1:
 		screen.surface.blit(select_button, (8*Globals.RATIO, 18*Globals.RATIO) )
 	elif selection == 2:

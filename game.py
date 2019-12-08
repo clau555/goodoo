@@ -22,17 +22,9 @@ from level1 import *
 
 def game_initialize():
 
-	global screen, level, TAB, player, weapon, FONT, clock, over, wave
+	global level, TAB, player, weapon, FONT, clock, over, wave
 
 	# ============================== INITIALISATION ==============================
-
-	pygame.init()
-
-
-	# ========== FENETRE
-
-	screen = Screen()
-
 
 	# ========== NIVEAU
 
@@ -77,9 +69,9 @@ def game_initialize():
 
 # ==================================================================================================================================
 
-def game_body():
+def game_body(screen):
 
-	global screen, level, TAB, player, weapon, FONT, clock, over, wave
+	global level, player, weapon, over, wave
 
 
 	# ======================================== EVENTS
@@ -310,14 +302,19 @@ def game_body():
 		over = True
 		# écran de game over
 
-
+	# victoire d'un niveau
+	if wave == len(level.waves) and Globals.enemies == []:
+		Globals.transition -= 1
+		if Globals.transition == 0:
+			over = True
+			# écran de victoire
 
 
 # ==================================================================================================================================
 
-def game_display():
+def game_display(screen):
 
-	global screen, level, TAB, player, weapon, FONT, clock, over, wave
+	global player, weapon, FONT, clock, wave
 
 	# ======================================== DESSIN DES SURFACES
 

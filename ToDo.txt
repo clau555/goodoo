@@ -35,8 +35,8 @@ Programmation niveau
 
 Menu
  Ecran principal
-  Jouer
-  Quitter
+  Jouer					V
+  Quitter				V
  Ecran sélection
   Contrôles
   Skin?

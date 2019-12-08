@@ -11,17 +11,9 @@ from screen import *
 
 def menu_initialize():
 
-	global screen, FONT, TITLE_FONT, clock, selection
+	global FONT, TITLE_FONT, clock, selection
 
 	# ============================== INITIALISATION ==============================
-
-	pygame.init()
-
-
-	# ========== FENETRE
-
-	screen = Screen()
-
 
 	# ========== TEXTE
 
@@ -50,7 +42,7 @@ def menu_initialize():
 
 def menu_body():
 
-	global screen, FONT, TITLE_FONT, clock, selection
+	global selection
 
 
 	# ======================================== EVENTS
@@ -103,9 +95,9 @@ def menu_body():
 
 # ==================================================================================================================================
 
-def menu_display():
+def menu_display(screen):
 
-	global screen, FONT, TITLE_FONT, clock, selection
+	global FONT, TITLE_FONT, clock, selection
 
 	# ======================================== DESSIN DES SURFACES
 
