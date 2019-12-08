@@ -49,19 +49,19 @@ while Globals.launched:
 	elif Globals.ecran == "menu":
 		menu_initialize()
 		while Globals.ecran == "menu" and Globals.launched:
-			menu_body()
+			menu_body(screen)
 			menu_display(screen)
 
 	elif Globals.ecran == "select":
 		select_initialize()
 		while Globals.ecran == "select" and Globals.launched:
-			select_body()
+			select_body(screen)
 			select_display(screen)
 
 	elif Globals.ecran == "guide":
 		guide_initialize()
 		while Globals.ecran == "guide" and Globals.launched:
-			guide_body()
+			guide_body(screen)
 			guide_display(screen)
 
 pygame.quit()

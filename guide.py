@@ -28,9 +28,9 @@ def guide_initialize():
 
 # ==================================================================================================================================
 
-def guide_body():
+def guide_body(screen):
 
-	global screen, FONT, TITLE_FONT, clock
+	global FONT, TITLE_FONT, clock
 
 	# ======================================== EVENTS
 
