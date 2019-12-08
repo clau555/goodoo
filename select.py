@@ -64,13 +64,19 @@ def select_body():
 
 		elif event.type == pygame.KEYDOWN:
 
-			# selection vers le bas
+			# selection
+
 			if event.key == pygame.K_RIGHT:
 				selection += 1
 
-			# selection vers le haut
 			elif event.key == pygame.K_LEFT:
 				selection -= 1
+
+			elif event.key == pygame.K_UP:
+				selection -= 3
+
+			elif event.key == pygame.K_DOWN:
+				selection += 3
 
 			# activation de la selection
 			elif event.key == pygame.K_RETURN:
