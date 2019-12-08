@@ -42,7 +42,7 @@ def game_initialize():
 	elif Globals.level == 1:	
 		level = Level1()
 	elif Globals.level == 2: # /!\ n'existe pas
-		level = Level3()
+		level = Level3() # /!\ n'existe pas
 
 	TAB = level.TAB # tableau de 1 et 0 du niveau
 	player = level.player # initialisation du joueur
@@ -60,14 +60,6 @@ def game_initialize():
 
 	pygame.font.init()
 	FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 15)
-
-
-	# ========== MUSIQUE / SON
-
-	#pygame.mixer.music.load("./ressources/music/S.Rachmaninov - prelude op 23 no 5.wav")
-	#sound_pickup = pygame.mixer.Sound("./ressources/sounds/pickup.wav")
-	pygame.mixer.init()
-	#pygame.mixer.music.play()
 
 
 	# ========== HORLOGE

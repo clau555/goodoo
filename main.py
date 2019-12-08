@@ -14,6 +14,7 @@ Changelog 6:
 from game import *
 from menu import *
 from guide import * 
+from select import *
 
 Globals.launched = True
 

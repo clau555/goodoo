@@ -70,7 +70,7 @@ def menu_body():
 			# activation de la selection
 			elif event.key == pygame.K_RETURN:
 				if selection == 0:
-					Globals.ecran = "game"
+					Globals.ecran = "select"
 				elif selection == 1:
 					Globals.ecran = "guide"
 				elif selection == 2:
@@ -126,9 +126,9 @@ def menu_display():
 
 	# rules
 	if selection == 1:
-		rules_button = FONT.render("RULES <-", False, Globals.WHITE)
+		rules_button = FONT.render("GUIDE <-", False, Globals.WHITE)
 	else:
-		rules_button = FONT.render("RULES", False, Globals.WHITE)
+		rules_button = FONT.render("GUIDE", False, Globals.WHITE)
 	screen.surface.blit(rules_button, (2*Globals.RATIO, 7.5*Globals.RATIO) )
 
 	# quit

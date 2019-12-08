@@ -29,15 +29,6 @@ def guide_initialize():
 	FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 15)
 	TITLE_FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 40)
 
-
-	# ========== MUSIQUE / SON
-
-	#pygame.mixer.music.load("./ressources/music/S.Rachmaninov - prelude op 23 no 5.wav")
-	#sound_pickup = pygame.mixer.Sound("./ressources/sounds/pickup.wav")
-	pygame.mixer.init()
-	#pygame.mixer.music.play()
-
-
 	# ========== HORLOGE
 
 	clock = pygame.time.Clock()
@@ -92,8 +83,12 @@ def guide_display():
 	#screen.surface.blit(screen.sprite, (0,0)) # /!\ Chute de fps
 
 	# titre
+	title = TITLE_FONT.render("GUIDE", False, Globals.WHITE)
+	screen.surface.blit(title, (1*Globals.RATIO, 1*Globals.RATIO) )
+
+	# retour arrière
 	back_button = FONT.render("BACK <-", False, Globals.WHITE)
-	screen.surface.blit(back_button, (1*Globals.RATIO, 1*Globals.RATIO) )
+	screen.surface.blit(back_button, (1*Globals.RATIO, 4*Globals.RATIO) )
 
 
 	# actualisation de l'écran
