@@ -43,6 +43,8 @@ Menu
   Niveaux
  Ecran Game Over
   Retour sélection
+ Ecran Victoire
+  Retour sélection
 
 Game Over
  Chronomètre
@@ -54,6 +56,7 @@ Confort
  Popup indicatifs
  Chronomètre de vague
  Faisage des niveaux (game design)
+ barre de vie
 
 Son
  Joueur
@@ -65,3 +68,10 @@ Si on a le temps
  Animations
  Blocks de différents type
  Dessin(s) intangibles
+
+
+
+style.css
+index.js
+front-settings.php
+accueil.php

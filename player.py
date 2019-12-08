@@ -30,7 +30,7 @@ class Player(Entity):
 
 		self.HEART = 5 # barre de vie
 		self.heart = self.HEART
-		self.INVINCIBLE = 320 # temps d'invicibilité après être touché
+		self.INVINCIBLE = 180 # temps d'invicibilité après être touché
 		self.invincible_counter = 0
 		self.hurted = False # vrai si touché
 

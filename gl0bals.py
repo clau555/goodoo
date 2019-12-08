@@ -4,6 +4,8 @@ class Globals:
 	FPS = 60 # images/boucles par seconde
 	RESOLUTION = (1280,720)
 	counter = 0 # compteur de boucle
+	launched = False
+	ecran = "menu"
 
 	# COULEURS
 	WHITE = (255,255,255)

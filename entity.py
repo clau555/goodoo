@@ -47,7 +47,14 @@ class Entity:
 
 
 	def move_single_axis(self, vx, vy):
-		"""Bouge en fonction de vx et vy"""
+		"""Bouge le rectangle de l'entitée en fonction de vx et vy
+		
+		[description]
+		
+		Arguments:
+			vx {float} -- distance à parcourir en x
+			vy {float} -- distance à parcourir en y
+		"""
 
 		# initialise les collisions
 		self.iscollide = False
