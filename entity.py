@@ -24,6 +24,11 @@ class Entity:
 
 		self.sprites_right = sprites_right
 		self.sprites_left = sprites_left
+		# conversion des sprites (pb de fps sinon)
+		for sprite in sprites_right:
+			sprite.convert()
+		for sprite in sprites_left:
+			sprite.convert()
 
 		self.animation_counter = 0
 		self.sprite = self.sprites_right[self.animation_counter] # sprite courant

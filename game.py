@@ -42,7 +42,7 @@ def game_initialize():
 	elif Globals.level == 1:	
 		level = Level1()
 	elif Globals.level == 2: # /!\ n'existe pas
-		level = Level3() # /!\ n'existe pas
+		level = Level2() # /!\ n'existe pas
 
 	TAB = level.TAB # tableau de 1 et 0 du niveau
 	player = level.player # initialisation du joueur
@@ -64,6 +64,7 @@ def game_initialize():
 
 	# ========== HORLOGE
 
+	Globals.counter = 0
 	clock = pygame.time.Clock()
 
 
@@ -84,8 +85,11 @@ def game_body():
 	# ======================================== EVENTS
 
 	for event in pygame.event.get():
-		if event.type == pygame.QUIT or over:
+		if event.type == pygame.QUIT:
 			Globals.launched = False
+
+	if over:
+		Globals.ecran = "select"
 	
 
 	keys = pygame.key.get_pressed()
