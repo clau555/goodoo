@@ -4,7 +4,7 @@ import pygame
 # ============================== OBJETS ==============================
 
 from gl0bals import *
-from screen import *
+from classes.screen import *
 
 
 # ==================================================================================================================================
@@ -103,7 +103,6 @@ def menu_display(screen):
 
 	# fond
 	screen.surface.fill(Globals.BLACK)
-	#screen.surface.blit(screen.sprite, (0,0)) # /!\ Chute de fps
 
 	# titre
 	title = TITLE_FONT.render("GOODOO", False, Globals.WHITE)

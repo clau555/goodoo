@@ -1,8 +1,8 @@
 import pygame
 import random
 from gl0bals import *
-from entity import *
-from block import *
+from .entity import *
+from .block import *
 
 
 class Enemy1(Entity):

@@ -1,10 +1,10 @@
-from entity import *
-from player import *
-from weapon import *
-from enemy1 import *
-from enemy1 import *
-from enemy3 import *
-from mist import *
+from .entity import *
+from .player import *
+from .weapon import *
+from .enemy1 import *
+from .enemy2 import *
+from .enemy3 import *
+from .mist import *
 
 # ========== VAGUES
 

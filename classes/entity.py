@@ -1,6 +1,6 @@
 import pygame
 from gl0bals import *
-from screen import *
+from .screen import *
 
 class Entity:
 

@@ -5,18 +5,18 @@ import random
 # ============================== OBJETS ==============================
 
 from gl0bals import *
-from screen import *
-from block import *
-from entity import *
-from player import *
-from enemy1 import *
-from enemy2 import *
-from enemy3 import *
-from weapon import *
-from projectile import *
-from mist import *
-from level0 import *
-from level1 import *
+from classes.screen import *
+from classes.block import *
+from classes.entity import *
+from classes.player import *
+from classes.enemy1 import *
+from classes.enemy2 import *
+from classes.enemy3 import *
+from classes.weapon import *
+from classes.projectile import *
+from classes.mist import *
+from classes.level0 import *
+from classes.level1 import *
 
 # ==================================================================================================================================
 
@@ -319,8 +319,7 @@ def game_display(screen):
 	# ======================================== DESSIN DES SURFACES
 
 	# fond
-	#screen.surface.fill(Globals.BLACK)
-	screen.surface.blit(screen.sprite, (0,0)) # /!\ Chute de fps
+	screen.surface.blit(screen.sprite, (0,0))
 
 
 	# blocs

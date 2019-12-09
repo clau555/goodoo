@@ -4,8 +4,8 @@ import pygame
 # ============================== OBJETS ==============================
 
 from gl0bals import *
-from screen import *
-from big_button import *
+from classes.screen import *
+from classes.big_button import *
 
 
 # ==================================================================================================================================
@@ -126,7 +126,6 @@ def select_display(screen):
 
 	# fond
 	screen.surface.fill(Globals.BLACK)
-	#screen.surface.blit(screen.sprite, (0,0)) # /!\ Chute de fps
 	
 	# gros bouttons
 	for button in big_buttons:
