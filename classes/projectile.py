@@ -20,7 +20,8 @@ class Projectile():
 		self.vx = self.vx_direct / self.coef
 		self.vy = self.vy_direct / self.coef
 
-		self.sprites = [pygame.image.load("./ressources/projectile/1.png"), pygame.image.load("./ressources/projectile/2.png")]
+		self.sprites = [pygame.image.load("./ressources/projectile/1.png").convert_alpha(),
+						pygame.image.load("./ressources/projectile/2.png").convert_alpha()]
 		self.animation_counter = 0
 		self.sprite = self.sprites [self.animation_counter]
 
@@ -30,6 +31,10 @@ class Projectile():
 	def move_single_axis(self):
 		self.rect.x += self.vx
 		self.rect.y += self.vy
+
+		# correction de bug de manière brutale
+		if self.rect.y == 0 and -1 < self.vy <= 0:
+			self.rect.y = -100
 
 
 	def animation(self):

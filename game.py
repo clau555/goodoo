@@ -17,6 +17,7 @@ from classes.projectile import *
 from classes.mist import *
 from classes.level1 import *
 from classes.level2 import *
+from classes.level3 import *
 from classes.level4 import *
 from classes.level5 import *
 
@@ -237,7 +238,7 @@ def game_body(screen):
 			player.hurted = True
 			player.invincible_counter = player.INVINCIBLE
 		# out of bounds
-		if projectile.rect.left > screen.resolution[0] or projectile.rect.right < 0 or projectile.rect.bottom < 0 or projectile.rect.top > screen.resolution[1]:
+		if projectile.rect.left >= screen.resolution[0] or projectile.rect.right <= 0 or projectile.rect.bottom <= 0 or projectile.rect.top >= screen.resolution[1]:
 			del Globals.projectiles[Globals.projectiles.index(projectile)]
 
 
@@ -342,7 +343,11 @@ def game_display(screen):
 
 	# ennemis
 	for enemy in Globals.enemies3:
-		if not enemy.killed :
+		if not enemy.killed:
+			if enemy.rect.x + enemy.width/2 < player.rect.x:
+				enemy.last_move = "right"
+			elif enemy.rect.x + enemy.width/2 >= player.rect.x:
+				enemy.last_move = "left"
 			enemy.animation(enemy.last_move)
 			#pygame.draw.rect(screen.surface, Globals.RED, enemy.rect) # hitbox
 			screen.surface.blit(enemy.sprite, (enemy.rect.x, enemy.rect.y) )
