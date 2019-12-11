@@ -9,11 +9,11 @@ from ressources.conversion_tool import *
 
 # ========== VAGUES
 
-class Level1:
+class Level2:
 
 	def __init__(self):
 
-		self.im = Image.open('ressources/levels_tab/tab1.jpg')
+		self.im = Image.open('ressources/levels_tab/tab2.jpg')
 		self.TAB = convert_to_tab(self.im)
 
 		self.player = Player(13.0, 31.0)
@@ -23,7 +23,7 @@ class Level1:
 
 		def pre_wave1(self):
 
-			Mist(50.0, 30.0)
+			Mist(1.0, 1.0)
 
 
 		def wave1(self):
@@ -32,16 +32,14 @@ class Level1:
 			# ARME
 			self.weapon = Weapon(44.0, 16.0)
 			# ENNEMIES
-			Enemy1(50.0, 30.0)
+			Enemy1(1.0, 1.0)
 
 
 		# ==================== VAGUE 2
 
 		def pre_wave2(self):
 
-			Mist(28.0, 32.0)
-			Mist(31.0, 32.0)
-			Mist(34.0, 32.0)
+			Mist(1.0, 1.0)
 
 
 		def wave2(self):
@@ -54,21 +52,14 @@ class Level1:
 			# ARME
 			self.weapon = Weapon(19.0, 16.0)
 			# ENNEMIES
-			Enemy1(28.0, 32.0)
-			Enemy1(31.0, 32.0)
-			Enemy1(34.0, 32.0)
+			Enemy1(1.0, 1.0)
 
 
 		# ==================== VAGUE 3
 
 		def pre_wave3(self):
 
-			Mist(37.0, 5.0)
-			Mist(42.0, 32.0)
-			Mist(28.0, 32.0)
-			Mist(32.0, 32.0)
-			Mist(46.0, 3.0)
-			Mist(11.0, 1.0)
+			Mist(1.0, 1.0)
 
 
 		def wave3(self):
@@ -81,12 +72,7 @@ class Level1:
 			# ARME
 			self.weapon = Weapon(4.0, 4.0)
 			# ENNEMIES
-			Enemy1(37.0, 5.0)
-			Enemy1(42.0, 32.0)
-			Enemy1(28.0, 32.0)
-			Enemy1(32.0, 32.0)
-			Enemy1(46.0, 3.0)
-			Enemy1(11.0, 1.0)
+			Enemy1(1.0, 1.0)
 
 
 		# ==================== REPERTOIRE DES FONCTIONS

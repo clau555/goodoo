@@ -15,13 +15,16 @@ from game import *
 from menu import *
 from guide import * 
 from select import *
+from game_over import *
 from gl0bals import *
 
+"""
 # fonction temporaire
 def clearall():
 	all = [var for var in globals() if var[0] != "_" and inspect.isclass(var)]
 	for var in all:
 		del globals()[var]
+"""
 
 
 pygame.init()
@@ -63,5 +66,11 @@ while Globals.launched:
 		while Globals.ecran == "guide" and Globals.launched:
 			guide_body(screen)
 			guide_display(screen)
+
+	elif Globals.ecran == "game_over":
+		over_initialize()
+		while Globals.ecran == "game_over" and Globals.launched:
+			over_body(screen)
+			over_display(screen)
 
 pygame.quit()

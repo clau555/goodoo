@@ -11,5 +11,4 @@ class Screen():
 		self.icon = pygame.image.load("ressources/icon.jpg")
 		pygame.display.set_icon(self.icon) # icône de la fenêtre
 		pygame.display.set_caption("Goodoo") # titre de la fenêtre
-		self.sprite = pygame.image.load("ressources/background.jpg")
-		self.sprite.convert()
+		self.sprite = pygame.image.load("ressources/background.jpg").convert()

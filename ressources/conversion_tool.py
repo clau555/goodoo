@@ -35,10 +35,12 @@ def convert_to_tab(im):
 
 # ===== EXECUTION
 
-tab = Image.open('tab5.jpg') # entrer le fichier à convertir
+"""
+tab = Image.open('tab3.jpg') # entrer le fichier à convertir
 res = convert_to_tab(tab)
 
 print("[\n")
 for i in range(0, len(res)):
     print(str(res[i]) + ",\n")
 print("]\n")
+"""

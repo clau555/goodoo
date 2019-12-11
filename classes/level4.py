@@ -9,7 +9,7 @@ from ressources.conversion_tool import *
 
 # ========== VAGUES
 
-class Level1:
+class Level4:
 
 	def __init__(self):
 

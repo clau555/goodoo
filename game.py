@@ -15,8 +15,9 @@ from classes.enemy3 import *
 from classes.weapon import *
 from classes.projectile import *
 from classes.mist import *
-from classes.level0 import *
 from classes.level1 import *
+from classes.level2 import *
+from classes.level5 import *
 
 # ==================================================================================================================================
 
@@ -29,12 +30,18 @@ def game_initialize():
 	# ========== NIVEAU
 
 	# séléction du niveau
-	if Globals.level == 0:
-		level = Level0()
-	elif Globals.level == 1:	
+	if Globals.level == 1:
 		level = Level1()
-	elif Globals.level == 2: # /!\ n'existe pas
-		level = Level2() # /!\ n'existe pas
+	elif Globals.level == 2:
+		level = Level2()
+	elif Globals.level == 3:
+		level = Level3()
+	elif Globals.level == 4:
+		level = Level4()
+	elif Globals.level == 5:
+		level = Level5()
+	elif Globals.level == 6:
+		level = Level6()
 
 	TAB = level.TAB # tableau de 1 et 0 du niveau
 	player = level.player # initialisation du joueur
@@ -81,7 +88,7 @@ def game_body(screen):
 			Globals.launched = False
 
 	if over:
-		Globals.ecran = "select"
+		Globals.ecran = "game_over"
 	
 
 	keys = pygame.key.get_pressed()
@@ -133,10 +140,6 @@ def game_body(screen):
 			player.heart -= 1
 			player.hurted = True
 			player.invincible_counter = player.INVINCIBLE
-			# game over
-			if player.heart == 0:
-				over = True
-				player.heart = player.HEART
 
 		# out of bounds
 		if enemy.killed or enemy.rect.top > screen.resolution[1]:
@@ -230,6 +233,11 @@ def game_body(screen):
 	for projectile in Globals.projectiles:
 		# déplacement
 		projectile.move_single_axis()
+		# joueur touché
+		if player.rect.colliderect(projectile.rect) and not player.hurted:
+			player.heart -= 1
+			player.hurted = True
+			player.invincible_counter = player.INVINCIBLE
 		# out of bounds
 		if projectile.rect.left > screen.resolution[0] or projectile.rect.right < 0 or projectile.rect.bottom < 0 or projectile.rect.top > screen.resolution[1]:
 			del Globals.projectiles[Globals.projectiles.index(projectile)]
@@ -239,7 +247,7 @@ def game_body(screen):
 
 	# out of bounds
 	if player.rect.y > screen.resolution[1]:
-		Globals.launched = False
+		over = True
 
 	# déplacement gauche
 	if keys[pygame.K_LEFT]:
@@ -276,6 +284,11 @@ def game_body(screen):
 		player.invincible_counter -= 1
 	elif player.hurted and player.invincible_counter == 0:
 		player.hurted = False
+
+	# game over
+	if player.heart == 0:
+		over = True
+		player.heart = player.HEART
 
 	# ======================================== ARME
 
@@ -319,6 +332,7 @@ def game_display(screen):
 	# ======================================== DESSIN DES SURFACES
 
 	# fond
+	#screen.surface.fill(Globals.BLACK)
 	screen.surface.blit(screen.sprite, (0,0))
 
 

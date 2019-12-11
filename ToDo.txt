@@ -68,10 +68,3 @@ Si on a le temps
  Animations
  Blocks de différents type
  Dessin(s) intangibles
-
-
-
-style.css
-index.js
-front-settings.php
-accueil.php
