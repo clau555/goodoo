@@ -5,7 +5,6 @@ import pygame
 
 from gl0bals import *
 from classes.screen import *
-from classes.big_button import *
 
 
 # ==================================================================================================================================
@@ -60,7 +59,7 @@ def over_body(screen):
 			elif event.key == pygame.K_RETURN:
 				# retour arrière
 				if selection == 0:
-					Globals.ecran = "menu"
+					Globals.ecran = "select"
 				# lancement d'un niveau
 				elif selection == 1:
 					Globals.ecran = "game"

@@ -16,6 +16,7 @@ from menu import *
 from guide import * 
 from select import *
 from game_over import *
+from game_victory import *
 from gl0bals import *
 
 """
@@ -72,5 +73,11 @@ while Globals.launched:
 		while Globals.ecran == "game_over" and Globals.launched:
 			over_body(screen)
 			over_display(screen)
+
+	elif Globals.ecran == "game_victory":
+		victory_initialize()
+		while Globals.ecran == "game_victory" and Globals.launched:
+			victory_body(screen)
+			victory_display(screen)
 
 pygame.quit()

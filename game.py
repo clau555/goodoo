@@ -17,13 +17,14 @@ from classes.projectile import *
 from classes.mist import *
 from classes.level1 import *
 from classes.level2 import *
+from classes.level4 import *
 from classes.level5 import *
 
 # ==================================================================================================================================
 
 def game_initialize():
 
-	global level, TAB, player, weapon, FONT, clock, over, wave
+	global level, TAB, player, weapon, FONT, clock, over, victory, wave
 
 	# ============================== INITIALISATION ==============================
 
@@ -70,6 +71,7 @@ def game_initialize():
 	# ========== JEU
 
 	over = False
+	victory = False
 	wave = 0
 
 
@@ -78,7 +80,7 @@ def game_initialize():
 
 def game_body(screen):
 
-	global level, player, weapon, over, wave
+	global level, player, weapon, over, victory, wave
 
 
 	# ======================================== EVENTS
@@ -86,10 +88,6 @@ def game_body(screen):
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			Globals.launched = False
-
-	if over:
-		Globals.ecran = "game_over"
-	
 
 	keys = pygame.key.get_pressed()
 
@@ -122,7 +120,7 @@ def game_body(screen):
 			if Globals.transition == Globals.TRANSITION -1:
 				level.pre_waves[i](level)
 			# initialisation de la prochaine vague
-			if Globals.transition == 0:
+			elif Globals.transition == 0:
 				wave = i+1
 				level.waves[i](level)
 				player = level.player
@@ -245,8 +243,8 @@ def game_body(screen):
 
 	# ======================================== JOUEUR
 
-	# out of bounds
-	if player.rect.y > screen.resolution[1]:
+	# game over
+	if player.heart <= 0 or player.rect.y > screen.resolution[1]:
 		over = True
 
 	# déplacement gauche
@@ -310,17 +308,17 @@ def game_body(screen):
 
 	# ======================================== GAME OVER
 
-	# défaite d'un niveau
-	if player.heart <= 0:
-		over = True
-		# écran de game over
-
-	# victoire d'un niveau
 	if wave == len(level.waves) and Globals.enemies == []:
 		Globals.transition -= 1
 		if Globals.transition == 0:
-			over = True
-			# écran de victoire
+			victory = True
+
+	# victoire d'un niveau
+	if victory:
+		Globals.ecran = "game_victory"
+	# défaite d'un niveau
+	elif over:
+		Globals.ecran = "game_over"
 
 
 # ==================================================================================================================================

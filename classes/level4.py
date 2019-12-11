@@ -13,35 +13,38 @@ class Level4:
 
 	def __init__(self):
 
-		self.im = Image.open('ressources/levels_tab/tab1.jpg')
+		self.im = Image.open('ressources/levels_tab/tab4.jpg')
 		self.TAB = convert_to_tab(self.im)
 
-		self.player = Player(13.0, 31.0)
+		self.player = Player(32.0, 5.0)
 		self.weapon = None
 
 		# ==================== VAGUE 1
 
 		def pre_wave1(self):
 
-			Mist(50.0, 30.0)
+			Mist(13.0, 20.0)
+			Mist(51.0, 20.0)
 
 
 		def wave1(self):
 			# JOUEUR
 			self.player.weaponized = False
 			# ARME
-			self.weapon = Weapon(44.0, 16.0)
+			self.weapon = Weapon(1.0, 32.0)
 			# ENNEMIES
-			Enemy1(50.0, 30.0)
+			Enemy2(13.0, 20.0)
+			Enemy2(51.0, 20.0)
 
 
 		# ==================== VAGUE 2
 
 		def pre_wave2(self):
 
-			Mist(28.0, 32.0)
-			Mist(31.0, 32.0)
-			Mist(34.0, 32.0)
+			Mist(5.0, 24.0)
+			Mist(58.0, 24.0)
+			Mist(55.0, 7.0)
+			Mist(3.0, 8.0)
 
 
 		def wave2(self):
@@ -52,23 +55,22 @@ class Level4:
 			self.player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
 									pygame.image.load("./ressources/goodoo_white/4.png") ]
 			# ARME
-			self.weapon = Weapon(19.0, 16.0)
+			self.weapon = Weapon(62.0, 32.0)
 			# ENNEMIES
-			Enemy1(28.0, 32.0)
-			Enemy1(31.0, 32.0)
-			Enemy1(34.0, 32.0)
+			Enemy2(5.0, 24.0)
+			Enemy2(58.0, 24.0)
+			Enemy1(55.0, 7.0)
+			Enemy2(3.0, 8.0)
 
 
 		# ==================== VAGUE 3
 
 		def pre_wave3(self):
 
-			Mist(37.0, 5.0)
-			Mist(42.0, 32.0)
-			Mist(28.0, 32.0)
-			Mist(32.0, 32.0)
-			Mist(46.0, 3.0)
-			Mist(11.0, 1.0)
+			Mist(22.0, 16.0)
+			Mist(42.0, 16.0)
+			Mist(12.0, 12.0)
+			Mist(51.0, 12.0)
 
 
 		def wave3(self):
@@ -79,14 +81,12 @@ class Level4:
 			self.player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
 									pygame.image.load("./ressources/goodoo_white/4.png") ]
 			# ARME
-			self.weapon = Weapon(4.0, 4.0)
+			self.weapon = Weapon(36.0, 1.0)
 			# ENNEMIES
-			Enemy1(37.0, 5.0)
-			Enemy1(42.0, 32.0)
-			Enemy1(28.0, 32.0)
-			Enemy1(32.0, 32.0)
-			Enemy1(46.0, 3.0)
-			Enemy1(11.0, 1.0)
+			Enemy2(22.0, 16.0)
+			Enemy2(42.0, 16.0)
+			Enemy2(12.0, 12.0)
+			Enemy2(51.0, 12.0)
 
 
 		# ==================== REPERTOIRE DES FONCTIONS

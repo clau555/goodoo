@@ -9,7 +9,7 @@ from classes.screen import *
 
 # ==================================================================================================================================
 
-def guide_initialize():
+def victory_initialize():
 
 	global FONT, TITLE_FONT, clock
 
@@ -21,6 +21,7 @@ def guide_initialize():
 	FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 15)
 	TITLE_FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 40)
 
+
 	# ========== HORLOGE
 
 	clock = pygame.time.Clock()
@@ -28,9 +29,8 @@ def guide_initialize():
 
 # ==================================================================================================================================
 
-def guide_body(screen):
+def victory_body(screen):
 
-	global FONT, TITLE_FONT, clock
 
 	# ======================================== EVENTS
 
@@ -40,10 +40,9 @@ def guide_body(screen):
 			Globals.launched = False
 
 		elif event.type == pygame.KEYDOWN:
-			# activation de la selection
 			if event.key == pygame.K_RETURN:
-				Globals.ecran = "menu"
-				
+				Globals.ecran = "select"
+
 	keys = pygame.key.get_pressed()
 
 	# ======================================== FENETRE
@@ -62,9 +61,10 @@ def guide_body(screen):
 		pygame.mouse.set_visible(True)
 		screen.fullscreen = False
 
+
 # ==================================================================================================================================
 
-def guide_display(screen):
+def victory_display(screen):
 
 	global FONT, TITLE_FONT, clock
 
@@ -74,13 +74,13 @@ def guide_display(screen):
 	screen.surface.fill(Globals.BLACK)
 
 	# titre
-	title = TITLE_FONT.render("GUIDE", False, Globals.WHITE)
+	title = TITLE_FONT.render("VICTORY", False, Globals.CYAN)
 	screen.surface.blit(title, (1*Globals.RATIO, 1*Globals.RATIO) )
 
 	# retour arrière
-	back_button = FONT.render("BACK <-", False, Globals.WHITE)
-	screen.surface.blit(back_button, (1*Globals.RATIO, 4*Globals.RATIO) )
+	back_button = FONT.render("MENU <-", False, Globals.WHITE)
 
+	screen.surface.blit(back_button, (4*Globals.RATIO, 6*Globals.RATIO) )
 
 	# actualisation de l'écran
 	pygame.display.flip()
