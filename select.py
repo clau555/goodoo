@@ -12,7 +12,7 @@ from classes.big_button import *
 
 def select_initialize():
 
-	global FONT, TITLE_FONT, clock, selection, big_buttons
+	global FONT, TITLE_FONT, clock, selection, big_buttons, levels_titles
 
 	# ============================== INITIALISATION ==============================
 
@@ -36,6 +36,14 @@ def select_initialize():
 	big_button5 = Big_button(26, 25, pygame.image.load("./ressources/levels_img/tab5.jpg"))
 	big_button6 = Big_button(44, 25, pygame.image.load("./ressources/levels_img/tab6.jpg"))
 	big_buttons = [ big_button1, big_button2, big_button3, big_button4, big_button5, big_button6 ]
+
+	level1_title = FONT.render("001", False, Globals.WHITE)
+	level2_title = FONT.render("002", False, Globals.WHITE)
+	level3_title = FONT.render("003", False, Globals.WHITE)
+	level4_title = FONT.render("004", False, Globals.WHITE)
+	level5_title = FONT.render("005", False, Globals.WHITE)
+	level6_title = FONT.render("006", False, Globals.WHITE)
+	levels_titles = [ level1_title, level2_title, level3_title, level4_title, level5_title, level6_title ]
 
 	selection = 1
 
@@ -120,7 +128,7 @@ def select_body(screen):
 
 def select_display(screen):
 
-	global FONT, TITLE_FONT, clock, selection, big_buttons
+	global FONT, TITLE_FONT, clock, selection, big_buttons, levels_titles
 
 	# ======================================== DESSIN DES SURFACES
 
@@ -128,12 +136,16 @@ def select_display(screen):
 	screen.surface.fill(Globals.BLACK)
 	
 	# gros bouttons
+	i = 0
 	for button in big_buttons:
 		screen.surface.blit(button.sprite, (button.rect.x, button.rect.y) )
+		screen.surface.blit( levels_titles[i], (button.rect.x, button.rect.y - 1.5*Globals.RATIO ) )
+		i += 1
 
 	# titre
 	title = TITLE_FONT.render("LEVEL SELECTION", False, Globals.WHITE)
 	screen.surface.blit(title, (1*Globals.RATIO, 1*Globals.RATIO) )
+
 
 	# retour arrière
 	if selection == 0:
