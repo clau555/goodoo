@@ -20,6 +20,7 @@ from classes.level2 import *
 from classes.level3 import *
 from classes.level4 import *
 from classes.level5 import *
+from classes.level6 import *
 
 # ==================================================================================================================================
 
@@ -425,7 +426,10 @@ def game_display(screen):
 	# popups
 	for popup in Globals.popups:
 		popup.animation()
-		screen.surface.blit(popup.text, (popup.x, popup.y) )
+		if popup.type == 'weapon' and weapon != None:
+			screen.surface.blit(popup.text, (popup.x, popup.y) )
+		elif popup.type != 'weapon':
+			screen.surface.blit(popup.text, (popup.x, popup.y) )
 
 	#texte
 	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.LIGHT_GRAY)
