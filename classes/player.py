@@ -2,6 +2,7 @@ import pygame
 from gl0bals import *
 from .entity import *
 from .block import *
+from .popup import *
 
 
 class Player(Entity):
@@ -33,6 +34,8 @@ class Player(Entity):
 		self.INVINCIBLE = 180 # temps d'invicibilité après être touché
 		self.invincible_counter = 0
 		self.hurted = False # vrai si touché
+
+		self.popup = Popup(self.rect.x, self.rect.y, "YOU'RE HERE", 'player' )
 
 
 	def hit(self):

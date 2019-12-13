@@ -74,7 +74,7 @@ def victory_display(screen):
 	screen.surface.fill(Globals.BLACK)
 
 	# titre
-	title = TITLE_FONT.render("VICTORY", False, Globals.CYAN)
+	title = TITLE_FONT.render("VICTORY", False, Globals.WHITE)
 	screen.surface.blit(title, (1*Globals.RATIO, 1*Globals.RATIO) )
 
 	# retour arrière

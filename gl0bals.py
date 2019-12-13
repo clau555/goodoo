@@ -9,8 +9,9 @@ class Globals:
 
 	# COULEURS
 	WHITE = (255,255,255)
-	BLACK = (0,0,0)
+	LIGHT_GRAY = (200, 200, 200)
 	GRAY = (76, 76, 76)
+	BLACK = (0,0,0)
 	RED = (255,0,0)
 	YELLOW = (255,255,0)
 	GREEN = (0,255,0)
@@ -35,3 +36,6 @@ class Globals:
 	TRANSITION = 180 # attente entre deux vagues (en image/sec)
 	transition = TRANSITION # compteur entre deux vagues
 	mists = []
+
+	# POPUPS
+	popups = [] # liste de tout les popups

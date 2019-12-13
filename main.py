@@ -19,14 +19,6 @@ from game_over import *
 from game_victory import *
 from gl0bals import *
 
-"""
-# fonction temporaire
-def clearall():
-	all = [var for var in globals() if var[0] != "_" and inspect.isclass(var)]
-	for var in all:
-		del globals()[var]
-"""
-
 
 pygame.init()
 screen = Screen()

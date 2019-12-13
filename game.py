@@ -293,6 +293,10 @@ def game_body(screen):
 
 	if weapon != None and player.rect.colliderect(weapon.rect):
 		player.weaponized = True
+		weapon = None
+		if player.popup.TTL > 0:
+			del Globals.popups[Globals.popups.index(player.popup)]
+		player.popup = Popup( player.rect.x - 1.5 * Globals.RATIO, player.rect.y - 1 * Globals.RATIO, "   PRESS X", 'player' )
 
 	# changement d'apparence du joueur
 	if player.weaponized:
@@ -305,6 +309,26 @@ def game_body(screen):
 								pygame.image.load("./ressources/goodoo_white/2.png") ]
 		player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
 								pygame.image.load("./ressources/goodoo_white/4.png") ]
+
+	# ======================================== POPUPS
+
+	for popup in Globals.popups:
+
+		if popup.TTL > 0:
+			popup.TTL -= 1
+		
+		if popup.type == "player":
+			popup.x = player.rect.x - 1.5 * Globals.RATIO
+			popup.y = player.rect.y - 1 * Globals.RATIO
+
+		if popup.type == "weapon" and weapon != None:
+			popup.x = weapon.rect.x - 1 * Globals.RATIO
+			popup.y = weapon.rect.y - 1 * Globals.RATIO
+		elif popup.type == "weapon" and player.weaponized:
+			popup.TTL = 0
+		
+		if popup.TTL == 0:
+			del Globals.popups[Globals.popups.index(popup)]
 
 
 	# ======================================== GAME OVER
@@ -380,7 +404,7 @@ def game_display(screen):
 	#pygame.draw.rect(screen.surface, Globals.RED, player.rect) # hitbox
 	if not player.hurted:
 		screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
-	elif player.hurted and Globals.counter%4 == 0:
+	elif player.hurted and Globals.counter % 4 == 0:
 		screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
 	#pygame.draw.rect(screen.surface, Globals.PURPLE, player.blockcollide) # bloc de collision
 
@@ -392,15 +416,20 @@ def game_display(screen):
 		screen.surface.blit(player.hit_sprite_left, (player.rect.x - Globals.RATIO, player.rect.y - Globals.RATIO) )
 
 
-	#projectiles
+	# projectiles
 	for projectile in Globals.projectiles:
 		projectile.animation()
 		#pygame.draw.rect(screen.surface, Globals.RED, projectile.rect) # hitbox
 		screen.surface.blit(projectile.sprite, (projectile.rect.x, projectile.rect.y) )
 
+	# popups
+	for popup in Globals.popups:
+		popup.animation()
+		screen.surface.blit(popup.text, (popup.x, popup.y) )
+
 	#texte
-	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.RED)
-	wave_text = FONT.render(f"WAVE : { wave }", False, Globals.RED)
+	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.LIGHT_GRAY)
+	wave_text = FONT.render(f"WAVE : { wave }", False, Globals.LIGHT_GRAY)
 	heart_text = FONT.render(f"HEART : { player.heart }", False, Globals.RED)
 	screen.surface.blit(fps_text, (5, 5) )
 	screen.surface.blit(wave_text, (5, 30) )
