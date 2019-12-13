@@ -1,32 +1,12 @@
-# VISI_301
+# UnivDefender
 
-<h3>Changelog 5:</h3>
-	Répartition des classes en fichiers<br>
-	Ennemies 1 et 2<br>
-	Projectiles<br>
-	Vagues<br>
-	Arme<br>
-	Frappe du joueur<br>
-<br>
-<h3>Changelog 4 </h3>
-	  Saut<br>
-	  Gravité<br>
+Goodoo est un jeu vidéo de type platformer.
+Le but d'un niveau est d'arriver à passer 3 vagues d'ennemis. Au début d'une vague, le joueur est vulnérable face aux ennemis qui apparaissent. Il doit se débrouiller pour aller chercher une arme placée sur la carte pour par la suite éliminer les ennemis.
 
-<h3>Changelog 3</h3><br>
-	Collision entre le joueur et le décor<br>
-	Passage en programmation orienté objet -- IMPORTANT<br>
-<br>
-<h3>Changelog 2</h3><br>
-	Fenêtre de 1280x720px<br>
-	Environnement en grille 64x36 blocs<br>
-	1 bloc = 20 px<br>
-	Grille de 64x36 blocs<br>
-	Nouvelle taille du joueur (1 bloc)<br>
-<br>
-<h3>Changelog 1</h3><br>
-	Fenêtre de 1000x600px<br>
-	Plein écran (curseur caché) sur F11<br>
-	Quitter sur Echap<br>
-	Joueur dirigé par les touches directionelles<br>
-	Joueur animé selon une boucle et les directions<br>
-	Joueur stoppé par les bords de la fenêtre<br>
+# Mode d'emploie
+
+- Ce programme s'exécute avec la librairie Pygame de Python.
+- Exécutez le <code>main.py</code> pour lancer le jeu.
+
+
+<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC-BY-NC-SA</a>
