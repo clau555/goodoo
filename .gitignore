@@ -1,18 +1,2 @@
 
 *.pyc
-*.pyc
-classes/__pycache__/enemy1.cpython-37.pyc
-classes/__pycache__/block.cpython-37.pyc
-__pycache__/gl0bals.cpython-37.pyc
-__pycache__/game.cpython-37.pyc
-classes/__pycache__/enemy3.cpython-37.pyc
-classes/__pycache__/enemy2.cpython-37.pyc
-classes/__pycache__/entity.cpython-37.pyc
-classes/__pycache__/level1.cpython-37.pyc
-classes/__pycache__/mist.cpython-37.pyc
-classes/__pycache__/popup.cpython-37.pyc
-classes/__pycache__/player.cpython-37.pyc
-classes/__pycache__/projectile.cpython-37.pyc
-classes/__pycache__/screen.cpython-37.pyc
-classes/__pycache__/weapon.cpython-37.pyc
-ressources/__pycache__/conversion_tool.cpython-37.pyc
