@@ -461,3 +461,4 @@ def chronometre():
 		else:
 			Globals.ss += 1
 	print(mm + ':' + ss)
+
