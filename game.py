@@ -449,3 +449,16 @@ def game_display(screen):
 
 	Globals.counter += 1
 	clock.tick(Globals.FPS)
+
+def chronometre():
+
+	global counter
+	
+	if Globals.counter %60 == 0:
+		if Globals.ss == 59:
+			Globals.ss = 0
+			Globals.mm += 1
+		else:
+			Globals.ss += 1
+	print(mm + ':' + ss)
+

@@ -6,6 +6,8 @@ class Globals:
 	counter = 0 # compteur de boucle
 	launched = False
 	ecran = "menu"
+	mm = 0
+	ss = 0
 
 	# COULEURS
 	WHITE = (255,255,255)
