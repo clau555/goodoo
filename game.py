@@ -334,7 +334,10 @@ def game_body(screen):
 
 	# ======================================== GAME OVER
 
-	if wave == len(level.waves) and Globals.enemies == []:
+
+	if Globals.m == 0 and Globals.s == 0 and not victory:
+		over = True
+	elif wave == len(level.waves) and Globals.enemies == []:
 		Globals.transition -= 1
 		if Globals.transition == 0:
 			victory = True
@@ -436,9 +439,11 @@ def game_display(screen):
 	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.LIGHT_GRAY)
 	wave_text = FONT.render(f"WAVE : { wave }", False, Globals.LIGHT_GRAY)
 	heart_text = FONT.render(f"HEART : { player.heart }", False, Globals.RED)
+	chrono_text = FONT.render(chronometre(), False, Globals.RED)
 	#screen.surface.blit(fps_text, (5, 5) )
 	#screen.surface.blit(wave_text, (5, 30) )
 	#screen.surface.blit(heart_text, (5, 55) )
+	screen.surface.blit(chrono_text, ( 3 * Globals.RATIO, 0.5 * Globals.RATIO) )
 
 
 	# actualisation de l'écran
@@ -450,15 +455,20 @@ def game_display(screen):
 	Globals.counter += 1
 	clock.tick(Globals.FPS)
 
+
+# ==================================================================================================================================
+
 def chronometre():
 
-	global counter
-	
 	if Globals.counter %60 == 0:
-		if Globals.ss == 59:
-			Globals.ss = 0
-			Globals.mm += 1
+		if Globals.s == 0:
+			Globals.s = 59
+			Globals.m -= 1
+		elif Globals.m == 0 and Globals.s == 0:
+			Globals.s = 0
+			Globals.m = 0
 		else:
-			Globals.ss += 1
-	print(mm + ':' + ss)
+			Globals.s -= 1
 
+	res = str(Globals.m) + ':' + str(Globals.s)
+	return res
