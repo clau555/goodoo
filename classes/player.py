@@ -1,8 +1,8 @@
 import pygame
 from gl0bals import *
-from .entity import *
-from .block import *
-from .popup import *
+from classes.entity import *
+from classes.block import *
+from classes.popup import *
 
 
 class Player(Entity):

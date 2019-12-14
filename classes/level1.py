@@ -1,10 +1,10 @@
-from .entity import *
-from .player import *
-from .weapon import *
-from .enemy1 import *
-from .enemy2 import *
-from .enemy3 import *
-from .mist import *
+from classes.entity import *
+from classes.player import *
+from classes.weapon import *
+from classes.enemy1 import *
+from classes.enemy2 import *
+from classes.enemy3 import *
+from classes.mist import *
 from ressources.conversion_tool import *
 
 # ========== VAGUES

@@ -1,6 +1,6 @@
 import pygame
 from gl0bals import *
-from .popup import *
+from classes.popup import *
 
 class Weapon:
 
