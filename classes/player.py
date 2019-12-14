@@ -31,6 +31,10 @@ class Player(Entity):
 
 		self.HEART = 5 # barre de vie
 		self.heart = self.HEART
+		self.heart_sprite = [ pygame.image.load("./ressources/heart/5.png"), pygame.image.load("./ressources/heart/4.png"),
+							pygame.image.load("./ressources/heart/3.png"), pygame.image.load("./ressources/heart/2.png"),
+							pygame.image.load("./ressources/heart/1.png"), pygame.image.load("./ressources/heart/0.png") ]
+
 		self.INVINCIBLE = 180 # temps d'invicibilité après être touché
 		self.invincible_counter = 0
 		self.hurted = False # vrai si touché

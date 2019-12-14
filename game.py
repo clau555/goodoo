@@ -408,6 +408,7 @@ def game_display(screen):
 	elif player.hurted and Globals.counter % 4 == 0:
 		screen.surface.blit(player.sprite, (player.rect.x, player.rect.y) )
 	#pygame.draw.rect(screen.surface, Globals.PURPLE, player.blockcollide) # bloc de collision
+	screen.surface.blit(player.heart_sprite[player.heart], (0.5 * Globals.RATIO, 0.5 * Globals.RATIO) )
 
 
 	# frappe
@@ -431,13 +432,13 @@ def game_display(screen):
 		elif popup.type != 'weapon':
 			screen.surface.blit(popup.text, (popup.x, popup.y) )
 
-	#texte
+	# texte
 	fps_text = FONT.render(f"FPS : { int(clock.get_fps()) }", False, Globals.LIGHT_GRAY)
 	wave_text = FONT.render(f"WAVE : { wave }", False, Globals.LIGHT_GRAY)
 	heart_text = FONT.render(f"HEART : { player.heart }", False, Globals.RED)
-	screen.surface.blit(fps_text, (5, 5) )
-	screen.surface.blit(wave_text, (5, 30) )
-	screen.surface.blit(heart_text, (5, 55) )
+	#screen.surface.blit(fps_text, (5, 5) )
+	#screen.surface.blit(wave_text, (5, 30) )
+	#screen.surface.blit(heart_text, (5, 55) )
 
 
 	# actualisation de l'écran
