@@ -1,27 +1,70 @@
-Pixel � 500%
-1 bloc = 1 carr� de 20px
+﻿Pixel à 500%
+1 bloc = 1 carré de 20px
 64x36 blocs
 resolution = 1280x720px
 
 
 Joueur
  Image/Animation			V
- Contr�les				V
- Limites bords 				X
+ Contrôles				V
+ Limites bords 				V
 
-Environnement
- Dessin(s)
+Tableau
+ blocks					V
 
 Physique
  Collision joueur/Environnement		V
- Gravit�
- Saut
+ Gravité				V
+ Saut					V
 
 Ennemis
-Taper
-Vagues
-	<= Menu?
-	<= Skin?
-Bonus/armes
+ Classe mère				V
+ Enemy1					V
+ Enemy2					V
+ Enemy3
+ Enemy4 ?
+
+Programmation niveau
+ Spawn ennemies				V
+  Transition				V
+ Game Over
+ Objet arme				V
+ Joueur frapper				V
+ Différents niveau			V
+ Système de vie				V
+
+Menu
+ Ecran principal
+  Jouer					V
+  Quitter				V
+ Ecran sélection
+  Contrôles
+  Skin?
+  Niveaux
+ Ecran Game Over
+  Retour sélection
+ Ecran Victoire
+  Retour sélection
+
+Game Over
+ Chronomètre
+ donne écran de Game Over
+  Quand vie = 0
+  Quand chronomètre = 0
+
+Confort
+ Popup indicatifs
+ Chronomètre de vague
+ Faisage des niveaux (game design)
+ barre de vie
+
 Son
-Musique
+ Joueur
+ Ennemies
+ Sons
+
+Si on a le temps
+ Musique
+ Animations
+ Blocks de différents type
+ Dessin(s) intangibles
