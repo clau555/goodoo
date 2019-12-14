@@ -12,4 +12,4 @@ class Weapon:
 		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width,self.width)) # hitbox
 		self.sprite = pygame.image.load("./ressources/weapon/1.png")
 
-		self.popup = Popup(self.rect.x, self.rect.y, 'TAKE ME', 'weapon' )
+		self.popup = Popup(self.rect.x, self.rect.y, 'PICK ME', 'weapon' )

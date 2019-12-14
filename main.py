@@ -40,6 +40,7 @@ while Globals.launched:
 		Globals.enemies = []
 		Globals.projectiles = []
 		Globals.mists = []
+		Globals.popups = []
 		Globals.transition = Globals.TRANSITION
 
 	elif Globals.ecran == "menu":

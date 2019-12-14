@@ -71,7 +71,7 @@ def guide_display(screen):
 	# ======================================== DESSIN DES SURFACES
 
 	# fond
-	screen.surface.fill(Globals.BLACK)
+	screen.surface.blit(screen.guide, (0,0))
 
 	# titre
 	title = TITLE_FONT.render("GUIDE", False, Globals.WHITE)

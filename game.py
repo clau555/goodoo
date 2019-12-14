@@ -357,7 +357,7 @@ def game_display(screen):
 
 	# fond
 	#screen.surface.fill(Globals.BLACK)
-	screen.surface.blit(screen.sprite, (0,0))
+	screen.surface.blit(screen.background, (0,0))
 
 
 	# blocs
