@@ -1,3 +1,5 @@
+# coding : utf-8
+
 from classes.entity import *
 from classes.player import *
 from classes.weapon import *

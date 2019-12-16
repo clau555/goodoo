@@ -1,3 +1,5 @@
+# coding : utf-8
+
 class Globals:
 
 	RATIO = 20 # ratio écran / grille

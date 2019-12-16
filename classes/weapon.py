@@ -1,3 +1,5 @@
+# coding : utf-8
+
 import pygame
 from gl0bals import *
 from classes.popup import *

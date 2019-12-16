@@ -1,16 +1,5 @@
-"""
--- EN COURS
-Changelog 6:
-	Corrections diverses
-	Transition entre les vagues
-	Menu et sélection des niveaux
-	Game over
-	Setup niveaux 1, 2 et 3
-	Amélioration IA
-	Ennemies 3 et 4?
-"""
+# coding : utf-8
 
-import inspect
 from game import *
 from menu import *
 from guide import * 
