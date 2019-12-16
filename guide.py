@@ -1,4 +1,4 @@
-# coding : utf-8s
+# -*- coding : utf-8 -*-
 
 import pygame
 
