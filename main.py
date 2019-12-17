@@ -9,7 +9,6 @@ from game_victory import *
 from gl0bals import *
 
 
-pygame.init()
 screen = Screen()
 
 Globals.launched = True

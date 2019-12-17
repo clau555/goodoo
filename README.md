@@ -5,7 +5,8 @@ Le but d'un niveau est d'arriver à passer 3 vagues d'ennemis. Au début d'une v
 
 # Mode d'emploi
 
-- Ce programme s'exécute avec la librairie Pygame de Python.
+- Ce programme s'exécute avec la librairie <a href="https://www.pygame.org/wiki/GettingStarted">Pygame</a> de Python.
+- Vous aurez aussi besoin de la libraire <a href="https://pillow.readthedocs.io/en/stable/installation.html">Pillow</a>.
 - Exécutez le <code>main.py</code> pour lancer le jeu.
 
 <br>
