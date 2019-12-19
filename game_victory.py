@@ -73,7 +73,8 @@ def victory_display(screen):
 	# ======================================== DESSIN DES SURFACES
 
 	# fond
-	screen.surface.fill(Globals.BLACK)
+	#screen.surface.fill(Globals.BLACK)
+	screen.surface.blit(screen.background_victory, (0,0))
 
 	# titre
 	title = TITLE_FONT.render("VICTORY", False, Globals.WHITE)

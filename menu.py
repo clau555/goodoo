@@ -104,7 +104,8 @@ def menu_display(screen):
 	# ======================================== DESSIN DES SURFACES
 
 	# fond
-	screen.surface.fill(Globals.BLACK)
+	#screen.surface.fill(Globals.BLACK)
+	screen.surface.blit(screen.background_menu, (0,0))
 
 	# titre
 	title = TITLE_FONT.render("GOODOO", False, Globals.WHITE)
