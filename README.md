@@ -1,7 +1,13 @@
 # Goodoo
 
+![screenshot1](ressources/screenshot1.jpg "Menu")
+
 Goodoo est un jeu vidéo de type platformer.
 Le but d'un niveau est d'arriver à passer 3 vagues d'ennemis. Au début d'une vague, le joueur est vulnérable face aux ennemis qui apparaissent. Il doit se débrouiller pour aller chercher une arme placée sur la carte pour par la suite éliminer les ennemis.
+
+![screenshot1](ressources/screenshot2.jpg "Level 1")
+
+![screenshot1](ressources/screenshot3.jpg "Level 2")
 
 # Mode d'emploi
 
