@@ -349,6 +349,8 @@ def game_body(screen):
 		Globals.ecran = "game_victory"
 	# défaite d'un niveau
 	elif over:
+		Globals.m = 5
+		Globals.s = 0
 		Globals.ecran = "game_over"
 
 
