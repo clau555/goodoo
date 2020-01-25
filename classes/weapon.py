@@ -1,6 +1,7 @@
 # -*- coding : utf-8 -*-
 
 import pygame
+
 from gl0bals import *
 from classes.popup import *
 
@@ -14,6 +15,8 @@ class Weapon:
 		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width,self.width)) # hitbox
 		self.sprite = pygame.image.load("./ressources/weapon/1.png")
 
+		self.alive = True
+
 		self.popup = Popup(self.rect.x, self.rect.y, 'PICK ME', 'weapon' )
 
 	def update(self, player):
@@ -24,6 +27,7 @@ class Weapon:
 				del Globals.popups[Globals.popups.index(player.popup)]
 			player.popup = Popup( player.rect.x - 1.5 * Globals.RATIO, player.rect.y - 1 * Globals.RATIO, "   PRESS X", 'player' )
 			self.popup.TTL = 0
+			self.alive = False
 			self = None
 
 	def display(self, screen):

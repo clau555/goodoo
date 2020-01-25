@@ -25,7 +25,6 @@ from classes.level6 import *
 
 class Game:
 
-
 	def __init__(self):
 
 		# niveau
@@ -62,9 +61,7 @@ class Game:
 		self.victory = False
 		self.wave = 0
 
-
-
-	# ==================================================================================================================================
+# ==================================================================================================================================
 
 	def body(self, screen):
 
@@ -115,11 +112,9 @@ class Game:
 			if not enemy.alive or enemy.rect.top > screen.resolution[1]:
 				del Globals.enemies[Globals.enemies.index(enemy)]
 
-
 		# PROJECTILES
 		for projectile in Globals.projectiles:
 			projectile.update(player, screen)
-
 
 		# JOUEUR
 		player.update(keys, screen)
@@ -128,11 +123,9 @@ class Game:
 		if weapon != None:
 			weapon.update(player)
 
-
 		# POPUPS
 		for popup in Globals.popups:
 			popup.update(player, weapon)
-
 
 		# GAME OVER
 
@@ -161,7 +154,6 @@ class Game:
 
 	# ==================================================================================================================================
 
-
 	def display(self, screen):
 
 		player = self.level.player
@@ -170,7 +162,6 @@ class Game:
 		# fond
 		#screen.surface.fill(Globals.BLACK)
 		screen.surface.blit(screen.background, (0,0))
-
 
 		# blocs
 		for block in Globals.blocks:
@@ -182,7 +173,7 @@ class Game:
 				enemy.display(screen)
 
 		# arme
-		if weapon != None and not player.weaponized:
+		if weapon != None and weapon.alive and not player.weaponized:
 			weapon.display(screen)
 
 		# brouillard
@@ -210,14 +201,12 @@ class Game:
 		#screen.surface.blit(heart_text, (5, 55) )
 		screen.surface.blit(chrono_text, ( 3 * Globals.RATIO, 0.5 * Globals.RATIO) )
 
-
 		# MISE A JOUR
 		pygame.display.flip() # actualisation de l'écran
 		Globals.counter += 1
 		self.clock.tick(Globals.FPS)
 
-	# ==================================================================================================================================
-
+# ==================================================================================================================================
 
 def chronometre():
 
