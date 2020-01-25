@@ -15,7 +15,7 @@ class Enemy2(Entity):
 		super().__init__(
 						(x , y), # position initiale
 						(1.0 , 1.5), # dimensions
-						list([(i / 20.0) - 1 for i in range(0, 40)]), # vélocité x
+						list([(i / 100.0)+0.01 for i in range(0, 5)]), # plage de vélocités x
 						list([(i / 20.0) - 1 for i in range(0, 40)]), # vélocité y
 						[ pygame.image.load("./ressources/enemy2/1.png") ], # sprites de droite
 						[ pygame.image.load("./ressources/enemy2/2.png") ] # sprites de gauche
