@@ -31,6 +31,7 @@ class Projectile():
 
 
 	def move_single_axis(self):
+
 		self.rect.x += self.vx
 		self.rect.y += self.vy
 
@@ -40,7 +41,6 @@ class Projectile():
 
 
 	def animation(self):
-		"""Oriente le sprite joueur selon son dernier mouvement"""
 
 		# passe au sprite suivant toute les 10 images (0.2 sec)
 		if Globals.counter%10 == 0:
@@ -50,3 +50,24 @@ class Projectile():
 			self.animation_counter = 0
 
 		self.sprite = self.sprites[self.animation_counter]
+
+
+	def update(self, player, screen):
+
+		# déplacement
+		self.move_single_axis()
+
+		# joueur touché
+		if player.rect.colliderect(self.rect) and not player.hurted:
+			player.heart -= 1
+			player.hurted = True
+			player.invincible_counter = player.INVINCIBLE
+
+		# out of bounds
+		if self.rect.left >= screen.resolution[0] or self.rect.right <= 0 or self.rect.bottom <= 0 or self.rect.top >= screen.resolution[1]:
+			del Globals.projectiles[Globals.projectiles.index(self)]
+
+	def display(self, screen):
+		self.animation()
+		#pygame.draw.rect(screen.surface, Globals.RED, self.rect) # hitbox
+		screen.surface.blit(self.sprite, (self.rect.x, self.rect.y) )

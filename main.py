@@ -16,49 +16,45 @@ Globals.launched = True
 while Globals.launched:
 
 	if Globals.ecran == "game":
-		game_initialize()
+		game = Game()
 		while Globals.ecran == "game" and Globals.launched:
-			game_body(screen)
-			game_display(screen)
+			game.body(screen)
+			game.display(screen)
 		# vidage de la mémoire
 		Globals.blocks = []
-		Globals.enemies1 = []
-		Globals.enemies2 = []
-		Globals.enemies3 = []
 		Globals.enemies = []
 		Globals.projectiles = []
 		Globals.mists = []
 		Globals.popups = []
-		Globals.transition = Globals.TRANSITION
 
 	elif Globals.ecran == "menu":
-		menu_initialize()
+		menu = Menu()
 		while Globals.ecran == "menu" and Globals.launched:
-			menu_body(screen)
-			menu_display(screen)
+			menu.body(screen)
+			menu.display(screen)
 
 	elif Globals.ecran == "select":
-		select_initialize()
+		selection = Selection()
 		while Globals.ecran == "select" and Globals.launched:
-			select_body(screen)
-			select_display(screen)
+			selection.body(screen)
+			selection.display(screen)
 
 	elif Globals.ecran == "guide":
-		guide_initialize()
+		guide = Guide()
 		while Globals.ecran == "guide" and Globals.launched:
-			guide_body(screen)
-			guide_display(screen)
+			guide.body(screen)
+			guide.display(screen)
 
 	elif Globals.ecran == "game_over":
-		over_initialize()
+		gameover = GameOver()
 		while Globals.ecran == "game_over" and Globals.launched:
-			over_body(screen)
-			over_display(screen)
+			gameover.body(screen)
+			gameover.display(screen)
 
 	elif Globals.ecran == "game_victory":
-		victory_initialize()
+		gamevictory = GameVictory()
 		while Globals.ecran == "game_victory" and Globals.launched:
-			victory_body(screen)
-			victory_display(screen)
+			gamevictory.body(screen)
+			gamevictory.display(screen)
 
 pygame.quit()

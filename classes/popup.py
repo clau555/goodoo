@@ -27,3 +27,28 @@ class Popup():
 
 		elif Globals.counter % 5 == 0:
 			self.text = self.FONT.render(self.string, False, Globals.LIGHT_GRAY)
+
+	def update(self, player, weapon):
+
+		if self.TTL > 0:
+			self.TTL -= 1
+		
+		if self.type == "player":
+			self.x = player.rect.x - 1.5 * Globals.RATIO
+			self.y = player.rect.y - 1 * Globals.RATIO
+
+		if self.type == "weapon" and weapon != None:
+			self.x = weapon.rect.x - 1 * Globals.RATIO
+			self.y = weapon.rect.y - 1 * Globals.RATIO
+		elif self.type == "weapon" and player.weaponized:
+			self.TTL = 0
+		
+		if self.TTL == 0:
+			del Globals.popups[Globals.popups.index(self)]
+
+	def display(self, screen, player, weapon):
+		self.animation()
+		if self.type == 'weapon' and weapon != None:
+			screen.surface.blit(self.text, (self.x, self.y) )
+		elif self.type != 'weapon':
+			screen.surface.blit(self.text, (self.x, self.y) )

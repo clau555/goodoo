@@ -1,5 +1,7 @@
 # -*- coding : utf-8 -*-
 
+import pygame
+
 class Globals:
 
 	RATIO = 20 # ratio écran / grille
@@ -8,6 +10,9 @@ class Globals:
 	counter = 0 # compteur de boucle
 	launched = False
 	ecran = "menu"
+	pygame.font.init()
+	FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 15)
+	TITLE_FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 40)
 	m = 5
 	s = 0
 
@@ -28,9 +33,6 @@ class Globals:
 	blocks = [] # liste qui stock des blocs de l'environnement
 
 	# ENNEMIES
-	enemies1 = [] # liste des ennemies de type 1
-	enemies2 = [] # liste des ennemies de type 2
-	enemies3 = [] # liste des ennemies de type 3
 	enemies = [] # liste de tout les ennemies
 
 	# PROJECTILES
@@ -38,7 +40,7 @@ class Globals:
 
 	# BROUILLARD
 	TRANSITION = 180 # attente entre deux vagues (en image/sec)
-	transition = TRANSITION # compteur entre deux vagues
+	transition_counter = TRANSITION # compteur entre deux vagues
 	mists = []
 
 	# POPUPS

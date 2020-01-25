@@ -30,3 +30,9 @@ class Mist():
 			self.animation_counter = 0
 
 		self.sprite = self.sprites[self.animation_counter]
+
+
+	def display(self, screen):
+		self.animation()
+		#pygame.draw.rect(screen.surface, Globals.PURPLE, self.rect) # hitbox
+		screen.surface.blit(self.sprite, (self.rect.x, self.rect.y) )

@@ -46,12 +46,6 @@ class Level2:
 
 
 		def wave2(self):
-			# JOUEUR
-			self.player.weaponized = False
-			self.player.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
-									pygame.image.load("./ressources/goodoo_white/2.png") ]
-			self.player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
-									pygame.image.load("./ressources/goodoo_white/4.png") ]
 			# ARME
 			self.weapon = Weapon(31.0, 33.0)
 			# ENNEMIES
@@ -70,12 +64,6 @@ class Level2:
 
 
 		def wave3(self):
-			# JOUEUR
-			self.player.weaponized = False
-			self.player.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
-									pygame.image.load("./ressources/goodoo_white/2.png") ]
-			self.player.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
-									pygame.image.load("./ressources/goodoo_white/4.png") ]
 			# ARME
 			self.weapon = Weapon(8.0, 1.0)
 			# ENNEMIES

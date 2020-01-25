@@ -12,13 +12,10 @@ class Player(Entity):
 	def __init__(self, x, y):
 
 		super().__init__(
-						x, # x initial
-						y, # y initial
-						1.0, # largeur
-						1.0, # hauteur
-						list([(i / 20.0) - 1 for i in range(0, 40)]), # vélocité x
-						list([(i / 20.0) - 1 for i in range(0, 40)]), # vélocité y
-						0.2, # vélocité fixée
+						(x , y), # position initiale
+						(1.0 , 1.0), # dimensions
+						list([(i / 100.0) + 0.1 for i in range(0, 20)]), # plage de vélocités x
+						list([(i / 20.0) - 1 for i in range(0, 40)]), # plage de vélocités y
 						[ pygame.image.load("./ressources/goodoo_white/1.png"), pygame.image.load("./ressources/goodoo_white/2.png") ], # sprites de droite
 						[ pygame.image.load("./ressources/goodoo_white/3.png"), pygame.image.load("./ressources/goodoo_white/4.png") ] # sprites de gauche
 						)
@@ -31,8 +28,7 @@ class Player(Entity):
 		self.COOLDOWN = 10 # temps de recharge d'une frappe
 		self.cooldown_counter = 0
 
-		self.HEART = 5 # barre de vie
-		self.heart = self.HEART
+		self.heart = 5 # barre de vie
 		self.heart_sprite = [ pygame.image.load("./ressources/heart/5.png"), pygame.image.load("./ressources/heart/4.png"),
 							pygame.image.load("./ressources/heart/3.png"), pygame.image.load("./ressources/heart/2.png"),
 							pygame.image.load("./ressources/heart/1.png"), pygame.image.load("./ressources/heart/0.png") ]
@@ -59,4 +55,87 @@ class Player(Entity):
 		for enemy in Globals.enemies:
 
 			if self.hit_rect.colliderect(enemy.rect):
-				enemy.killed = True
+				enemy.alive = False
+
+
+	def update(self, keys, screen):
+
+		# déplacement gauche
+		if keys[pygame.K_LEFT]:
+			if not(keys[pygame.K_RIGHT]):
+				self.last_move = "left"
+			self.x_speeds_index += 1
+			if self.x_speeds_index >= len(self.x_speeds):
+				self.x_speeds_index = len(self.x_speeds) - 1
+			self.move(-self.x_speeds[self.x_speeds_index], 0)
+
+		# déplacement droit
+		elif keys[pygame.K_RIGHT]:
+			if not(keys[pygame.K_LEFT]):
+				self.last_move = "right"
+			self.x_speeds_index += 1
+			if self.x_speeds_index >= len(self.x_speeds):
+				self.x_speeds_index = len(self.x_speeds) - 1
+			self.move(self.x_speeds[self.x_speeds_index], 0)
+
+		# aucun déplacement
+		else:
+			self.x_speeds_index = 0
+
+		# saut
+		if keys[pygame.K_SPACE] and self.on_ground and not self.jumping:
+			self.jumping = True
+			self.y_speeds_index = len(self.y_speeds)//6 # rang de vélocité d'impulsion initiale
+		if self.jumping:
+			self.jump()
+
+		# gravité
+		if not self.jumping:
+			self.gravity()
+
+		# frappe
+		if self.weaponized and keys[pygame.K_x] and self.cooldown_counter == 0:
+			self.hit()
+			self.cooldown_counter = self.COOLDOWN + 1
+		if self.cooldown_counter > 0:
+			self.cooldown_counter -= 1
+
+		# touché
+		if self.hurted and self.invincible_counter > 0:
+			self.invincible_counter -= 1
+		elif self.hurted and self.invincible_counter == 0:
+			self.hurted = False
+
+		# game over
+		if self.heart <= 0 or self.rect.y > screen.resolution[1]:
+			self.alive = False
+
+		# animation
+		if self.weaponized:
+			self.sprites_right = [ pygame.image.load("./ressources/goodoo_gold/1.png"),
+									pygame.image.load("./ressources/goodoo_gold/2.png") ]
+			self.sprites_left = [ pygame.image.load("./ressources/goodoo_gold/3.png"),
+									pygame.image.load("./ressources/goodoo_gold/4.png") ]
+		else:
+			self.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
+									pygame.image.load("./ressources/goodoo_white/2.png") ]
+			self.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
+									pygame.image.load("./ressources/goodoo_white/4.png") ]
+		self.animation(self.last_move)
+
+
+	def display(self, screen):
+
+		#pygame.draw.rect(screen.surface, Globals.RED, self.rect) # hitbox
+		if not self.hurted:
+			screen.surface.blit(self.sprite, (self.rect.x, self.rect.y) )
+		elif self.hurted and Globals.counter % 4 == 0:
+			screen.surface.blit(self.sprite, (self.rect.x, self.rect.y) )
+		#pygame.draw.rect(screen.surface, Globals.PURPLE, self.blockcollide) # bloc de collision
+		screen.surface.blit(self.heart_sprite[self.heart], (0.5 * Globals.RATIO, 0.5 * Globals.RATIO) )
+
+		# frappe
+		if self.cooldown_counter == self.COOLDOWN and self.last_move == "right":
+			screen.surface.blit(self.hit_sprite_right, (self.rect.x, self.rect.y - Globals.RATIO) )
+		elif self.cooldown_counter == self.COOLDOWN and self.last_move == "left":
+			screen.surface.blit(self.hit_sprite_left, (self.rect.x - Globals.RATIO, self.rect.y - Globals.RATIO) )

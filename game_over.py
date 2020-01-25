@@ -2,127 +2,75 @@
 
 import pygame
 
-
-# ============================== OBJETS ==============================
-
 from gl0bals import *
 from classes.screen import *
 
 
-# ==================================================================================================================================
+class GameOver:
 
-def over_initialize():
-
-	global FONT, TITLE_FONT, clock, selection, big_buttons
-
-	# ============================== INITIALISATION ==============================
-
-	# ========== TEXTE
-
-	pygame.font.init()
-	FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 15)
-	TITLE_FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 40)
+	def __init__(self):
+		self.selection = 1
 
 
-	# ========== HORLOGE
+	def body(self, screen):
 
-	clock = pygame.time.Clock()
+		# EVENTS
+		for event in pygame.event.get():
 
-	# ========== MENU
+			if event.type == pygame.QUIT:
+				Globals.launched = False
 
-	selection = 1
+			elif event.type == pygame.KEYDOWN:
+
+				# selection
+
+				if event.key == pygame.K_DOWN:
+					self.selection += 1
+
+				elif event.key == pygame.K_UP:
+					self.selection -= 1
+
+				# activation de la selection
+				elif event.key == pygame.K_RETURN:
+					# retour arrière
+					if self.selection == 0:
+						Globals.ecran = "select"
+					# lancement d'un niveau
+					elif self.selection == 1:
+						Globals.ecran = "game"
+
+		#  FENETRE
+		keys = pygame.key.get_pressed()
+		screen.update(keys)
+
+		# SELECTION
+		if self.selection > 1:
+			self.selection = 1
+		elif self.selection < 0:
+			self.selection = 0
 
 
-# ==================================================================================================================================
+	def display(self, screen):
 
-def over_body(screen):
+		# fond
+		#screen.surface.fill(Globals.BLACK)
+		screen.surface.blit(screen.background_over, (0,0))
 
-	global selection
+		# titre
+		title = Globals.TITLE_FONT.render("GAME OVER", False, Globals.RED)
+		screen.surface.blit(title, (1*Globals.RATIO, 1*Globals.RATIO) )
 
+		# retour arrière
+		if self.selection == 0:
+			back_button = Globals.FONT.render("MENU <-", False, Globals.RED)
+			retry_button = Globals.FONT.render("RETRY", False, Globals.WHITE)
+		elif self.selection == 1:
+			back_button = Globals.FONT.render("MENU", False, Globals.WHITE)
+			retry_button = Globals.FONT.render("RETRY <-", False, Globals.WHITE)
 
-	# ======================================== EVENTS
-
-	for event in pygame.event.get():
-
-		if event.type == pygame.QUIT:
-			Globals.launched = False
-
-		elif event.type == pygame.KEYDOWN:
-
-			# selection
-
-			if event.key == pygame.K_DOWN:
-				selection += 1
-
-			elif event.key == pygame.K_UP:
-				selection -= 1
-
-			# activation de la selection
-			elif event.key == pygame.K_RETURN:
-				# retour arrière
-				if selection == 0:
-					Globals.ecran = "select"
-				# lancement d'un niveau
-				elif selection == 1:
-					Globals.ecran = "game"
-
-	keys = pygame.key.get_pressed()
-
-	# ======================================== FENETRE
-
-	# quitter
-	if keys[pygame.K_ESCAPE]:
-		Globals.launched = False
-
-	# plein écran
-	if keys[pygame.K_F11] and screen.fullscreen==False:
-		screen.surface = pygame.display.set_mode(screen.resolution, pygame.FULLSCREEN)
-		pygame.mouse.set_visible(False)
-		screen.fullscreen = True
-	elif keys[pygame.K_F11] and screen.fullscreen==True:
-		screen.surface = pygame.display.set_mode(screen.resolution)
-		pygame.mouse.set_visible(True)
-		screen.fullscreen = False
-
-	# ======================================== SELECTION
-
-	if selection > 1:
-		selection = 1
-	elif selection < 0:
-		selection = 0
-
-# ==================================================================================================================================
-
-def over_display(screen):
-
-	global FONT, TITLE_FONT, clock, selection
-
-	# ======================================== DESSIN DES SURFACES
-
-	# fond
-	#screen.surface.fill(Globals.BLACK)
-	screen.surface.blit(screen.background_over, (0,0))
-
-	# titre
-	title = TITLE_FONT.render("GAME OVER", False, Globals.RED)
-	screen.surface.blit(title, (1*Globals.RATIO, 1*Globals.RATIO) )
-
-	# retour arrière
-	if selection == 0:
-		back_button = FONT.render("MENU <-", False, Globals.RED)
-		retry_button = FONT.render("RETRY", False, Globals.WHITE)
-	elif selection == 1:
-		back_button = FONT.render("MENU", False, Globals.WHITE)
-		retry_button = FONT.render("RETRY <-", False, Globals.WHITE)
-
-	screen.surface.blit(back_button, (4*Globals.RATIO, 6*Globals.RATIO) )
-	screen.surface.blit(retry_button, (4*Globals.RATIO, 8*Globals.RATIO) )
-
-	# actualisation de l'écran
-	pygame.display.flip()
-
-	
-	# ========== MISE A JOUR
-
-	Globals.counter += 1
-	clock.tick(Globals.FPS)
+		screen.surface.blit(back_button, (4*Globals.RATIO, 6*Globals.RATIO) )
+		screen.surface.blit(retry_button, (4*Globals.RATIO, 8*Globals.RATIO) )
+		
+		# MISE A JOUR
+		pygame.display.flip()
+		Globals.counter += 1
