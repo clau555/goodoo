@@ -23,10 +23,8 @@ class GameOver:
 			elif event.type == pygame.KEYDOWN:
 
 				# selection
-
 				if event.key == pygame.K_DOWN:
 					self.selection += 1
-
 				elif event.key == pygame.K_UP:
 					self.selection -= 1
 

@@ -214,7 +214,7 @@ def chronometre():
 		if Globals.s == 0:
 			Globals.s = 59
 			Globals.m -= 1
-		elif Globals.m == 0 and Globals.s == 0:
+		elif Globals.m <= 0 and Globals.s <= 0:
 			Globals.s = 0
 			Globals.m = 0
 		else:
