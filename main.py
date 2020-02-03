@@ -1,12 +1,12 @@
 # -*- coding : utf-8 -*-
 
-from game import *
-from menu import *
-from guide import * 
-from select2 import *
-from game_over import *
-from game_victory import *
-from gl0bals import *
+from view.game import *
+from view.menu import *
+from view.guide import * 
+from view.selection import *
+from view.game_over import *
+from view.game_victory import *
+from global_variables import *
 
 
 screen = Screen()

@@ -1,7 +1,7 @@
 # -*- coding : utf-8 -*-
 
 import pygame
-from gl0bals import *
+from global_variables import *
 
 class Screen():
 

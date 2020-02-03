@@ -2,7 +2,7 @@
 
 import pygame
 
-from gl0bals import *
+from global_variables import *
 from classes.screen import *
 from classes.big_button import *
 

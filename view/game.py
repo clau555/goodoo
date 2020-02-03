@@ -3,7 +3,7 @@
 import pygame
 import random
 
-from gl0bals import *
+from global_variables import *
 from classes.screen import *
 from classes.block import *
 from classes.entity import *

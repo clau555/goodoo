@@ -2,7 +2,7 @@
 
 import pygame
 
-from gl0bals import *
+from global_variables import *
 from classes.popup import *
 
 class Weapon:

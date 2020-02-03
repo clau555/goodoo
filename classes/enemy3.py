@@ -2,7 +2,7 @@
 
 import pygame
 import random
-from gl0bals import *
+from global_variables import *
 from classes.entity import *
 from classes.block import *
 from classes.projectile import *

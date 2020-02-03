@@ -2,7 +2,7 @@
 
 import pygame
 import math
-from gl0bals import *
+from global_variables import *
 
 class Big_button():
 
