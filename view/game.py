@@ -13,7 +13,7 @@ from classes.enemy2 import *
 from classes.enemy3 import *
 from classes.weapon import *
 from classes.projectile import *
-from classes.mist import *
+from classes.particle import *
 from classes.level1 import *
 from classes.level2 import *
 from classes.level3 import *
@@ -94,7 +94,7 @@ class Game:
 				elif Globals.transition_counter <= 0:
 					self.wave = i+1
 					self.level.waves[i](self.level)
-					Globals.mists = []
+					Globals.particles = []
 					Globals.transition_counter = Globals.TRANSITION
 
 		# ENNEMIES
@@ -161,7 +161,7 @@ class Game:
 
 		# fond
 		#screen.surface.fill(Globals.BLACK)
-		screen.surface.blit(screen.background, (0,0))
+		screen.surface.blit(screen.background_game, (0,0))
 
 		# blocs
 		for block in Globals.blocks:
@@ -177,8 +177,8 @@ class Game:
 			weapon.display(screen)
 
 		# brouillard
-		for mist in Globals.mists:
-			mist.display(screen)
+		for particle in Globals.particles:
+			particle.display(screen)
 
 		# joueur
 		player.display(screen)

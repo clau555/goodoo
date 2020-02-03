@@ -6,7 +6,7 @@ from classes.weapon import *
 from classes.enemy1 import *
 from classes.enemy2 import *
 from classes.enemy3 import *
-from classes.mist import *
+from classes.particle import *
 from ressources.conversion_tool import *
 
 # ========== VAGUES
@@ -25,10 +25,10 @@ class Level6:
 
 		def pre_wave1(self):
 
-			Mist(1.0, 25.0)
-			Mist(10.0, 5.0)
-			Mist(60.0, 25.0)
-			Mist(55.0, 5.0)
+			Particle(1.0, 25.0)
+			Particle(10.0, 5.0)
+			Particle(60.0, 25.0)
+			Particle(55.0, 5.0)
 
 
 		def wave1(self):
@@ -47,10 +47,10 @@ class Level6:
 
 		def pre_wave2(self):
 
-			Mist(1.0, 25.0)
-			Mist(4.0, 6.0)
-			Mist(60.0, 25.0)
-			Mist(59.0, 6.0)
+			Particle(1.0, 25.0)
+			Particle(4.0, 6.0)
+			Particle(60.0, 25.0)
+			Particle(59.0, 6.0)
 
 
 		def wave2(self):
@@ -66,10 +66,10 @@ class Level6:
 
 		def pre_wave3(self):
 
-			Mist(1.0, 25.0)
-			Mist(10.0, 5.0)
-			Mist(60.0, 25.0)
-			Mist(55.0, 5.0)
+			Particle(1.0, 25.0)
+			Particle(10.0, 5.0)
+			Particle(60.0, 25.0)
+			Particle(55.0, 5.0)
 
 		def wave3(self):
 			# ARME

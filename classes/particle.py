@@ -4,7 +4,7 @@ import pygame
 import math
 from global_variables import *
 
-class Mist():
+class Particle():
 
 	def __init__(self, x, y):
 
@@ -17,7 +17,7 @@ class Mist():
 		self.animation_counter = 0
 		self.sprite = self.sprites[self.animation_counter]
 		
-		Globals.mists.append(self)
+		Globals.particles.append(self)
 
 
 	def animation(self):

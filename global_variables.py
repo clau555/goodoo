@@ -41,7 +41,7 @@ class Globals:
 	# BROUILLARD
 	TRANSITION = 180 # attente entre deux vagues (en image/sec)
 	transition_counter = TRANSITION # compteur entre deux vagues
-	mists = []
+	particles = []
 
 	# POPUPS
 	popups = [] # liste de tout les popups
