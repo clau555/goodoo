@@ -1,11 +1,11 @@
 # -*- coding : utf-8 -*-
 
-from view.game import *
-from view.menu import *
-from view.guide import * 
-from view.selection import *
-from view.game_over import *
-from view.game_victory import *
+from views.game import *
+from views.menu import *
+from views.guide import * 
+from views.selection import *
+from views.game_over import *
+from views.game_victory import *
 from global_variables import *
 
 
