@@ -11,8 +11,8 @@ class Globals:
 	launched = False
 	ecran = "menu"
 	pygame.font.init()
-	FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 15)
-	TITLE_FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 40)
+	FONT = pygame.font.Font("./resources/FFFFORWA.TTF", 15)
+	TITLE_FONT = pygame.font.Font("./resources/FFFFORWA.TTF", 40)
 	m = 5
 	s = 0
 

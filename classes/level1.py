@@ -7,7 +7,7 @@ from classes.enemy1 import *
 from classes.enemy2 import *
 from classes.enemy3 import *
 from classes.particle import *
-from ressources.conversion_tool import *
+from resources.conversion_tool import *
 
 # ========== VAGUES
 
@@ -15,7 +15,7 @@ class Level1:
 
 	def __init__(self):
 
-		self.im = Image.open('ressources/levels_tab/tab1.jpg')
+		self.im = Image.open('resources/levels_tab/tab1.jpg')
 		self.TAB = convert_to_tab(self.im)
 
 		self.player = Player(13.0, 31.0)

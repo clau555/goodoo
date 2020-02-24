@@ -16,8 +16,8 @@ class Enemy1(Entity):
 						(0.6 , 0.6), # dimensions
 						None, # plages de vélocités en x inutile ici
 						list([(i / 20.0) - 1 for i in range(0, 40)]), # plages de vélocités en y
-						[ pygame.image.load("./ressources/enemy1/1.png"), pygame.image.load("./ressources/enemy1/2.png") ], # sprites de droite
-						[ pygame.image.load("./ressources/enemy1/1.png"), pygame.image.load("./ressources/enemy1/2.png") ] # sprites de gauche
+						[ pygame.image.load("./resources/enemy1/1.png"), pygame.image.load("./resources/enemy1/2.png") ], # sprites de droite
+						[ pygame.image.load("./resources/enemy1/1.png"), pygame.image.load("./resources/enemy1/2.png") ] # sprites de gauche
 						)
 		Globals.enemies.append(self)
 

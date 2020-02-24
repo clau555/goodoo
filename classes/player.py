@@ -16,22 +16,22 @@ class Player(Entity):
 						(1.0 , 1.0), # dimensions
 						list([(i / 100.0) + 0.1 for i in range(0, 20)]), # plage de vélocités x
 						list([(i / 20.0) - 1 for i in range(0, 40)]), # plage de vélocités y
-						[ pygame.image.load("./ressources/goodoo_white/1.png"), pygame.image.load("./ressources/goodoo_white/2.png") ], # sprites de droite
-						[ pygame.image.load("./ressources/goodoo_white/3.png"), pygame.image.load("./ressources/goodoo_white/4.png") ] # sprites de gauche
+						[ pygame.image.load("./resources/goodoo_white/1.png"), pygame.image.load("./resources/goodoo_white/2.png") ], # sprites de droite
+						[ pygame.image.load("./resources/goodoo_white/3.png"), pygame.image.load("./resources/goodoo_white/4.png") ] # sprites de gauche
 						)
 
 		self.weaponized = False # vrai si possède l'arme (weapon)
 		self.hit_rect = None # zone de dégât d'une frappe
-		self.hit_sprite_right = pygame.image.load("./ressources/hit/1.png")
-		self.hit_sprite_left = pygame.image.load("./ressources/hit/2.png")
+		self.hit_sprite_right = pygame.image.load("./resources/hit/1.png")
+		self.hit_sprite_left = pygame.image.load("./resources/hit/2.png")
 
 		self.COOLDOWN = 10 # temps de recharge d'une frappe
 		self.cooldown_counter = 0
 
 		self.heart = 5 # barre de vie
-		self.heart_sprite = [ pygame.image.load("./ressources/heart/5.png"), pygame.image.load("./ressources/heart/4.png"),
-							pygame.image.load("./ressources/heart/3.png"), pygame.image.load("./ressources/heart/2.png"),
-							pygame.image.load("./ressources/heart/1.png"), pygame.image.load("./ressources/heart/0.png") ]
+		self.heart_sprite = [ pygame.image.load("./resources/heart/5.png"), pygame.image.load("./resources/heart/4.png"),
+							pygame.image.load("./resources/heart/3.png"), pygame.image.load("./resources/heart/2.png"),
+							pygame.image.load("./resources/heart/1.png"), pygame.image.load("./resources/heart/0.png") ]
 
 		self.INVINCIBLE = 180 # temps d'invicibilité après être touché
 		self.invincible_counter = 0
@@ -112,15 +112,15 @@ class Player(Entity):
 
 		# animation
 		if self.weaponized:
-			self.sprites_right = [ pygame.image.load("./ressources/goodoo_gold/1.png"),
-									pygame.image.load("./ressources/goodoo_gold/2.png") ]
-			self.sprites_left = [ pygame.image.load("./ressources/goodoo_gold/3.png"),
-									pygame.image.load("./ressources/goodoo_gold/4.png") ]
+			self.sprites_right = [ pygame.image.load("./resources/goodoo_gold/1.png"),
+									pygame.image.load("./resources/goodoo_gold/2.png") ]
+			self.sprites_left = [ pygame.image.load("./resources/goodoo_gold/3.png"),
+									pygame.image.load("./resources/goodoo_gold/4.png") ]
 		else:
-			self.sprites_right = [ pygame.image.load("./ressources/goodoo_white/1.png"),
-									pygame.image.load("./ressources/goodoo_white/2.png") ]
-			self.sprites_left = [ pygame.image.load("./ressources/goodoo_white/3.png"),
-									pygame.image.load("./ressources/goodoo_white/4.png") ]
+			self.sprites_right = [ pygame.image.load("./resources/goodoo_white/1.png"),
+									pygame.image.load("./resources/goodoo_white/2.png") ]
+			self.sprites_left = [ pygame.image.load("./resources/goodoo_white/3.png"),
+									pygame.image.load("./resources/goodoo_white/4.png") ]
 		self.animation(self.last_move)
 
 

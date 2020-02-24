@@ -14,12 +14,12 @@ class Selection:
 	def __init__(self):
 
 		# MENU
-		big_button1 = Big_button(8, 10, pygame.image.load("./ressources/levels_img/tab1.jpg"))
-		big_button2 = Big_button(26, 10, pygame.image.load("./ressources/levels_img/tab2.jpg"))
-		big_button3 = Big_button(44, 10, pygame.image.load("./ressources/levels_img/tab3.jpg"))
-		big_button4 = Big_button(8, 25, pygame.image.load("./ressources/levels_img/tab4.jpg"))
-		big_button5 = Big_button(26, 25, pygame.image.load("./ressources/levels_img/tab5.jpg"))
-		big_button6 = Big_button(44, 25, pygame.image.load("./ressources/levels_img/tab6.jpg"))
+		big_button1 = Big_button(8, 10, pygame.image.load("./resources/levels_img/tab1.jpg"))
+		big_button2 = Big_button(26, 10, pygame.image.load("./resources/levels_img/tab2.jpg"))
+		big_button3 = Big_button(44, 10, pygame.image.load("./resources/levels_img/tab3.jpg"))
+		big_button4 = Big_button(8, 25, pygame.image.load("./resources/levels_img/tab4.jpg"))
+		big_button5 = Big_button(26, 25, pygame.image.load("./resources/levels_img/tab5.jpg"))
+		big_button6 = Big_button(44, 25, pygame.image.load("./resources/levels_img/tab6.jpg"))
 		self.big_buttons = [ big_button1, big_button2, big_button3, big_button4, big_button5, big_button6 ]
 
 		level1_title = Globals.FONT.render("001", False, Globals.WHITE)

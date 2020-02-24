@@ -17,10 +17,10 @@ class Enemy3(Entity):
 						(2.5 , 2.5), # dimensions
 						list([(i / 20.0) - 1 for i in range(0, 40)]), # vélocité x
 						list([(i / 20.0) - 1 for i in range(0, 40)]), # vélocité y
-						[ pygame.image.load("./ressources/enemy3/1.png"), pygame.image.load("./ressources/enemy3/2.png"),
-						pygame.image.load("./ressources/enemy3/3.png"), pygame.image.load("./ressources/enemy3/4.png") ], # sprites de droite
-						[ pygame.image.load("./ressources/enemy3/5.png"), pygame.image.load("./ressources/enemy3/6.png"),
-						pygame.image.load("./ressources/enemy3/7.png"), pygame.image.load("./ressources/enemy3/8.png"), ] # sprites de gauche
+						[ pygame.image.load("./resources/enemy3/1.png"), pygame.image.load("./resources/enemy3/2.png"),
+						pygame.image.load("./resources/enemy3/3.png"), pygame.image.load("./resources/enemy3/4.png") ], # sprites de droite
+						[ pygame.image.load("./resources/enemy3/5.png"), pygame.image.load("./resources/enemy3/6.png"),
+						pygame.image.load("./resources/enemy3/7.png"), pygame.image.load("./resources/enemy3/8.png"), ] # sprites de gauche
 						)
 		Globals.enemies.append(self)
 

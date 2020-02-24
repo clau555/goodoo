@@ -13,7 +13,7 @@ class Particle():
 		self.width = 1.0 * Globals.RATIO
 		self.rect = pygame.Rect((self.x, self.y), (self.width,self.width)) # hitbox
 
-		self.sprites = [pygame.image.load("./ressources/mist/1.png"), pygame.image.load("./ressources/mist/2.png")]
+		self.sprites = [pygame.image.load("./resources/mist/1.png"), pygame.image.load("./resources/mist/2.png")]
 		self.animation_counter = 0
 		self.sprite = self.sprites[self.animation_counter]
 		

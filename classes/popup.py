@@ -10,7 +10,7 @@ class Popup():
 		self.x = x # x initial
 		self.y = y # y initial
 
-		self.FONT = pygame.font.Font("./ressources/FFFFORWA.TTF", 10)
+		self.FONT = pygame.font.Font("./resources/FFFFORWA.TTF", 10)
 		self.string = text
 		self.text = self.FONT.render(text, True, Globals.LIGHT_GRAY)
 

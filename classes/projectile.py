@@ -22,8 +22,8 @@ class Projectile():
 		self.vx = self.vx_direct / self.coef
 		self.vy = self.vy_direct / self.coef
 
-		self.sprites = [pygame.image.load("./ressources/projectile/1.png").convert_alpha(),
-						pygame.image.load("./ressources/projectile/2.png").convert_alpha()]
+		self.sprites = [pygame.image.load("./resources/projectile/1.png").convert_alpha(),
+						pygame.image.load("./resources/projectile/2.png").convert_alpha()]
 		self.animation_counter = 0
 		self.sprite = self.sprites [self.animation_counter]
 

@@ -13,7 +13,7 @@ class Weapon:
 		self.y = y
 		self.width = 1.0 * Globals.RATIO
 		self.rect = pygame.Rect((self.x*Globals.RATIO, self.y*Globals.RATIO), (self.width,self.width)) # hitbox
-		self.sprite = pygame.image.load("./ressources/weapon/1.png")
+		self.sprite = pygame.image.load("./resources/weapon/1.png")
 
 		self.alive = True
 
