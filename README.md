@@ -1,5 +1,7 @@
 # Impulsive Goo
 
+Jeu vidéo de plateforme.
+
 ## Dépendances
 
 - [Pygame](https://www.pygame.org/wiki/GettingStarted)

@@ -1,17 +1,18 @@
 from config import GRAVITY, COLLISION_TOLERANCE, TILE_SCALE
-from displayable import *
+from displayable import Displayable
 from tile import Tile
 
 
 class Entity(Displayable):
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], sprite: str = None,
-                 velocity_max: tuple[int, int] = (3, 3), has_gravity: bool = True) -> None:
+                 velocity_max: tuple[int, int] = (int(TILE_SCALE * 0.075), int(TILE_SCALE * 0.075)),
+                 has_gravity: bool = True) -> None:
         super().__init__(pos, size, sprite)
         self._velocity: list[int, int] = [0, 0]
         self._velocity_max: tuple[int, int] = velocity_max
         self._has_gravity: bool = has_gravity
-        self._is_jumping: bool = False
+        self._is_on_ground: bool = False
         self.right: bool = False
         self.left: bool = False
         self.up: bool = False
@@ -30,9 +31,8 @@ class Entity(Displayable):
             self._velocity[0] = self._velocity_max[0]
 
         if self._has_gravity:
-            if self.up and not self._is_jumping:
+            if self.up and self._is_on_ground:
                 self._velocity[1] -= TILE_SCALE / 4
-                self._is_jumping = True
         else:
             if self.up and not self.down:
                 self._velocity[1] = -self._velocity_max[1]
@@ -44,7 +44,7 @@ class Entity(Displayable):
             self._velocity[1] += 1 if self._velocity[1] <= GRAVITY else 0
 
         # x axis movement execution
-        self.rect.x += self._velocity[0] * delta_time
+        self.rect.x += int(self._velocity[0] * delta_time)
 
         # x axis collisions
         for tile in tiles:
@@ -61,7 +61,9 @@ class Entity(Displayable):
                     self._velocity[0] = 0
 
         # y axis movement execution
-        self.rect.y += self._velocity[1] * delta_time
+        self.rect.y += int(self._velocity[1] * delta_time)
+
+        self._is_on_ground = False
 
         # y axis collisions
         for tile in tiles:
@@ -71,7 +73,7 @@ class Entity(Displayable):
                 if abs(self.rect.bottom - tile.rect.top) < COLLISION_TOLERANCE:
                     self.rect.bottom = tile.rect.top
                     self._velocity[1] = 0
-                    self._is_jumping = False
+                    self._is_on_ground = True
 
                 # top collision
                 if abs(self.rect.top - tile.rect.bottom) < COLLISION_TOLERANCE:

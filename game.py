@@ -1,6 +1,9 @@
 import pygame
 
-from level_parser import *
+from config import TILE_SCALE, SCREEN_WIDTH, SCREEN_HEIGHT
+from displayable import Displayable
+from level_parser import level_from_image
+from player import Player
 from tile import Tile
 
 
@@ -11,7 +14,7 @@ class Game:
         self.map: list[list[Tile]]
         self.player, self.map = level_from_image(level_file_name)
         self.tiles: list[Tile] = self._get_existing_tiles()
-        self.sky = pygame.image.load("assets/sky.jpg")
+        self.sky: Displayable = Displayable((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), sprite="assets/sky.jpg")
 
     def _get_existing_tiles(self) -> list[Tile]:
         tiles: list[Tile] = []
@@ -42,7 +45,7 @@ class Game:
                                     delta_time)
 
         # display
-        pygame.display.get_surface().blit(self.sky, (0, 0))
+        self.sky.display()
         for tile in self.tiles:
             tile.display()
         self.player.display()
