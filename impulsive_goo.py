@@ -22,12 +22,13 @@ def main(level_file_name: str = None) -> None:
         delta_time *= FPS
         last_time = time.time()
 
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-        game.update_and_display(delta_time)
+        game.update_and_display(events, delta_time)
 
         pygame.display.flip()
         pygame.time.Clock().tick(FPS)

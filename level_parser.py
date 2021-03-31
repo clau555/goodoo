@@ -35,7 +35,8 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Tile]]]:
                 player.rect.y = j * TILE_SCALE
                 player_spawn = True
             if pixel_comparison(current_pixel, (255, 255, 255)):
-                line.append(Tile((i * TILE_SCALE, j * TILE_SCALE)))
+                value = 2 * (WORLD_HEIGHT - j) + 30
+                line.append(Tile((i * TILE_SCALE, j * TILE_SCALE), (value, value, value)))
             else:
                 line.append(None)
 
