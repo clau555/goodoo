@@ -1,4 +1,5 @@
 import sys
+from typing import Union
 
 from PIL import Image
 
@@ -14,7 +15,7 @@ def pixel_comparison(pixel: tuple[int, int, int], color: tuple[int, int, int], m
            color[2] - pixel_margin[2] <= pixel[2] <= color[2] + pixel_margin[2]
 
 
-def level_from_image(file_name: str) -> tuple[Player, list[list[Tile]]]:
+def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None]]]]:
     im: Image = Image.open(file_name).convert('RGB')
 
     if im.size[0] != WORLD_WIDTH or im.size[1] != WORLD_HEIGHT:
@@ -26,7 +27,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Tile]]]:
     player_spawn = False
 
     for i in range(im.size[0]):
-        line: list[Tile] = []
+        line: list[Union[Tile, None]] = []
         for j in range(im.size[1]):
             current_pixel = im.getpixel((i, j))
 

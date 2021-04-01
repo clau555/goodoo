@@ -8,7 +8,7 @@ class Weapon(Collectable):
 
     def __init__(self, pos: tuple[int, int], sprite: str, weapon_type: int = 0, recoil: int = 0) -> None:
         super(Weapon, self).__init__(pos, sprite)
-        self.type = weapon_type
+        self.type: int = weapon_type
         self.recoil: int = recoil
 
     def action(self) -> None:
