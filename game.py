@@ -3,7 +3,7 @@ from typing import Union
 import pygame
 from pygame.event import Event
 
-from config import TILE_SCALE, SCREEN_WIDTH, SCREEN_HEIGHT
+from config import TILE_SCALE, SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 from displayable import Displayable
 from level_parser import level_from_image
 from player import Player
@@ -21,9 +21,12 @@ class Game:
         self.__sky: Displayable = Displayable((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), sprite="assets/sky.jpg")
 
         self.__entities = [self.__player]
-        self.__weapons = [Weapon((int(SCREEN_WIDTH / 2), int(SCREEN_HEIGHT / 2)), "assets/gun.png")]
+        self.__weapons = [Weapon((int(SCREEN_WIDTH / 2), int(SCREEN_HEIGHT / 2)), "assets/gun.png", Weapon.RANGE)]
 
         self.__debug = False
+
+    def get_player(self):
+        return self.__player
 
     def __get_existing_tiles(self) -> list[Tile]:
         tiles: list[Tile] = []
@@ -53,9 +56,9 @@ class Game:
         self.__player.update_from_inputs(events, self.__neighbor_tiles(self.__player.rect.center),
                                          self.__weapons, delta_time)
 
-        # unused items destruction
+        # unused items removal
         for collectable in self.__weapons:
-            if not collectable.is_active:
+            if not collectable.is_available:
                 self.__weapons.pop(self.__weapons.index(collectable))
 
         # display update
@@ -84,6 +87,11 @@ class Game:
 
             # player direction
             start_point = self.__player.rect.center
-            end_point = (self.__player.rect.centerx + self.__player.direction[0],
-                         self.__player.rect.centery + self.__player.direction[1])
+            end_point = (self.__player.rect.center + self.__player.get_direction())
             pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), start_point, end_point)
+
+            # fps
+            fps_str = str(int(1 / (delta_time / FPS)))
+            font = pygame.font.Font("freesansbold.ttf", 32)
+            text = font.render(fps_str, False, (255, 0, 0))
+            pygame.display.get_surface().blit(text, text.get_rect())

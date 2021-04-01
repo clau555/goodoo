@@ -8,7 +8,7 @@ from player import Player
 from tile import Tile
 
 
-def pixel_comparison(pixel: tuple[int, int, int], color: tuple[int, int, int], margin: int = 30) -> bool:
+def pixel_comparison(pixel: tuple[int, int, int], color: tuple[int, int, int], margin: int = 50) -> bool:
     pixel_margin = (margin, margin, margin)
     return color[0] - pixel_margin[0] <= pixel[0] <= color[0] + pixel_margin[0] and \
            color[1] - pixel_margin[1] <= pixel[1] <= color[1] + pixel_margin[1] and \
@@ -24,7 +24,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
 
     world: list[list[Tile]] = []
     player: Player = Player((0, 0))
-    player_spawn = False
+    player_spawn: bool = False
 
     for i in range(im.size[0]):
         line: list[Union[Tile, None]] = []
@@ -46,7 +46,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
     for i in range(len(world)):
         for j in range(len(world[i])):
             if world[i][j] is not None and j > 0 and world[i][j - 1] is None:
-                world[i][j].is_at_top = True
+                world[i][j].set_at_top(True)
 
     if not player_spawn:
         sys.exit("no player spawn point set inside the map")
