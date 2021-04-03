@@ -14,27 +14,33 @@ class Displayable:
         self.rect: Rect = pygame.Rect(pos, size)
         self.__color: tuple[int, int, int] = color
 
-        self.sprite: Union[Surface, None] = None
+        self.__sprite: Union[Surface, None] = None
         if sprite:
             if sprite_to_scale:
-                self.sprite = pygame.transform.scale(pygame.image.load(sprite), size)
+                self.__sprite = pygame.transform.scale(pygame.image.load(sprite), size)
             else:
-                self.sprite = pygame.image.load(sprite)
-        self.__original_sprite: Union[Surface, None] = self.sprite
+                self.__sprite = pygame.image.load(sprite)
+        self.__original_sprite: Union[Surface, None] = self.__sprite
 
-    def get_color(self):
+    def get_color(self) -> tuple[int, int, int]:
         return self.__color
 
-    def rotate(self, angle: float, flipped: bool = False) -> None:
+    def reset_sprite(self) -> None:
+        self.__sprite = self.__original_sprite
+
+    def flip_sprite(self) -> None:
+        self.__sprite = pygame.transform.flip(self.__original_sprite, True, False)
+
+    def rotate_sprite(self, angle: float, flipped: bool = False) -> None:
         if flipped:
-            self.sprite = pygame.transform.flip(self.__original_sprite, True, False)
-            self.sprite = pygame.transform.rotate(self.sprite, angle - 180)
+            self.__sprite = pygame.transform.flip(self.__original_sprite, True, False)
+            self.__sprite = pygame.transform.rotate(self.__sprite, angle - 180)
         else:
-            self.sprite = pygame.transform.rotate(self.__original_sprite, angle)
+            self.__sprite = pygame.transform.rotate(self.__original_sprite, angle)
 
     def display(self) -> None:
         screen = pygame.display.get_surface()
-        if self.sprite:
-            screen.blit(self.sprite, (self.rect.x, self.rect.y))
+        if self.__sprite:
+            screen.blit(self.__sprite, (self.rect.x, self.rect.y))
         else:
             pygame.draw.rect(screen, self.__color, self.rect)

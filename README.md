@@ -4,11 +4,11 @@ Jeu vidéo de plateforme.
 
 ## Dépendances
 
-- [Pygame](https://www.pygame.org/wiki/GettingStarted)
-- [Pillow](https://pillow.readthedocs.io/en/stable/installation.html)
+- [Pygame](https://pypi.org/project/pygame/) ```pip3 install pygame```
+- [Pillow](https://pythonexamples.org/python-pillow-read-image/) ```pip3 install pillow```
 
 ## Exécution
 
 ```
-python impulsive_goo.py levels/level_1.jpg
+python impulsive_goo.py levels/level_2.jpg
 ```

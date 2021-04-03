@@ -3,7 +3,7 @@ import time
 
 import pygame
 
-from config import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
 from game import Game
 
 
