@@ -48,7 +48,7 @@ class Game:
 
         self.__entities: list[Entity] = [self.__player]
 
-        gun: Weapon = Weapon(get_item_placement_from_index((7, 7)), "assets/gun.png", Weapon.RANGE)
+        gun: Weapon = Weapon(get_item_placement_from_index((7, 7)), "assets/gun.png", Weapon.RANGE, TILE_SCALE/4)
         saber: Weapon = Weapon(get_item_placement_from_index((9, 7)), "assets/saber.png", Weapon.MELEE)
         sword: Weapon = Weapon(get_item_placement_from_index((11, 7)), "assets/sword.png", Weapon.MELEE)
         self.__weapons: list[Weapon] = [gun, saber, sword]
@@ -128,6 +128,11 @@ class Game:
             start_point = self.__player.rect.center
             end_point = (self.__player.rect.center + self.__player.get_direction())
             pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), start_point, end_point)
+
+            for projectile in self.__projectiles:
+                start_point = self.__player.get_weapon().rect.center
+                end_point = projectile.rect.center
+                pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), start_point, end_point)
 
             # fps
             fps_str = str(int(1 / (delta_time / FPS)))

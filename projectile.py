@@ -9,23 +9,25 @@ from tile import Tile
 class Projectile(Displayable):
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], color: tuple[int, int, int],
-                 angle: float, speed: float) -> None:
+                 target_pos: tuple[int, int], speed: float) -> None:
 
         super(Projectile, self).__init__(pos, size, color)
 
-        # FIXME the line followed by the projectile doesn't match the targeted position
-        self.__speed: float = speed
-        self.__angle: float = math.radians(angle)
-        self.__velocity: Vector2 = Vector2(self.__speed * math.cos(self.__angle),
-                                           -self.__speed * math.sin(self.__angle))
+        self.__pos: Vector2 = Vector2(pos)
+        self.__target_pos: Vector2 = Vector2(target_pos)
+
+        angle: float = math.atan2(self.__target_pos.y - self.__pos.y, self.__target_pos.x - self.__pos.x)
+        self.__velocity: Vector2 = Vector2(math.cos(angle) * speed, math.sin(angle) * speed)
+
         self.alive = True
 
     def update(self, tiles: list[Tile], delta_time: float) -> None:
-        self.rect = self.rect.move(self.__velocity * delta_time)
+
+        self.__pos += self.__velocity * delta_time
+        self.rect.centerx = int(self.__pos.x)
+        self.rect.centery = int(self.__pos.y)
 
         # tiles collision
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
                 self.alive = False
-
-        # TODO entities collision

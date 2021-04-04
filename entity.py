@@ -1,13 +1,13 @@
-import math
+import copy
 from typing import Union
 
 import pygame
 from pygame.math import Vector2
 
-from constants import GRAVITY, COLLISION_TOLERANCE, TILE_SCALE
+from constants import GRAVITY, TILE_SCALE
 from displayable import Displayable
-from tile import Tile
 from projectile import Projectile
+from tile import Tile
 from weapon import Weapon
 
 
@@ -26,9 +26,10 @@ class Entity(Displayable):
         self.__angle: float = self.__direction.angle_to(Vector2(1, 0))
 
         self.__has_gravity: bool = has_gravity
-        self.__is_on_ground: bool = False
+        self.__on_ground: bool = False
 
         self.__weapon: Union[Weapon, None] = None
+        self.__coil: bool = False
 
         self.right: bool = False
         self.left: bool = False
@@ -43,32 +44,64 @@ class Entity(Displayable):
     def has_weapon(self) -> bool:
         return True if self.__weapon else False
 
+    def get_weapon(self) -> Weapon:
+        return self.__weapon
+
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
                weapons: list[Weapon], projectiles: list[Projectile], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
+        # TODO projectile collision
 
-        self.__velocity.xy = (0, 0) if not self.__has_gravity else self.__velocity
-        self.__velocity.x = 0
+        self.__velocity.xy = (0, 0) if not self.__has_gravity else self.__velocity.xy
 
-        # movements from controls
-
-        if self.left and not self.right:
-            self.__velocity.x = -self.__velocity_max.x
-        elif self.right and not self.left:
-            self.__velocity.x = self.__velocity_max.x
-
+        # y control movements
         if self.__has_gravity:
-            if self.up and self.__is_on_ground:
-                self.__velocity.y -= TILE_SCALE / 4
+            if self.up and self.__on_ground:
+                self.__velocity.y -= self.__velocity_max.y * TILE_SCALE / 12
         else:
             if self.up and not self.down:
-                self.__velocity.y = -self.__velocity_max.y
+                self.__velocity.y -= self.__velocity_max.y
             elif self.down and not self.up:
-                self.__velocity.y = self.__velocity_max.y
+                self.__velocity.y += self.__velocity_max.y
 
         # gravity
         if self.__has_gravity:
             self.__velocity.y += 1 if self.__velocity.y <= GRAVITY else 0
+
+        # friction
+        if -1 < self.__velocity.x < 1:
+            self.__velocity.x = 0
+            self.__coil = False
+        elif self.__velocity.x > 0:
+            self.__velocity.x -= 1
+        elif self.__velocity.x < 0:
+            self.__velocity.x += 1
+
+        # x control movements (overrides friction)
+        if not self.__coil:
+            if self.left and not self.right:
+                self.__velocity.x = -self.__velocity_max.x
+            elif self.right and not self.left:
+                self.__velocity.x = self.__velocity_max.x
+
+        # direction and angle
+        self.__direction = (Vector2(direction_pos) - self.rect.center)
+        self.__angle = self.__direction.angle_to(Vector2(1, 0))
+
+        # owned weapon action
+        if self.__weapon:
+            if self.action \
+                    and not(self.rect.centerx <= direction_pos[0] <= self.__weapon.rect.centerx or
+                            self.rect.centery <= direction_pos[1] <= self.__weapon. rect.centery) \
+                    and not (self.rect.centerx >= direction_pos[0] >= self.__weapon.rect.centerx or
+                             self.rect.centery >= direction_pos[1] >= self.__weapon.rect.centery):
+                self.__weapon.action(projectiles)
+
+                # recoil physic
+                recoil: Vector2 = copy.deepcopy(-1 * self.__direction)
+                recoil.scale_to_length(self.__weapon.recoil)
+                self.__velocity += recoil
+                self.__coil = True
 
         # x axis movement execution
         self.rect.x += int(self.__velocity.x * delta_time)
@@ -78,38 +111,38 @@ class Entity(Displayable):
             if self.rect.colliderect(tile.rect):
 
                 # right collision
-                if abs(self.rect.right - tile.rect.left) < COLLISION_TOLERANCE:
+                if self.__velocity.x > 0:
                     self.rect.right = tile.rect.left
-                    self.__velocity.x = 0
 
                 # left collision
-                if abs(self.rect.left - tile.rect.right) < COLLISION_TOLERANCE:
+                if self.__velocity.x < 0:
                     self.rect.left = tile.rect.right
-                    self.__velocity.x = 0
+
+                self.__velocity.x = 0
 
         # y axis movement execution
         self.rect.y += int(self.__velocity.y * delta_time)
 
-        self.__is_on_ground = False
+        self.__on_ground = False
 
         # y axis collisions
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
 
                 # bottom collision
-                if abs(self.rect.bottom - tile.rect.top) < COLLISION_TOLERANCE:
+                if self.__velocity.y > 0:
                     self.rect.bottom = tile.rect.top
-                    self.__velocity.y = 0
-                    self.__is_on_ground = True
+                    self.__on_ground = True
 
                 # top collision
-                if abs(self.rect.top - tile.rect.bottom) < COLLISION_TOLERANCE:
+                if self.__velocity.y < 0:
                     self.rect.top = tile.rect.bottom
-                    self.__velocity.y = 0
 
-        # direction and angle
-        self.__direction = (Vector2(direction_pos) - self.rect.center)
-        self.__angle = self.__direction.angle_to(Vector2(1, 0))
+                self.__velocity.y = 0
+
+        # weapon position update
+        if self.__weapon:
+            self.__weapon_update()
 
         # item grabbing
         for weapon in weapons:
@@ -117,17 +150,9 @@ class Entity(Displayable):
                 self.__weapon = weapon
                 weapon.is_available = False
 
-        # owned weapon update
-        if self.__weapon:
-            self.__weapon_update()
-            if self.action:
-                self.__weapon.action(self.__angle, projectiles)
-
     def __weapon_update(self) -> None:
         if self.__direction.length() > 1:
-            offset: Vector2 = Vector2(self.rect.width * (4 / 3) * math.cos(math.radians(self.__angle)),
-                                      -self.rect.width * (4 / 3) * math.sin(math.radians(self.__angle)))
-            self.__weapon.rect.center = self.rect.center + offset
+            self.__weapon.rect.center = self.rect.center + self.__direction.normalize() * self.rect.width * (4 / 3)
 
             # direction and angle
             if self.__direction.x < 0:
@@ -137,10 +162,11 @@ class Entity(Displayable):
 
     def display(self) -> None:
 
-        if self.__direction.x < 0:
-            self.flip_sprite()
-        elif self.__direction.x > 0:
-            self.reset_sprite()
+        if self.__direction.length() > 1:
+            if self.__direction.x < 0:
+                self.flip_sprite()
+            elif self.__direction.x > 0:
+                self.reset_sprite()
 
         super(Entity, self).display()
 
