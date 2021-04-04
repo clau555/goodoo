@@ -48,9 +48,9 @@ class Game:
 
         self.__entities: list[Entity] = [self.__player]
 
-        gun: Weapon = Weapon(get_item_placement_from_index((7, 7)), "assets/gun.png", Weapon.RANGE, TILE_SCALE/4)
-        saber: Weapon = Weapon(get_item_placement_from_index((9, 7)), "assets/saber.png", Weapon.MELEE)
-        sword: Weapon = Weapon(get_item_placement_from_index((11, 7)), "assets/sword.png", Weapon.MELEE)
+        gun: Weapon = Weapon(get_item_placement_from_index((7, 7)), "assets/gun.png", Weapon.RANGE, 0.8, TILE_SCALE/4)
+        saber: Weapon = Weapon(get_item_placement_from_index((9, 7)), "assets/saber.png", Weapon.MELEE, 1)
+        sword: Weapon = Weapon(get_item_placement_from_index((11, 7)), "assets/sword.png", Weapon.MELEE, 2)
         self.__weapons: list[Weapon] = [gun, saber, sword]
 
         self.__projectiles: list[Projectile] = []
@@ -87,7 +87,7 @@ class Game:
                                          self.__weapons, self.__projectiles, delta_time)
 
         for collectable in self.__weapons:
-            if not collectable.is_available:
+            if not collectable.is_available():
                 self.__weapons.pop(self.__weapons.index(collectable))
             else:
                 collectable.update(delta_time)

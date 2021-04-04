@@ -4,6 +4,7 @@ from typing import Union
 import pygame
 from pygame.math import Vector2
 
+from bar import Bar
 from constants import GRAVITY, TILE_SCALE
 from displayable import Displayable
 from projectile import Projectile
@@ -30,6 +31,8 @@ class Entity(Displayable):
 
         self.__weapon: Union[Weapon, None] = None
         self.__coil: bool = False
+
+        self.__cooldown_bar: Bar = Bar((self.rect.x, self.rect.y))
 
         self.right: bool = False
         self.left: bool = False
@@ -95,13 +98,13 @@ class Entity(Displayable):
                             self.rect.centery <= direction_pos[1] <= self.__weapon. rect.centery) \
                     and not (self.rect.centerx >= direction_pos[0] >= self.__weapon.rect.centerx or
                              self.rect.centery >= direction_pos[1] >= self.__weapon.rect.centery):
-                self.__weapon.action(projectiles)
-
-                # recoil physic
-                recoil: Vector2 = copy.deepcopy(-1 * self.__direction)
-                recoil.scale_to_length(self.__weapon.recoil)
-                self.__velocity += recoil
-                self.__coil = True
+                if self.__weapon.action(projectiles):
+                    # if cooldown is finished
+                    # recoil physic
+                    recoil: Vector2 = copy.deepcopy(-1 * self.__direction)
+                    recoil.scale_to_length(self.__weapon.get_recoil())
+                    self.__velocity += recoil
+                    self.__coil = True
 
         # x axis movement execution
         self.rect.x += int(self.__velocity.x * delta_time)
@@ -140,15 +143,19 @@ class Entity(Displayable):
 
                 self.__velocity.y = 0
 
-        # weapon position update
         if self.__weapon:
+            # weapon position update
             self.__weapon_update()
+
+        # cooldown bar update
+        self.__bar_update()
 
         # item grabbing
         for weapon in weapons:
-            if self.rect.colliderect(weapon.rect) and weapon.is_available and weapon != self.__weapon and self.pick:
+            if self.rect.colliderect(weapon.rect) and weapon.is_available() and weapon != self.__weapon and self.pick:
                 self.__weapon = weapon
-                weapon.is_available = False
+                weapon.set_available(False)
+                weapon.update_counter()  # cooldown counter init
 
     def __weapon_update(self) -> None:
         if self.__direction.length() > 1:
@@ -159,6 +166,12 @@ class Entity(Displayable):
                 self.__weapon.rotate_sprite(self.__angle, True)
             elif self.__direction.x > 0:
                 self.__weapon.rotate_sprite(self.__angle)
+
+    def __bar_update(self):
+        self.__cooldown_bar.rect.center = (self.rect.centerx, self.rect.centery + self.rect.height)
+        if self.__weapon:
+            self.__cooldown_bar.set_progress((pygame.time.get_ticks() - self.__weapon.get_cooldown_counter()) / 1000
+                                             / self.__weapon.get_cooldown())
 
     def display(self) -> None:
 
@@ -172,3 +185,4 @@ class Entity(Displayable):
 
         if self.__weapon:
             self.__weapon.display()
+            self.__cooldown_bar.display()

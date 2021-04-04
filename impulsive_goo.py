@@ -24,7 +24,11 @@ def main(level_file_name: str = None) -> None:
 
         events = pygame.event.get()
         for event in events:
-            if event.type == pygame.QUIT:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    quit()
+            elif event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 

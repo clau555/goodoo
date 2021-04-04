@@ -13,6 +13,7 @@ class Displayable:
 
         self.rect: Rect = pygame.Rect(pos, size)
         self.__color: tuple[int, int, int] = color
+        self.__display: bool = True
 
         self.__sprite: Union[Surface, None] = None
         if sprite:
@@ -31,6 +32,9 @@ class Displayable:
     def flip_sprite(self) -> None:
         self.__sprite = pygame.transform.flip(self.__original_sprite, True, False)
 
+    def set_display(self, display: bool) -> None:
+        self.__display = display
+
     def rotate_sprite(self, angle: float, flipped: bool = False) -> None:
         if flipped:
             self.__sprite = pygame.transform.flip(self.__original_sprite, True, False)
@@ -39,8 +43,9 @@ class Displayable:
             self.__sprite = pygame.transform.rotate(self.__original_sprite, angle)
 
     def display(self) -> None:
-        screen = pygame.display.get_surface()
-        if self.__sprite:
-            screen.blit(self.__sprite, (self.rect.x, self.rect.y))
-        else:
-            pygame.draw.rect(screen, self.__color, self.rect)
+        if self.__display:
+            screen = pygame.display.get_surface()
+            if self.__sprite:
+                screen.blit(self.__sprite, (self.rect.x, self.rect.y))
+            else:
+                pygame.draw.rect(screen, self.__color, self.rect)
