@@ -1,6 +1,6 @@
 import pygame
 
-from constants import TILE_SCALE
+from config import TILE_SCALE
 from displayable import Displayable
 
 

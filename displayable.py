@@ -6,6 +6,10 @@ from pygame.surface import Surface
 
 
 class Displayable:
+    """
+    A displayable object stores the informations
+    needed to be displayed on a pygame surface.\n
+    """
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int],
                  color: tuple[int, int, int] = (255, 0, 0),

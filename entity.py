@@ -5,7 +5,7 @@ import pygame
 from pygame.math import Vector2
 
 from bar import Bar
-from constants import GRAVITY, TILE_SCALE
+from config import GRAVITY_MAX, TILE_SCALE
 from displayable import Displayable
 from projectile import Projectile
 from tile import Tile
@@ -13,10 +13,16 @@ from weapon import Weapon
 
 
 class Entity(Displayable):
+    """
+    An entity is a displayable object which has physics.\n
+    It is affected by gravity and collides with tiles.\n
+    Its movements are determined by its input variables (left, right etc...).\n
+    An entity can grab a weapon object and use it.\n
+    """
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], sprite: str = None,
-                 velocity_max: tuple[int, int] = (int(TILE_SCALE * 0.075), int(TILE_SCALE * 0.075)),
-                 has_gravity: bool = True, sprite_to_scale: bool = True) -> None:
+                 velocity_max: tuple[int, int] = (TILE_SCALE // 12, TILE_SCALE // 3.5),
+                 sprite_to_scale: bool = True) -> None:
 
         super().__init__(pos, size, sprite=sprite, sprite_to_scale=sprite_to_scale)
 
@@ -26,13 +32,12 @@ class Entity(Displayable):
         self.__direction: Vector2 = pygame.Vector2(0, 0)
         self.__angle: float = self.__direction.angle_to(Vector2(1, 0))
 
-        self.__has_gravity: bool = has_gravity
         self.__on_ground: bool = False
 
         self.__weapon: Union[Weapon, None] = None
         self.__coil: bool = False
 
-        self.__cooldown_bar: Bar = Bar((self.rect.x, self.rect.y))
+        self.__cooldown_bar: Bar = Bar((self.rect.centerx, self.rect.centery + self.rect.width))
 
         self.right: bool = False
         self.left: bool = False
@@ -41,11 +46,10 @@ class Entity(Displayable):
         self.pick: bool = False
         self.action: bool = False
 
+        print(TILE_SCALE, self.__velocity_max)
+
     def get_direction(self) -> Vector2:
         return self.__direction
-
-    def has_weapon(self) -> bool:
-        return True if self.__weapon else False
 
     def get_weapon(self) -> Weapon:
         return self.__weapon
@@ -54,22 +58,14 @@ class Entity(Displayable):
                weapons: list[Weapon], projectiles: list[Projectile], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
         # TODO projectile collision
-
-        self.__velocity.xy = (0, 0) if not self.__has_gravity else self.__velocity.xy
+        # TODO block weapon movement when direction_pos is on the entity ?
 
         # y control movements
-        if self.__has_gravity:
-            if self.up and self.__on_ground:
-                self.__velocity.y -= self.__velocity_max.y * TILE_SCALE / 12
-        else:
-            if self.up and not self.down:
-                self.__velocity.y -= self.__velocity_max.y
-            elif self.down and not self.up:
-                self.__velocity.y += self.__velocity_max.y
+        if self.up and self.__on_ground:
+            self.__velocity.y -= self.__velocity_max.y
 
         # gravity
-        if self.__has_gravity:
-            self.__velocity.y += 1 if self.__velocity.y <= GRAVITY else 0
+        self.__velocity.y += 1 if self.__velocity.y <= GRAVITY_MAX else 0
 
         # friction
         if -1 < self.__velocity.x < 1:
@@ -92,19 +88,20 @@ class Entity(Displayable):
         self.__angle = self.__direction.angle_to(Vector2(1, 0))
 
         # owned weapon action
-        if self.__weapon:
-            if self.action \
-                    and not(self.rect.centerx <= direction_pos[0] <= self.__weapon.rect.centerx or
-                            self.rect.centery <= direction_pos[1] <= self.__weapon. rect.centery) \
-                    and not (self.rect.centerx >= direction_pos[0] >= self.__weapon.rect.centerx or
-                             self.rect.centery >= direction_pos[1] >= self.__weapon.rect.centery):
-                if self.__weapon.action(projectiles):
-                    # if cooldown is finished
-                    # recoil physic
-                    recoil: Vector2 = copy.deepcopy(-1 * self.__direction)
-                    recoil.scale_to_length(self.__weapon.get_recoil())
-                    self.__velocity += recoil
-                    self.__coil = True
+        if self.__weapon and self.action \
+                and not (self.rect.centerx < direction_pos[0] < self.__weapon.rect.centerx or
+                         self.rect.centery < direction_pos[1] < self.__weapon.rect.centery) \
+                and not (self.rect.centerx > direction_pos[0] > self.__weapon.rect.centerx or
+                         self.rect.centery > direction_pos[1] > self.__weapon.rect.centery) \
+                and self.__direction.length() > 0:
+
+            # the weapon action is true if its cooldown is finished
+            if self.__weapon.action(projectiles):
+                # recoil physic
+                recoil: Vector2 = copy.deepcopy(-1 * self.__direction)
+                recoil.scale_to_length(self.__weapon.get_recoil())
+                self.__velocity += recoil
+                self.__coil = True
 
         # x axis movement execution
         self.rect.x += int(self.__velocity.x * delta_time)
@@ -118,7 +115,7 @@ class Entity(Displayable):
                     self.rect.right = tile.rect.left
 
                 # left collision
-                if self.__velocity.x < 0:
+                elif self.__velocity.x < 0:
                     self.rect.left = tile.rect.right
 
                 self.__velocity.x = 0
@@ -138,10 +135,13 @@ class Entity(Displayable):
                     self.__on_ground = True
 
                 # top collision
-                if self.__velocity.y < 0:
+                elif self.__velocity.y < 0:
                     self.rect.top = tile.rect.bottom
 
-                self.__velocity.y = 0
+                # setting vertical velocity above zero
+                # to avoid not colliding with the ground on
+                # the next frame even if the entity is on it
+                self.__velocity.y = 0.1
 
         if self.__weapon:
             # weapon position update

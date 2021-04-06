@@ -2,8 +2,9 @@ import sys
 import time
 
 import pygame
+from pygame.time import Clock
 
-from constants import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
+from config import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
 from game import Game
 
 
@@ -12,30 +13,74 @@ def main(level_file_name: str = None) -> None:
     pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Impulsive Goo")
 
-    game = Game(level_file_name)
-
-    last_time = time.time()
+    game: Game = Game(level_file_name)
+    clock: Clock = pygame.time.Clock()
+    last_time: float = time.time()
+    fullscreen: bool = False
 
     while True:
 
-        delta_time = time.time() - last_time
-        delta_time *= FPS
-        last_time = time.time()
+        delta_time: float = (time.time() - last_time) * FPS
+        last_time: float = time.time()
 
-        events = pygame.event.get()
-        for event in events:
+        inputs: dict[str, bool] = {
+            "left": False,
+            "right": False,
+            "up": False,
+            "down": False,
+            "action": False,
+            "pick": False
+        }
+
+        # user movement inputs
+        keys = pygame.key.get_pressed()
+        if (keys[pygame.K_q] or keys[pygame.K_LEFT]) and not (keys[pygame.K_d] or keys[pygame.K_RIGHT]):
+            inputs["left"] = True
+        elif (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and not (keys[pygame.K_q] or keys[pygame.K_LEFT]):
+            inputs["right"] = True
+
+        # events
+        for event in pygame.event.get():
+
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+
+                # user event inputs
+                if event.key == pygame.K_z or event.key == pygame.K_UP or event.key == pygame.K_SPACE:
+                    inputs["up"] = True
+                if event.key == pygame.K_r or event.key == pygame.K_LSHIFT:
+                    inputs["pick"] = True
+
+                # quit shortcut
+                elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
+
+                # fullscreen
+                elif event.key == pygame.K_F11:
+                    fullscreen = not fullscreen
+                    if fullscreen:
+                        pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT),
+                                                pygame.FULLSCREEN | pygame.SCALED | pygame.HWSURFACE | pygame.DOUBLEBUF)
+                    else:
+                        pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+                # debug
+                elif event.key == pygame.K_ASTERISK:
+                    game.toggle_debug()
+
+            # user mouse inputs
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == pygame.BUTTON_LEFT:
+                    inputs["action"] = True
+
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-        game.update_and_display(events, delta_time)
-
+        # update
+        game.update_and_display(inputs, delta_time)
         pygame.display.flip()
-        pygame.time.Clock().tick(FPS)
+        clock.tick(FPS)
 
 
 if __name__ == "__main__":

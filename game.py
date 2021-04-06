@@ -1,15 +1,14 @@
 from typing import Union
 
 import pygame
-from pygame.event import Event
 from pygame.rect import Rect
 
-from projectile import Projectile
-from constants import TILE_SCALE, SCREEN_WIDTH, SCREEN_HEIGHT, FPS, WORLD_WIDTH, WORLD_HEIGHT
+from config import TILE_SCALE, SCREEN_WIDTH, SCREEN_HEIGHT, FPS, WORLD_WIDTH, WORLD_HEIGHT
 from displayable import Displayable
 from entity import Entity
 from level_parser import level_from_image
 from player import Player
+from projectile import Projectile
 from tile import Tile
 from weapon import Weapon
 
@@ -48,17 +47,20 @@ class Game:
 
         self.__entities: list[Entity] = [self.__player]
 
-        gun: Weapon = Weapon(get_item_placement_from_index((7, 7)), "assets/gun.png", Weapon.RANGE, 0.8, TILE_SCALE/4)
-        saber: Weapon = Weapon(get_item_placement_from_index((9, 7)), "assets/saber.png", Weapon.MELEE, 1)
-        sword: Weapon = Weapon(get_item_placement_from_index((11, 7)), "assets/sword.png", Weapon.MELEE, 2)
+        gun: Weapon = Weapon(get_item_placement_from_index((12, 8)), "assets/gun.png", Weapon.RANGE, 0.8, TILE_SCALE/4)
+        saber: Weapon = Weapon(get_item_placement_from_index((14, 8)), "assets/saber.png", Weapon.MELEE, 1)
+        sword: Weapon = Weapon(get_item_placement_from_index((16, 8)), "assets/sword.png", Weapon.MELEE, 2)
         self.__weapons: list[Weapon] = [gun, saber, sword]
 
         self.__projectiles: list[Projectile] = []
 
         self.__debug: bool = False
 
-    def get_player(self):
+    def get_player(self) -> Player:
         return self.__player
+
+    def toggle_debug(self) -> None:
+        self.__debug = not self.__debug
 
     def __get_existing_tiles(self) -> list[Tile]:
         tiles: list[Tile] = []
@@ -78,12 +80,12 @@ class Game:
                         tiles.append(self.__map[i][j])
         return tiles
 
-    def update_and_display(self, events: list[Event], delta_time: float) -> None:
+    def update_and_display(self, inputs: dict[str, bool], delta_time: float) -> None:
 
         # MODEL UPDATE
 
         # we pass neighbor tiles only for better performances (used for collisions)
-        self.__player.update_from_inputs(events, self.__neighbor_tiles(self.__player.rect.center),
+        self.__player.update_from_inputs(inputs, self.__neighbor_tiles(self.__player.rect.center),
                                          self.__weapons, self.__projectiles, delta_time)
 
         for collectable in self.__weapons:
@@ -100,7 +102,8 @@ class Game:
 
         # DISPLAY UPDATE
 
-        self.__sky.display()
+        # self.__sky.display()
+        pygame.display.get_surface().fill((0, 0, 0))
         for tile in self.__tiles:
             tile.display()
         for entity in self.__entities:
@@ -111,11 +114,6 @@ class Game:
             projectile.display()
 
         # DEBUG
-
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ASTERISK:
-                    self.__debug = not self.__debug
 
         if self.__debug:
 
@@ -128,11 +126,6 @@ class Game:
             start_point = self.__player.rect.center
             end_point = (self.__player.rect.center + self.__player.get_direction())
             pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), start_point, end_point)
-
-            for projectile in self.__projectiles:
-                start_point = self.__player.get_weapon().rect.center
-                end_point = projectile.rect.center
-                pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), start_point, end_point)
 
             # fps
             fps_str = str(int(1 / (delta_time / FPS)))

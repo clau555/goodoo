@@ -1,7 +1,7 @@
 import pygame
 
 from collectable import Collectable
-from constants import TILE_SCALE
+from config import TILE_SCALE
 from projectile import Projectile
 
 
@@ -33,8 +33,8 @@ class Weapon(Collectable):
         if (pygame.time.get_ticks() - self.__counter) / 1000 > self.__cooldown:
 
             if self.__type == self.RANGE:
-                projectiles.append(Projectile(self.rect.center, (TILE_SCALE / 8, TILE_SCALE / 8),
-                                              (255, 255, 0), pygame.mouse.get_pos(), TILE_SCALE / 4))
+                projectiles.append(Projectile(self.rect.center, (TILE_SCALE // 8, TILE_SCALE // 8),
+                                              (255, 255, 255), pygame.mouse.get_pos(), TILE_SCALE / 2))
 
             elif self.__type == self.MELEE:
                 # TODO weapon melee action

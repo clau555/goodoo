@@ -3,9 +3,11 @@ from typing import Union
 
 from PIL import Image
 
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
 from player import Player
 from tile import Tile
+
+# TODO use pygame instead of pillow?
 
 
 def pixel_comparison(pixel: tuple[int, int, int], color: tuple[int, int, int], margin: int = 75) -> bool:
@@ -19,7 +21,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
     im: Image = Image.open(file_name).convert('RGB')
 
     if im.size[0] != WORLD_WIDTH or im.size[1] != WORLD_HEIGHT:
-        sys.exit("level map file is at size {} instead of {}"
+        sys.exit("level map file has a size of {} instead of {}"
                  .format(im.size, (int(SCREEN_WIDTH / TILE_SCALE), int(SCREEN_HEIGHT / TILE_SCALE))))
 
     world: list[list[Tile]] = []
