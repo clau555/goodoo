@@ -7,6 +7,11 @@ from tile import Tile
 
 
 class Projectile(Displayable):
+    """
+    A projectile is a moving displayable object
+    going in one direction at a target position.\n
+    It disappears when colliding with a tile or an entity.\n
+    """
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], color: tuple[int, int, int],
                  target_pos: tuple[int, int], speed: float) -> None:
@@ -20,6 +25,9 @@ class Projectile(Displayable):
         self.__velocity: Vector2 = Vector2(math.cos(angle) * speed, math.sin(angle) * speed)
 
         self.alive = True
+
+    def get_strength(self) -> Vector2:
+        return self.__velocity * 1.2
 
     def update(self, tiles: list[Tile], delta_time: float) -> None:
 

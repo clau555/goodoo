@@ -2,15 +2,19 @@
 
 Started as a second year project, Impulsive Goo is now a WIP side project.
 
+## Requirement
+
+Python 3.9
+
 ## Dependencies
 
-- [Pygame](https://pypi.org/project/pygame/) ```pip3 install pygame```
-- [Pillow](https://pythonexamples.org/python-pillow-read-image/) ```pip3 install pillow```
+- [Pygame](https://pypi.org/project/pygame/) ```pip install pygame```
+- [Pillow](https://pythonexamples.org/python-pillow-read-image/) ```pip install pillow```
 
 ## Execution example
 
 ```
-python impulsive_goo.py levels/level_1.jpg
+python impulsive_goo.py maps/map2.jpg
 ```
 
 ## Key Bindings
@@ -22,3 +26,4 @@ pick ```r``` / ```shift```<br/>
 action ```left click```<br/>
 fullscreen ```F11```<br/>
 quit ```escape```<br/>
+debug ```*```<br/>

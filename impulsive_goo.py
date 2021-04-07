@@ -20,9 +20,6 @@ def main(level_file_name: str = None) -> None:
 
     while True:
 
-        delta_time: float = (time.time() - last_time) * FPS
-        last_time: float = time.time()
-
         inputs: dict[str, bool] = {
             "left": False,
             "right": False,
@@ -31,13 +28,6 @@ def main(level_file_name: str = None) -> None:
             "action": False,
             "pick": False
         }
-
-        # user movement inputs
-        keys = pygame.key.get_pressed()
-        if (keys[pygame.K_q] or keys[pygame.K_LEFT]) and not (keys[pygame.K_d] or keys[pygame.K_RIGHT]):
-            inputs["left"] = True
-        elif (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and not (keys[pygame.K_q] or keys[pygame.K_LEFT]):
-            inputs["right"] = True
 
         # events
         for event in pygame.event.get():
@@ -63,24 +53,33 @@ def main(level_file_name: str = None) -> None:
                                                 pygame.FULLSCREEN | pygame.SCALED | pygame.HWSURFACE | pygame.DOUBLEBUF)
                     else:
                         pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+                        pygame.init()
 
                 # debug
                 elif event.key == pygame.K_ASTERISK:
                     game.toggle_debug()
 
-            # user mouse inputs
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == pygame.BUTTON_LEFT:
-                    inputs["action"] = True
-
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-        # update
-        game.update_and_display(inputs, delta_time)
-        pygame.display.flip()
-        clock.tick(FPS)
+        # user movement inputs
+        keys = pygame.key.get_pressed()
+        if (keys[pygame.K_q] or keys[pygame.K_LEFT]) and not (keys[pygame.K_d] or keys[pygame.K_RIGHT]):
+            inputs["left"] = True
+        elif (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and not (keys[pygame.K_q] or keys[pygame.K_LEFT]):
+            inputs["right"] = True
+
+        if pygame.mouse.get_pressed(3)[0]:
+            inputs["action"] = True
+
+        delta_time: float = (time.time() - last_time) * FPS
+        last_time: float = time.time()
+
+        if delta_time <= 2.:
+            game.update_and_display(inputs, delta_time)
+            pygame.display.flip()
+            clock.tick(FPS)
 
 
 if __name__ == "__main__":

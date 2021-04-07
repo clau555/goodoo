@@ -5,6 +5,9 @@ from displayable import Displayable
 
 
 class Tile(Displayable):
+    """
+    A tile is a fixed displayable object that collides with entities and projectiles.
+    """
 
     def __init__(self, pos: tuple[int, int], color: tuple[int, int, int], is_at_top: bool = False) -> None:
         super(Tile, self).__init__(pos, (TILE_SCALE, TILE_SCALE), color=color)

@@ -1,4 +1,3 @@
-import copy
 from typing import Union
 
 import pygame
@@ -17,8 +16,11 @@ class Entity(Displayable):
     An entity is a displayable object which has physics.\n
     It is affected by gravity and collides with tiles.\n
     Its movements are determined by its input variables (left, right etc...).\n
-    An entity can grab a weapon object and use it.\n
+    An entity can grab a weapon object and use it, and has health points.\n
     """
+
+    TOTAL_HEALTH: int = 10
+    HIT_DELAY: float = 100.
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], sprite: str = None,
                  velocity_max: tuple[int, int] = (TILE_SCALE // 12, TILE_SCALE // 3.5),
@@ -37,7 +39,12 @@ class Entity(Displayable):
         self.__weapon: Union[Weapon, None] = None
         self.__coil: bool = False
 
-        self.__cooldown_bar: Bar = Bar((self.rect.centerx, self.rect.centery + self.rect.width))
+        self.__health: int = self.TOTAL_HEALTH
+        self.__hit: bool = False
+        self.__hit_timer: float = self.HIT_DELAY
+
+        self.__cooldown_bar: Bar = Bar((self.rect.centerx, self.rect.centery + self.rect.width), (255, 255, 255))
+        self.__health_bar: Bar = Bar((self.rect.centerx, self.rect.centery - self.rect.width), (255, 0, 0))
 
         self.right: bool = False
         self.left: bool = False
@@ -46,13 +53,31 @@ class Entity(Displayable):
         self.pick: bool = False
         self.action: bool = False
 
-        print(TILE_SCALE, self.__velocity_max)
-
     def get_direction(self) -> Vector2:
         return self.__direction
 
     def get_weapon(self) -> Weapon:
         return self.__weapon
+
+    def __weapon_update(self) -> None:
+        if self.__direction.length() > 1:
+            self.__weapon.rect.center = self.rect.center + self.__direction.normalize() * self.rect.width * (4 / 3)
+
+            # direction and angle
+            if self.__direction.x < 0:
+                self.__weapon.rotate_sprite(self.__angle, True)
+            elif self.__direction.x > 0:
+                self.__weapon.rotate_sprite(self.__angle)
+
+    def __bars_update(self):
+        # cooldown bar
+        self.__cooldown_bar.rect.center = (self.rect.centerx, self.rect.centery + self.rect.height)
+        if self.__weapon:
+            self.__cooldown_bar.set_progress((pygame.time.get_ticks() - self.__weapon.get_cooldown_counter()) / 1000
+                                             / self.__weapon.get_cooldown())
+        # health bar
+        self.__health_bar.rect.center = (self.rect.centerx, self.rect.centery - self.rect.height)
+        self.__health_bar.set_progress(self.__health / self.TOTAL_HEALTH)
 
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
                weapons: list[Weapon], projectiles: list[Projectile], delta_time: float) -> None:
@@ -98,10 +123,24 @@ class Entity(Displayable):
             # the weapon action is true if its cooldown is finished
             if self.__weapon.action(projectiles):
                 # recoil physic
-                recoil: Vector2 = copy.deepcopy(-1 * self.__direction)
+                recoil: Vector2 = -1 * self.__direction
                 recoil.scale_to_length(self.__weapon.get_recoil())
                 self.__velocity += recoil
                 self.__coil = True
+
+        # projectiles collision and effect
+        for projectile in projectiles:
+            if self.rect.colliderect(projectile.rect) and not self.__hit:
+                self.__velocity += projectile.get_strength()
+                self.__coil = True
+                self.__health -= 1
+                self.__hit = True
+                projectile.alive = False
+
+        if self.__hit:
+            self.__hit_timer -= delta_time
+            if self.__hit_timer <= 0:
+                self.__hit = False
 
         # x axis movement execution
         self.rect.x += int(self.__velocity.x * delta_time)
@@ -147,8 +186,8 @@ class Entity(Displayable):
             # weapon position update
             self.__weapon_update()
 
-        # cooldown bar update
-        self.__bar_update()
+        # bars update
+        self.__bars_update()
 
         # item grabbing
         for weapon in weapons:
@@ -156,22 +195,6 @@ class Entity(Displayable):
                 self.__weapon = weapon
                 weapon.set_available(False)
                 weapon.update_counter()  # cooldown counter init
-
-    def __weapon_update(self) -> None:
-        if self.__direction.length() > 1:
-            self.__weapon.rect.center = self.rect.center + self.__direction.normalize() * self.rect.width * (4 / 3)
-
-            # direction and angle
-            if self.__direction.x < 0:
-                self.__weapon.rotate_sprite(self.__angle, True)
-            elif self.__direction.x > 0:
-                self.__weapon.rotate_sprite(self.__angle)
-
-    def __bar_update(self):
-        self.__cooldown_bar.rect.center = (self.rect.centerx, self.rect.centery + self.rect.height)
-        if self.__weapon:
-            self.__cooldown_bar.set_progress((pygame.time.get_ticks() - self.__weapon.get_cooldown_counter()) / 1000
-                                             / self.__weapon.get_cooldown())
 
     def display(self) -> None:
 
@@ -181,8 +204,11 @@ class Entity(Displayable):
             elif self.__direction.x > 0:
                 self.reset_sprite()
 
-        super(Entity, self).display()
+        if not (self.__hit and self.__hit_timer % 10 < 5):
+            super(Entity, self).display()
 
         if self.__weapon:
             self.__weapon.display()
             self.__cooldown_bar.display()
+
+        self.__health_bar.display()

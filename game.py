@@ -20,14 +20,14 @@ def get_tile_position_from_index(index_pos: tuple[int, int]) -> tuple[int, int]:
 
 def get_tile_center_from_index(index_pos: tuple[int, int]) -> tuple[int, int]:
     if 0 < index_pos[0] < WORLD_WIDTH and 0 < index_pos[1] < WORLD_HEIGHT:
-        return (index_pos[0] * TILE_SCALE) + TILE_SCALE / 2, \
-               (index_pos[1] * TILE_SCALE) + TILE_SCALE / 2
+        return (index_pos[0] * TILE_SCALE) + TILE_SCALE // 2, \
+               (index_pos[1] * TILE_SCALE) + TILE_SCALE // 2
 
 
 def get_item_placement_from_index(index_pos: tuple[int, int]) -> tuple[int, int]:
     if 0 < index_pos[0] < WORLD_WIDTH and 0 < index_pos[1] < WORLD_HEIGHT:
-        return index_pos[0] * TILE_SCALE + TILE_SCALE / 4, \
-               index_pos[1] * TILE_SCALE + TILE_SCALE / 4
+        return index_pos[0] * TILE_SCALE + TILE_SCALE // 4, \
+               index_pos[1] * TILE_SCALE + TILE_SCALE // 4
 
 
 def is_inside_screen(rect: Rect) -> bool:
@@ -36,6 +36,10 @@ def is_inside_screen(rect: Rect) -> bool:
 
 
 class Game:
+    """
+    The game object stores, update, and displays
+    every displayable objects of the program.\n
+    """
 
     def __init__(self, level_file_name) -> None:
         self.__player: Player
@@ -47,12 +51,16 @@ class Game:
 
         self.__entities: list[Entity] = [self.__player]
 
-        gun: Weapon = Weapon(get_item_placement_from_index((12, 8)), "assets/gun.png", Weapon.RANGE, 0.8, TILE_SCALE/4)
-        saber: Weapon = Weapon(get_item_placement_from_index((14, 8)), "assets/saber.png", Weapon.MELEE, 1)
-        sword: Weapon = Weapon(get_item_placement_from_index((16, 8)), "assets/sword.png", Weapon.MELEE, 2)
-        self.__weapons: list[Weapon] = [gun, saber, sword]
+        gun: Weapon = Weapon(get_item_placement_from_index((12, 8)), "assets/gun.png", 0.8, TILE_SCALE/4)
+        saber: Weapon = Weapon(get_item_placement_from_index((14, 8)), "assets/saber.png", 1)
+        sword: Weapon = Weapon(get_item_placement_from_index((16, 8)), "assets/sword.png", 2)
+        heart: Weapon = Weapon(get_item_placement_from_index((18, 8)), "assets/heart.png", 1, TILE_SCALE)
+        self.__weapons: list[Weapon] = [gun, saber, sword, heart]
 
-        self.__projectiles: list[Projectile] = []
+        test_projectile: Projectile = Projectile((0, 500), (TILE_SCALE // 8, TILE_SCALE // 8),
+                                                 (255, 255, 255), self.__player.rect.center, TILE_SCALE / 2)
+
+        self.__projectiles: list[Projectile] = [test_projectile]
 
         self.__debug: bool = False
 

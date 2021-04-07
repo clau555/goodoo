@@ -6,13 +6,15 @@ from projectile import Projectile
 
 
 class Weapon(Collectable):
+    """
+    A weapon is a collectable object that can be stored
+    by an entity when it's picked up.\n
+    It invokes a projectile towards a specific
+    when its action method is triggered.
+    """
 
-    MELEE = 0
-    RANGE = 1
-
-    def __init__(self, pos: tuple[int, int], sprite: str, weapon_type: int, cooldown: float, recoil: float = 0) -> None:
+    def __init__(self, pos: tuple[int, int], sprite: str, cooldown: float, recoil: float = 0) -> None:
         super(Weapon, self).__init__(pos, sprite)
-        self.__type: int = weapon_type
         self.__recoil: float = recoil
         self.__cooldown: float = cooldown  # cooldown duration in seconds
         self.__counter: int = pygame.time.get_ticks()  # time on last action
@@ -32,13 +34,8 @@ class Weapon(Collectable):
     def action(self, projectiles: list[Projectile]) -> bool:
         if (pygame.time.get_ticks() - self.__counter) / 1000 > self.__cooldown:
 
-            if self.__type == self.RANGE:
-                projectiles.append(Projectile(self.rect.center, (TILE_SCALE // 8, TILE_SCALE // 8),
-                                              (255, 255, 255), pygame.mouse.get_pos(), TILE_SCALE / 2))
-
-            elif self.__type == self.MELEE:
-                # TODO weapon melee action
-                print("melee action")
+            projectiles.append(Projectile(self.rect.center, (TILE_SCALE // 8, TILE_SCALE // 8),
+                                          (255, 255, 255), pygame.mouse.get_pos(), TILE_SCALE / 2))
 
             self.update_counter()
             return True
