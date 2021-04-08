@@ -1,6 +1,6 @@
-# Impulsive Goo
+# Goodoo
 
-Started as a second year project, Impulsive Goo is now a WIP side project.
+Started as a second year project, Goodoo is now a WIP side project.
 
 ## Requirement
 
