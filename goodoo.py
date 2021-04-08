@@ -10,13 +10,13 @@ from game import Game
 
 def main(level_file_name: str = None) -> None:
     pygame.init()
-    pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT),
+                            pygame.FULLSCREEN | pygame.SCALED | pygame.HWSURFACE | pygame.DOUBLEBUF)
     pygame.display.set_caption("Impulsive Goo")
 
     game: Game = Game(level_file_name)
     clock: Clock = pygame.time.Clock()
     last_time: float = time.time()
-    fullscreen: bool = False
 
     while True:
 
@@ -44,16 +44,6 @@ def main(level_file_name: str = None) -> None:
                 elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
-
-                # fullscreen
-                elif event.key == pygame.K_F11:
-                    fullscreen = not fullscreen
-                    if fullscreen:
-                        pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT),
-                                                pygame.FULLSCREEN | pygame.SCALED | pygame.HWSURFACE | pygame.DOUBLEBUF)
-                    else:
-                        pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-                        pygame.init()
 
                 # debug
                 elif event.key == pygame.K_ASTERISK:

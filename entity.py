@@ -82,7 +82,6 @@ class Entity(Displayable):
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
                weapons: list[Weapon], projectiles: list[Projectile], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
-        # TODO projectile collision
         # TODO block weapon movement when direction_pos is on the entity ?
 
         # y control movements
@@ -191,7 +190,10 @@ class Entity(Displayable):
 
         # item grabbing
         for weapon in weapons:
-            if self.rect.colliderect(weapon.rect) and weapon.is_available() and weapon != self.__weapon and self.pick:
+            if self.rect.colliderect(weapon.rect) and \
+                    weapon.is_available() and \
+                    weapon != self.__weapon and \
+                    (self.pick or weapon.auto_grab()):
                 self.__weapon = weapon
                 weapon.set_available(False)
                 weapon.update_counter()  # cooldown counter init
@@ -204,6 +206,7 @@ class Entity(Displayable):
             elif self.__direction.x > 0:
                 self.reset_sprite()
 
+        # blinks when hit
         if not (self.__hit and self.__hit_timer % 10 < 5):
             super(Entity, self).display()
 

@@ -14,7 +14,7 @@ Python 3.9
 ## Execution example
 
 ```
-python impulsive_goo.py maps/map2.jpg
+python goodoo.py maps/map2.jpg
 ```
 
 ## Key Bindings
@@ -22,7 +22,7 @@ python impulsive_goo.py maps/map2.jpg
 left  ```left``` / ```q```<br/>
 right ```right``` / ```d```<br/>
 jump ```up``` / ```z``` / ```space```<br/>
-pick ```r``` / ```shift```<br/>
+pick ```shift``` / ```r```<br/>
 action ```left click```<br/>
 fullscreen ```F11```<br/>
 quit ```escape```<br/>

@@ -13,8 +13,9 @@ class Weapon(Collectable):
     when its action method is triggered.
     """
 
-    def __init__(self, pos: tuple[int, int], sprite: str, cooldown: float, recoil: float = 0) -> None:
-        super(Weapon, self).__init__(pos, sprite)
+    def __init__(self, pos: tuple[int, int], sprite: str, cooldown: float,
+                 recoil: float = 0, auto_grab: bool = False) -> None:
+        super(Weapon, self).__init__(pos, sprite, auto_grab)
         self.__recoil: float = recoil
         self.__cooldown: float = cooldown  # cooldown duration in seconds
         self.__counter: int = pygame.time.get_ticks()  # time on last action
