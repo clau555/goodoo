@@ -14,7 +14,7 @@ Python 3.9
 ## Execution example
 
 ```
-python goodoo.py maps/map2.jpg
+python goodoo.py maps/map1.jpg
 ```
 
 ## Key Bindings

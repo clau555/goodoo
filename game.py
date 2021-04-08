@@ -23,7 +23,7 @@ class Game:
     """
 
     # time in seconds to pass before an item is created randomly on screen
-    ITEM_SPAWN_DELAY: int = 10
+    ITEM_SPAWN_DELAY: float = 10.
 
     def __init__(self, level_file_name) -> None:
         self.__player: Player
