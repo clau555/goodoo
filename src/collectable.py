@@ -20,13 +20,16 @@ class Collectable(Displayable):
         self.__counter: int = 0
         self.__auto_grab: bool = auto_grab
 
-    def is_available(self) -> bool:
+    @property
+    def available(self) -> bool:
         return self.__available
 
+    @property
     def auto_grab(self) -> bool:
         return self.__auto_grab
 
-    def set_available(self, available: bool) -> None:
+    @available.setter
+    def available(self, available: bool) -> None:
         self.__available = available
 
     def update(self, delta_time: float) -> None:

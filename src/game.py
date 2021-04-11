@@ -37,7 +37,7 @@ class Game:
         self.__weapons: list[Weapon] = []
 
         # an index marked as True indicates an item is already at this emplacement
-        self.__item_map: list[list[bool]] = [[False for i in range(WORLD_HEIGHT)] for j in range(WORLD_WIDTH)]
+        self.__item_map: list[list[bool]] = [[False for _ in range(WORLD_HEIGHT)] for _ in range(WORLD_WIDTH)]
 
         test_projectile: Projectile = Projectile((0, 500), (TILE_SCALE // 8, TILE_SCALE // 8),
                                                  (255, 255, 255), self.__player.rect.center, TILE_SCALE / 2)
@@ -51,7 +51,8 @@ class Game:
         self.__spawn_random_items()
         self.__spawn_random_items()
 
-    def get_player(self) -> Player:
+    @property
+    def player(self) -> Player:
         return self.__player
 
     def toggle_debug(self) -> None:
@@ -122,7 +123,7 @@ class Game:
                                          self.__weapons, self.__projectiles, delta_time)
 
         for collectable in self.__weapons:
-            if not collectable.is_available():
+            if not collectable.available:
                 weapon_pos: tuple[int, int] = get_index_from_screen_position(collectable.rect.center)
                 self.__item_map[weapon_pos[0]][weapon_pos[1]] = False
                 self.__weapons.pop(self.__weapons.index(collectable))
@@ -159,7 +160,7 @@ class Game:
 
             # player direction
             start_point = self.__player.rect.center
-            end_point = (self.__player.rect.center + self.__player.get_direction())
+            end_point = (self.__player.rect.center + self.__player.direction)
             pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), start_point, end_point)
 
             # fps

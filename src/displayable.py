@@ -15,7 +15,7 @@ class Displayable:
                  color: tuple[int, int, int] = (255, 0, 0),
                  sprite: str = None, sprite_to_scale: bool = True) -> None:
 
-        self.rect: Rect = pygame.Rect(pos, size)
+        self.__rect: Rect = pygame.Rect(pos, size)
         self.__color: tuple[int, int, int] = color
         self.__display: bool = True
 
@@ -27,7 +27,12 @@ class Displayable:
                 self.__sprite = pygame.image.load(sprite)
         self.__original_sprite: Union[Surface, None] = self.__sprite
 
-    def get_color(self) -> tuple[int, int, int]:
+    @property
+    def rect(self) -> Rect:
+        return self.__rect
+
+    @property
+    def color(self) -> tuple[int, int, int]:
         return self.__color
 
     def reset_sprite(self) -> None:

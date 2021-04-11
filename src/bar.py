@@ -11,7 +11,12 @@ class Bar(Displayable):
         self.__progress: float = 0.
         self.set_display(False)
 
-    def set_progress(self, progress: float) -> None:
+    @property
+    def progress(self) -> float:
+        return self.__progress
+
+    @progress.setter
+    def progress(self, progress: float) -> None:
         # the bar is displayed only if it's not full or empty
         if progress <= 0.:
             self.__progress = 0.

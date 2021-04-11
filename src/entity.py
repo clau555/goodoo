@@ -53,10 +53,12 @@ class Entity(Displayable):
         self.pick: bool = False
         self.action: bool = False
 
-    def get_direction(self) -> Vector2:
+    @property
+    def direction(self) -> Vector2:
         return self.__direction
 
-    def get_weapon(self) -> Weapon:
+    @property
+    def weapon(self) -> Weapon:
         return self.__weapon
 
     def __weapon_update(self) -> None:
@@ -73,11 +75,11 @@ class Entity(Displayable):
         # cooldown bar
         self.__cooldown_bar.rect.center = (self.rect.centerx, self.rect.centery + self.rect.height)
         if self.__weapon:
-            self.__cooldown_bar.set_progress((pygame.time.get_ticks() - self.__weapon.get_cooldown_counter()) / 1000
-                                             / self.__weapon.get_cooldown())
+            self.__cooldown_bar.progress = (pygame.time.get_ticks() - self.__weapon.counter) / 1000 \
+                                           / self.__weapon.cooldown
         # health bar
         self.__health_bar.rect.center = (self.rect.centerx, self.rect.centery - self.rect.height)
-        self.__health_bar.set_progress(self.__health / self.TOTAL_HEALTH)
+        self.__health_bar.progress = self.__health / self.TOTAL_HEALTH
 
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
                weapons: list[Weapon], projectiles: list[Projectile], delta_time: float) -> None:
@@ -123,7 +125,7 @@ class Entity(Displayable):
             if self.__weapon.action(projectiles):
                 # recoil physic
                 recoil: Vector2 = -1 * self.__direction
-                recoil.scale_to_length(self.__weapon.get_recoil())
+                recoil.scale_to_length(self.__weapon.recoil)
                 self.__velocity += recoil
                 self.__coil = True
 
@@ -191,11 +193,11 @@ class Entity(Displayable):
         # item grabbing
         for weapon in weapons:
             if self.rect.colliderect(weapon.rect) and \
-                    weapon.is_available() and \
+                    weapon.available and \
                     weapon != self.__weapon and \
-                    (self.pick or weapon.auto_grab()):
+                    (self.pick or weapon.auto_grab):
                 self.__weapon = weapon
-                weapon.set_available(False)
+                weapon.available = False
                 weapon.update_counter()  # cooldown counter init
 
     def display(self) -> None:

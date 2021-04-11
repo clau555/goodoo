@@ -21,7 +21,7 @@ class Tile(Displayable):
 
     def display(self) -> None:
         screen = pygame.display.get_surface()
-        pygame.draw.rect(screen, self.get_color(), self.rect)
+        pygame.draw.rect(screen, self.color, self.rect)
         if self.__at_top:
             pygame.draw.rect(screen, (100, 100, 100), pygame.Rect((self.rect.x, self.rect.y),
                                                                   (TILE_SCALE, TILE_SCALE / 20)))
