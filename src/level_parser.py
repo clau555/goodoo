@@ -11,13 +11,26 @@ from tile import Tile
 
 
 def pixel_comparison(pixel: tuple[int, int, int], color: tuple[int, int, int], margin: int = 75) -> bool:
-    pixel_margin = (margin, margin, margin)
-    return color[0] - pixel_margin[0] <= pixel[0] <= color[0] + pixel_margin[0] and \
-           color[1] - pixel_margin[1] <= pixel[1] <= color[1] + pixel_margin[1] and \
-           color[2] - pixel_margin[2] <= pixel[2] <= color[2] + pixel_margin[2]
+    """
+    Compares two tuples representing an rgb color.\n
+    Two colors are considered the same if their distances are null more or less a given margin.\n
+    :param pixel: color of a pixel
+    :param color: color to compare the pixel with
+    :param margin: margin of the comparison
+    :return: true if the two colors are considered the same
+    """
+    return color[0] - margin <= pixel[0] <= color[0] + margin and \
+           color[1] - margin <= pixel[1] <= color[1] + margin and \
+           color[2] - margin <= pixel[2] <= color[2] + margin
 
 
 def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None]]]]:
+    """
+    Creates a 2D array of tiles according to the given image file.\n
+    Returns also a player object initialized at its spawn point.\n
+    :param file_name: path of the image file
+    :return: player and tile 2D array
+    """
     im: Image = Image.open(file_name).convert('RGB')
 
     if im.size[0] != WORLD_WIDTH or im.size[1] != WORLD_HEIGHT:
@@ -47,6 +60,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
 
     for i in range(len(world)):
         for j in range(len(world[i])):
+            # a tile is considered to be "on top" if it doesn't have any tile above it
             if world[i][j] is not None and j > 0 and world[i][j - 1] is None:
                 world[i][j].set_at_top(True)
 
