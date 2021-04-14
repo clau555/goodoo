@@ -1,8 +1,11 @@
+from typing import Union
+
 import pygame
 
 from config import TILE_SCALE
 from entity import Entity
 from projectile import Projectile
+from cursor import Cursor
 from tile import Tile
 from weapon import Weapon
 
@@ -19,7 +22,8 @@ class Player(Entity):
                                      sprite="assets/player.png")
 
     def update_from_inputs(self, inputs: dict[str, bool], neighbor_tiles: list[Tile],
-                           weapons: list[Weapon], projectiles: list[Projectile], delta_time: float) -> None:
+                           weapons: list[Weapon], projectiles: list[Projectile],
+                           cursor: Union[Cursor, None], delta_time: float) -> None:
         # getting player inputs from main loop
         self.left = inputs["left"]
         self.right = inputs["right"]
@@ -28,4 +32,4 @@ class Player(Entity):
         self.pick = inputs["pick"]
         self.action = inputs["action"]
 
-        self.update(pygame.mouse.get_pos(), neighbor_tiles, weapons, projectiles, delta_time)
+        self.update(pygame.mouse.get_pos(), neighbor_tiles, weapons, projectiles, cursor, delta_time)

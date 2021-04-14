@@ -7,6 +7,7 @@ from bar import Bar
 from config import GRAVITY_MAX, TILE_SCALE
 from displayable import Displayable
 from projectile import Projectile
+from src.cursor import Cursor
 from tile import Tile
 from weapon import Weapon
 
@@ -23,7 +24,7 @@ class Entity(Displayable):
     HIT_DELAY: float = 100.
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], sprite: str = None,
-                 velocity_max: tuple[int, int] = (TILE_SCALE // 12, TILE_SCALE // 3.5),
+                 velocity_max: tuple[int, int] = (TILE_SCALE // 10, TILE_SCALE // 3.5),
                  sprite_to_scale: bool = True) -> None:
 
         super().__init__(pos, size, sprite=sprite, sprite_to_scale=sprite_to_scale)
@@ -63,6 +64,8 @@ class Entity(Displayable):
 
     def __weapon_update(self) -> None:
         if self.__direction.length() > 1:
+
+            # weapon position update
             self.__weapon.rect.center = self.rect.center + self.__direction.normalize() * self.rect.width * (4 / 3)
 
             # direction and angle
@@ -82,8 +85,10 @@ class Entity(Displayable):
         self.__health_bar.progress = self.__health / self.TOTAL_HEALTH
 
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
-               weapons: list[Weapon], projectiles: list[Projectile], delta_time: float) -> None:
+               weapons: list[Weapon], projectiles: list[Projectile],
+               cursor: Union[Cursor, None], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
+        # FIXME weapon action is possible when target position is at the very center of the entity
         # TODO block weapon movement when direction_pos is on the entity ?
 
         # y control movements
@@ -114,20 +119,30 @@ class Entity(Displayable):
         self.__angle = self.__direction.angle_to(Vector2(1, 0))
 
         # owned weapon action
-        if self.__weapon and self.action \
-                and not (self.rect.centerx < direction_pos[0] < self.__weapon.rect.centerx or
-                         self.rect.centery < direction_pos[1] < self.__weapon.rect.centery) \
-                and not (self.rect.centerx > direction_pos[0] > self.__weapon.rect.centerx or
-                         self.rect.centery > direction_pos[1] > self.__weapon.rect.centery) \
-                and self.__direction.length() > 0:
+        if self.__weapon:
 
-            # the weapon action is true if its cooldown is finished
-            if self.__weapon.action(projectiles):
-                # recoil physic
-                recoil: Vector2 = -1 * self.__direction
-                recoil.scale_to_length(self.__weapon.recoil)
-                self.__velocity += recoil
-                self.__coil = True
+            # owned weapon action if the targeted position
+            # is not near the weapon and the entity
+            if not (self.rect.centerx < direction_pos[0] < self.__weapon.rect.centerx or
+                    self.rect.centery < direction_pos[1] < self.__weapon.rect.centery) \
+                    and not (self.rect.centerx > direction_pos[0] > self.__weapon.rect.centerx or
+                             self.rect.centery > direction_pos[1] > self.__weapon.rect.centery) \
+                    and self.__direction.length() > 0:
+
+                # the weapon action is true if its cooldown is finished
+                if self.action and self.__weapon.action(projectiles):
+                    # recoil physic
+                    recoil: Vector2 = -1 * self.__direction
+                    recoil.scale_to_length(self.__weapon.recoil)
+                    self.__velocity += recoil
+                    self.__coil = True
+
+                cursor.enable()
+
+            # if the targeted position does not permit an action,
+            # the cursor become "disabled"
+            else:
+                cursor.disable()
 
         # projectiles collision and effect
         for projectile in projectiles:

@@ -19,13 +19,12 @@ class Displayable:
         self.__color: tuple[int, int, int] = color
         self.__display: bool = True
 
+        self.__sprite_to_scale: bool = sprite_to_scale
+
         self.__sprite: Union[Surface, None] = None
+        self.__original_sprite: Union[Surface, None] = None
         if sprite:
-            if sprite_to_scale:
-                self.__sprite = pygame.transform.scale(pygame.image.load(sprite), size)
-            else:
-                self.__sprite = pygame.image.load(sprite)
-        self.__original_sprite: Union[Surface, None] = self.__sprite
+            self.set_sprite(sprite)
 
     @property
     def rect(self) -> Rect:
@@ -34,6 +33,13 @@ class Displayable:
     @property
     def color(self) -> tuple[int, int, int]:
         return self.__color
+
+    def set_sprite(self, sprite: str) -> None:
+        if self.__sprite_to_scale:
+            self.__sprite = pygame.transform.scale(pygame.image.load(sprite), self.__rect.size)
+        else:
+            self.__sprite = pygame.image.load(sprite)
+        self.__original_sprite = self.__sprite
 
     def reset_sprite(self) -> None:
         self.__sprite = self.__original_sprite

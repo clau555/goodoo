@@ -11,6 +11,7 @@ from entity import Entity
 from level_parser import level_from_image
 from player import Player
 from projectile import Projectile
+from src.cursor import Cursor
 from tile import Tile
 from utils import *
 from weapon import Weapon
@@ -44,6 +45,8 @@ class Game:
         self.__projectiles: list[Projectile] = [test_projectile]
 
         self.__last_item_spawn_time: float = time.time()
+
+        self.__cursor: Cursor = Cursor()
 
         self.__debug: bool = False
 
@@ -101,8 +104,9 @@ class Game:
             screen_pos: tuple[int, int] = get_item_placement_from_index(map_pos)
 
             # TODO creating random item, for now it chooses between a gun and a heart
-            gun = Weapon(screen_pos, "assets/gun.png", 0.8, TILE_SCALE / 4)
-            heart = Weapon(screen_pos, "assets/heart.png", 0.5, TILE_SCALE, auto_grab=True)
+
+            gun = Weapon(screen_pos, "assets/gun.png", 0.8, recoil=(TILE_SCALE / 4))
+            heart = Weapon(screen_pos, "assets/heart.png", 0.5, recoil=TILE_SCALE, auto_grab=True)
             item = [gun, heart][randrange(2)]
             self.__weapons.append(item)
 
@@ -113,14 +117,18 @@ class Game:
 
         # MODEL UPDATE
 
-        # items spawn
+        # updates user cursor sprite position
+        self.__cursor.update()
+
+        # spawns item randomly when ITEM_SPAWN_DELAY is elapsed
         if (time.time() - self.__last_item_spawn_time) * delta_time > self.ITEM_SPAWN_DELAY:
             self.__spawn_random_items()
             self.__last_item_spawn_time = time.time()
 
-        # we pass neighbor tiles only for better performances (used for collisions)
+        # player entity updated according to user inputs
+        # we pass neighbor tiles only for collisions for better performances
         self.__player.update_from_inputs(inputs, self.__neighbor_tiles(self.__player.rect.center),
-                                         self.__weapons, self.__projectiles, delta_time)
+                                         self.__weapons, self.__projectiles, self.__cursor, delta_time)
 
         for collectable in self.__weapons:
             if not collectable.available:
@@ -148,6 +156,8 @@ class Game:
             collectable.display()
         for projectile in self.__projectiles:
             projectile.display()
+
+        self.__cursor.display()
 
         # DEBUG
 
