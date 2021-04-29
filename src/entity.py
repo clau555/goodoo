@@ -4,7 +4,7 @@ import pygame
 from pygame.math import Vector2
 
 from bar import Bar
-from config import GRAVITY_MAX, TILE_SCALE
+from constants import GRAVITY_MAX, TILE_SCALE
 from displayable import Displayable
 from projectile import Projectile
 from src.cursor import Cursor

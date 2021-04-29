@@ -3,7 +3,7 @@ from typing import Union
 
 from PIL import Image
 
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
 from player import Player
 from tile import Tile
 

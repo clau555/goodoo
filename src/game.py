@@ -5,13 +5,14 @@ from typing import Union
 
 import pygame
 
-from config import FPS
+from constants import FPS
 from displayable import Displayable
 from entity import Entity
 from level_parser import level_from_image
 from player import Player
 from projectile import Projectile
 from src.cursor import Cursor
+from src.object_parser import get_weapons_dict, get_weapon_instance
 from tile import Tile
 from utils import *
 from weapon import Weapon
@@ -32,23 +33,27 @@ class Game:
         self.__player, self.__tile_map = level_from_image(level_file_name)  # level parsing
 
         self.__tiles: list[Tile] = self.__get_existing_tiles()
-        self.__sky: Displayable = Displayable((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), sprite="assets/sky.jpg")
+        self.__sky: Displayable = Displayable((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), sprite="data/sprites/sky.jpg")
 
-        self.__entities: list[Entity] = [self.__player]
-        self.__weapons: list[Weapon] = []
+        self.__entities: list[Entity] = [self.__player]  # current list of entities in game
+        self.__weapons: list[Weapon] = []  # current list of weapons in game
 
         # an index marked as True indicates an item is already at this emplacement
         self.__item_map: list[list[bool]] = [[False for _ in range(WORLD_HEIGHT)] for _ in range(WORLD_WIDTH)]
 
+        # hardcoded projectile object to test entity/projectile collision
         test_projectile: Projectile = Projectile((0, 500), (TILE_SCALE // 8, TILE_SCALE // 8),
                                                  (255, 255, 255), self.__player.rect.center, TILE_SCALE / 2)
-        self.__projectiles: list[Projectile] = [test_projectile]
+        self.__projectiles: list[Projectile] = [test_projectile]  # current list of projectiles in game
 
-        self.__last_item_spawn_time: float = time.time()
+        self.__item_types: dict = get_weapons_dict()
+        self.__projectile_types: dict = {}
 
         self.__cursor: Cursor = Cursor()
 
         self.__debug: bool = False
+
+        self.__last_item_spawn_time: float = time.time()
 
         # first two items spawn
         self.__spawn_random_items()
@@ -103,11 +108,10 @@ class Game:
             # and converting it to a screen position
             screen_pos: tuple[int, int] = get_item_placement_from_index(map_pos)
 
-            # TODO creating random item, for now it chooses between a gun and a heart
-
-            gun = Weapon(screen_pos, "assets/gun.png", 0.8, recoil=(TILE_SCALE / 4))
-            heart = Weapon(screen_pos, "assets/heart.png", 0.5, recoil=TILE_SCALE, auto_grab=True)
-            item = [gun, heart][randrange(2)]
+            # loads a random item
+            random_key: str = list(self.__item_types.keys())[randrange(len(list(self.__item_types.keys())))]
+            item_obj: dict = self.__item_types[random_key]
+            item: Weapon = get_weapon_instance(screen_pos, item_obj)
             self.__weapons.append(item)
 
             # and marking its position as taken
@@ -120,7 +124,7 @@ class Game:
         # updates user cursor sprite position
         self.__cursor.update()
 
-        # spawns item randomly when ITEM_SPAWN_DELAY is elapsed
+        # spawns an item randomly when ITEM_SPAWN_DELAY is elapsed
         if (time.time() - self.__last_item_spawn_time) * delta_time > self.ITEM_SPAWN_DELAY:
             self.__spawn_random_items()
             self.__last_item_spawn_time = time.time()

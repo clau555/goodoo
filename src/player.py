@@ -2,7 +2,7 @@ from typing import Union
 
 import pygame
 
-from config import TILE_SCALE
+from constants import TILE_SCALE
 from entity import Entity
 from projectile import Projectile
 from cursor import Cursor
@@ -19,7 +19,7 @@ class Player(Entity):
 
     def __init__(self, pos: tuple[int, int]) -> None:
         super(Player, self).__init__(pos, (TILE_SCALE * 2 // 3, TILE_SCALE * 2 // 3),
-                                     sprite="assets/player.png")
+                                     sprite="data/sprites/player.png")
 
     def update_from_inputs(self, inputs: dict[str, bool], neighbor_tiles: list[Tile],
                            weapons: list[Weapon], projectiles: list[Projectile],

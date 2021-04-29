@@ -4,7 +4,7 @@ import time
 import pygame
 from pygame.time import Clock
 
-from config import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
 from game import Game
 
 
@@ -61,12 +61,15 @@ def main(level_file_name: str = None) -> None:
         elif (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and not (keys[pygame.K_q] or keys[pygame.K_LEFT]):
             inputs["right"] = True
 
+        # left click detection
         if pygame.mouse.get_pressed(3)[0]:
             inputs["action"] = True
 
+        # delta time update
         delta_time: float = (time.time() - last_time) * FPS
         last_time: float = time.time()
 
+        # game update and display update
         if delta_time <= 2.:
             game.update_and_display(inputs, delta_time)
             pygame.display.flip()

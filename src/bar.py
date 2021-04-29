@@ -1,4 +1,4 @@
-from config import TILE_SCALE
+from constants import TILE_SCALE
 from displayable import Displayable
 
 

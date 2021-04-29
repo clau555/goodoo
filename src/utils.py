@@ -1,6 +1,6 @@
 from pygame.rect import Rect
 
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
 
 
 def get_index_from_screen_position(screen_pos: tuple[int, int]) -> tuple[int, int]:

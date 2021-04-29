@@ -1,7 +1,7 @@
 import pygame
 
 from collectable import Collectable
-from config import TILE_SCALE
+from constants import TILE_SCALE
 from projectile import Projectile
 
 
@@ -14,10 +14,11 @@ class Weapon(Collectable):
     """
 
     def __init__(self, pos: tuple[int, int], sprite: str, cooldown: float,
-                 recoil: float = 0, auto_grab: bool = False) -> None:
+                 recoil: float, auto_grab: bool, projectile_name: str) -> None:
         super(Weapon, self).__init__(pos, sprite, auto_grab)
         self.__recoil: float = recoil
         self.__cooldown: float = cooldown  # cooldown duration in seconds
+        self.__projectile_type: str = projectile_name  # projectile the weapon will fire
         self.__counter: int = pygame.time.get_ticks()  # saved time on last action
 
     @property
@@ -44,6 +45,7 @@ class Weapon(Collectable):
         """
         if (pygame.time.get_ticks() - self.__counter) / 1000 > self.__cooldown:
 
+            # TODO load from projectiles dict, hard coded projectile for now
             projectiles.append(Projectile(self.rect.center, (TILE_SCALE // 8, TILE_SCALE // 8),
                                           (255, 255, 255), pygame.mouse.get_pos(), TILE_SCALE / 2))
             self.update_counter()

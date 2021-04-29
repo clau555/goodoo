@@ -2,7 +2,7 @@ import math
 
 from pygame.math import Vector2
 
-from config import TILE_SCALE
+from constants import TILE_SCALE
 from displayable import Displayable
 
 

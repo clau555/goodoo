@@ -1,6 +1,6 @@
 # Goodoo
 
-Started as a second year project, Goodoo is now a WIP side project.
+Started as a second year video game project, Goodoo is now a WIP side project.
 
 ## Requirement
 
@@ -13,9 +13,7 @@ Python 3.9
 
 ## Execution example
 
-```
-python goodoo.py maps/map1.jpg
-```
+```python goodoo.py data/maps/map1.jpg```
 
 ## Key Bindings
 
@@ -24,6 +22,5 @@ right ```right``` / ```d```<br/>
 jump ```up``` / ```z``` / ```space```<br/>
 pick ```shift``` / ```r```<br/>
 action ```left click```<br/>
-fullscreen ```F11```<br/>
-quit ```escape```<br/>
 debug ```*```<br/>
+quit ```escape```<br/>
