@@ -12,10 +12,21 @@ from level_parser import level_from_image
 from player import Player
 from projectile import Projectile
 from src.cursor import Cursor
-from src.object_parser import get_weapons_dict, get_weapon_instance
 from tile import Tile
 from utils import *
 from weapon import Weapon
+
+
+def get_weapon_instance(pos: tuple[int, int], weapon_obj: dict) -> Weapon:
+    """
+    Returns a weapon object instance with the parameters configuration
+    stored inside the weapon object dictionary.\n
+    :param pos: weapon position on screen
+    :param weapon_obj: dictionary storing the instance parameters
+    :return: weapon object
+    """
+    return Weapon(pos, "data/sprites/" + weapon_obj["sprite_file"], weapon_obj["cooldown"],
+                  TILE_SCALE * weapon_obj["recoil"], weapon_obj["auto_grab"], weapon_obj["projectile_name"])
 
 
 class Game:
@@ -26,6 +37,10 @@ class Game:
 
     # time in seconds to pass before an item is created randomly on screen
     ITEM_SPAWN_DELAY: float = 10.
+
+    ITEM_OBJECTS: dict
+    PROJECTILE_OBJECTS: dict
+    ITEM_OBJECTS, PROJECTILE_OBJECTS = get_types_dict()
 
     def __init__(self, level_file_name) -> None:
         self.__player: Player
@@ -45,9 +60,6 @@ class Game:
         test_projectile: Projectile = Projectile((0, 500), (TILE_SCALE // 8, TILE_SCALE // 8),
                                                  (255, 255, 255), self.__player.rect.center, TILE_SCALE / 2)
         self.__projectiles: list[Projectile] = [test_projectile]  # current list of projectiles in game
-
-        self.__item_types: dict = get_weapons_dict()
-        self.__projectile_types: dict = {}
 
         self.__cursor: Cursor = Cursor()
 
@@ -109,8 +121,8 @@ class Game:
             screen_pos: tuple[int, int] = get_item_placement_from_index(map_pos)
 
             # loads a random item
-            random_key: str = list(self.__item_types.keys())[randrange(len(list(self.__item_types.keys())))]
-            item_obj: dict = self.__item_types[random_key]
+            random_key: str = list(self.ITEM_OBJECTS.keys())[randrange(len(list(self.ITEM_OBJECTS.keys())))]
+            item_obj: dict = self.ITEM_OBJECTS[random_key]
             item: Weapon = get_weapon_instance(screen_pos, item_obj)
             self.__weapons.append(item)
 
@@ -119,7 +131,7 @@ class Game:
 
     def update_and_display(self, inputs: dict[str, bool], delta_time: float) -> None:
 
-        # MODEL UPDATE
+        # MODEL UPDATE ##############################################################
 
         # updates user cursor sprite position
         self.__cursor.update()
@@ -132,15 +144,18 @@ class Game:
         # player entity updated according to user inputs
         # we pass neighbor tiles only for collisions for better performances
         self.__player.update_from_inputs(inputs, self.__neighbor_tiles(self.__player.rect.center),
-                                         self.__weapons, self.__projectiles, self.__cursor, delta_time)
+                                         self.__weapons, self.__projectiles,
+                                         self.PROJECTILE_OBJECTS, self.__cursor, delta_time)
 
-        for collectable in self.__weapons:
-            if not collectable.available:
-                weapon_pos: tuple[int, int] = get_index_from_screen_position(collectable.rect.center)
+        for item in self.__weapons:
+            if not item.available:
+                # the item has been picked up, we can delete it from the map
+                weapon_pos: tuple[int, int] = get_index_from_screen_position(item.rect.center)
                 self.__item_map[weapon_pos[0]][weapon_pos[1]] = False
-                self.__weapons.pop(self.__weapons.index(collectable))
+                self.__weapons.pop(self.__weapons.index(item))
             else:
-                collectable.update(delta_time)
+                # idle item
+                item.update(delta_time)
 
         for projectile in self.__projectiles:
             if not is_inside_screen(projectile.rect) or not projectile.alive:
@@ -148,7 +163,7 @@ class Game:
             else:
                 projectile.update(self.__neighbor_tiles(projectile.rect.center), delta_time)
 
-        # DISPLAY UPDATE
+        # DISPLAY UPDATE ############################################################
 
         # self.__sky.display()
         pygame.display.get_surface().fill((0, 0, 0))
@@ -156,14 +171,14 @@ class Game:
             tile.display()
         for entity in self.__entities:
             entity.display()
-        for collectable in self.__weapons:
-            collectable.display()
+        for item in self.__weapons:
+            item.display()
         for projectile in self.__projectiles:
             projectile.display()
 
         self.__cursor.display()
 
-        # DEBUG
+        # DEBUG #####################################################################
 
         if self.__debug:
 

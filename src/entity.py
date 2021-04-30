@@ -20,7 +20,7 @@ class Entity(Displayable):
     An entity can grab a weapon object and use it, and has health points.\n
     """
 
-    TOTAL_HEALTH: int = 10
+    MAX_HEALTH: int = 10
     HIT_DELAY: float = 100.
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], sprite: str = None,
@@ -40,7 +40,7 @@ class Entity(Displayable):
         self.__weapon: Union[Weapon, None] = None
         self.__coil: bool = False
 
-        self.__health: int = self.TOTAL_HEALTH
+        self.__health: int = self.MAX_HEALTH
         self.__hit: bool = False
         self.__hit_timer: float = self.HIT_DELAY
 
@@ -62,6 +62,10 @@ class Entity(Displayable):
     def weapon(self) -> Weapon:
         return self.__weapon
 
+    @property
+    def health(self) -> int:
+        return self.__health
+
     def __weapon_update(self) -> None:
         if self.__direction.length() > 1:
 
@@ -82,11 +86,11 @@ class Entity(Displayable):
                                            / self.__weapon.cooldown
         # health bar
         self.__health_bar.rect.center = (self.rect.centerx, self.rect.centery - self.rect.height)
-        self.__health_bar.progress = self.__health / self.TOTAL_HEALTH
+        self.__health_bar.progress = self.__health / self.MAX_HEALTH
 
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
                weapons: list[Weapon], projectiles: list[Projectile],
-               cursor: Union[Cursor, None], delta_time: float) -> None:
+               projectile_objects: dict, cursor: Union[Cursor, None], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
         # FIXME weapon action is possible when target position is at the very center of the entity
         # TODO block weapon movement when direction_pos is on the entity ?
@@ -130,7 +134,7 @@ class Entity(Displayable):
                     and self.__direction.length() > 0:
 
                 # the weapon action is true if its cooldown is finished
-                if self.action and self.__weapon.action(projectiles):
+                if self.action and self.__weapon.action(projectiles, projectile_objects):
                     # recoil physic
                     recoil: Vector2 = -1 * self.__direction
                     recoil.scale_to_length(self.__weapon.recoil)

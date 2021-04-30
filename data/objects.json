@@ -10,9 +10,9 @@
         "heart": {
             "sprite_file": "heart.png",
             "cooldown": 0.9,
-            "recoil": 1,
+            "recoil": 0.7,
             "auto_grab": false,
-            "projectile_name": "bullet"
+            "projectile_name": "boulet"
         },
         "gatling": {
             "sprite_file": "sword.png",
@@ -24,9 +24,14 @@
     },
     "projectiles": {
         "bullet": {
-            "size": 0.8,
+            "size": 0.15,
             "color": [255, 255, 255],
-            "speed": 0.2
+            "speed": 0.5
+        },
+        "boulet": {
+            "size": 0.5,
+            "color": [150, 150, 150],
+            "speed": 0.3
         }
     }
 }

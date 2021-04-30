@@ -1,3 +1,6 @@
+import json
+from typing import IO
+
 from pygame.rect import Rect
 
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
@@ -66,3 +69,10 @@ def is_inside_screen(rect: Rect) -> bool:
     """
     return (0 < rect.left < SCREEN_WIDTH or 0 < rect.right < SCREEN_WIDTH) and \
            (0 < rect.top < SCREEN_HEIGHT or 0 < rect.bottom < SCREEN_HEIGHT)
+
+
+def get_types_dict() -> tuple[dict, dict]:
+    file: IO = open('data/objects.json')
+    data: dict = json.load(file)
+    file.close()
+    return data["weapons"], data["projectiles"]

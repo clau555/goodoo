@@ -23,7 +23,7 @@ class Player(Entity):
 
     def update_from_inputs(self, inputs: dict[str, bool], neighbor_tiles: list[Tile],
                            weapons: list[Weapon], projectiles: list[Projectile],
-                           cursor: Union[Cursor, None], delta_time: float) -> None:
+                           projectile_objects: dict, cursor: Union[Cursor, None], delta_time: float) -> None:
         # getting player inputs from main loop
         self.left = inputs["left"]
         self.right = inputs["right"]
@@ -32,4 +32,11 @@ class Player(Entity):
         self.pick = inputs["pick"]
         self.action = inputs["action"]
 
-        self.update(pygame.mouse.get_pos(), neighbor_tiles, weapons, projectiles, cursor, delta_time)
+        self.update(pygame.mouse.get_pos(), neighbor_tiles,
+                    weapons, projectiles,
+                    projectile_objects, cursor, delta_time)
+
+        if self.health <= 0:
+            print("GAME OVER")
+            pygame.quit()
+            quit()
