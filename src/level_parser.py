@@ -46,13 +46,15 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
         for j in range(im.size[1]):
             current_pixel = im.getpixel((i, j))
 
+            # player spawn point
             if pixel_comparison(current_pixel, (0, 0, 255)) and not player_spawn:
                 player.rect.centerx = i * TILE_SCALE + TILE_SCALE / 2
                 player.rect.centery = j * TILE_SCALE + TILE_SCALE / 2
                 player_spawn = True
+
+            # solid tile
             if pixel_comparison(current_pixel, (255, 255, 255)):
-                value = 2 * (WORLD_HEIGHT - j) + 30
-                line.append(Tile((i * TILE_SCALE, j * TILE_SCALE), (value, value, value)))
+                line.append(Tile((i * TILE_SCALE, j * TILE_SCALE), (60, 60, 60)))
             else:
                 line.append(None)
 
