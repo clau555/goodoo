@@ -1,0 +1,23 @@
+{
+    "gun": {
+        "sprite_file": "gun.png",
+        "cooldown": 0.6,
+        "recoil": 0.4,
+        "auto_grab": false,
+        "projectile_name": "bullet"
+    },
+    "heart": {
+        "sprite_file": "heart.png",
+        "cooldown": 0.9,
+        "recoil": 0.7,
+        "auto_grab": false,
+        "projectile_name": "boulet"
+    },
+    "gatling": {
+        "sprite_file": "sword.png",
+        "cooldown": 0.1,
+        "recoil": 0.15,
+        "auto_grab": false,
+        "projectile_name": "bullet"
+    }
+}

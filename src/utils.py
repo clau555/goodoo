@@ -71,8 +71,15 @@ def is_inside_screen(rect: Rect) -> bool:
            (0 < rect.top < SCREEN_HEIGHT or 0 < rect.bottom < SCREEN_HEIGHT)
 
 
-def get_types_dict() -> tuple[dict, dict]:
-    file: IO = open('data/objects.json')
+def get_weapons_dict() -> dict:
+    file: IO = open('data/weapons.json')
     data: dict = json.load(file)
     file.close()
-    return data["weapons"], data["projectiles"]
+    return data
+
+
+def get_projectiles_dict() -> dict:
+    file: IO = open('data/projectiles.json')
+    data: dict = json.load(file)
+    file.close()
+    return data

@@ -17,16 +17,15 @@ from utils import *
 from weapon import Weapon
 
 
-def get_weapon_instance(pos: tuple[int, int], weapon_obj: dict) -> Weapon:
+def get_weapon_instance(pos: tuple[int, int], weapon_dict: dict) -> Weapon:
     """
-    Returns a weapon object instance with the parameters configuration
-    stored inside the weapon object dictionary.\n
+    Returns a weapon object instance from data stored inside the weapon dictionary object.\n
     :param pos: weapon position on screen
-    :param weapon_obj: dictionary storing the instance parameters
+    :param weapon_dict: dictionary storing the instance parameters
     :return: weapon object
     """
-    return Weapon(pos, "data/sprites/" + weapon_obj["sprite_file"], weapon_obj["cooldown"],
-                  TILE_SCALE * weapon_obj["recoil"], weapon_obj["auto_grab"], weapon_obj["projectile_name"])
+    return Weapon(pos, "data/sprites/" + weapon_dict["sprite_file"], weapon_dict["cooldown"],
+                  TILE_SCALE * weapon_dict["recoil"], weapon_dict["auto_grab"], weapon_dict["projectile_name"])
 
 
 class Game:
@@ -38,9 +37,8 @@ class Game:
     # time in seconds to pass before an item is created randomly on screen
     ITEM_SPAWN_DELAY: float = 10.
 
-    ITEM_OBJECTS: dict
-    PROJECTILE_OBJECTS: dict
-    ITEM_OBJECTS, PROJECTILE_OBJECTS = get_types_dict()
+    ITEMS_DICT: dict = get_weapons_dict()
+    PROJECTILES_DICT: dict = get_projectiles_dict()
 
     def __init__(self, level_file_name) -> None:
         self.__player: Player
@@ -121,9 +119,9 @@ class Game:
             screen_pos: tuple[int, int] = get_item_placement_from_index(map_pos)
 
             # loads a random item
-            random_key: str = list(self.ITEM_OBJECTS.keys())[randrange(len(list(self.ITEM_OBJECTS.keys())))]
-            item_obj: dict = self.ITEM_OBJECTS[random_key]
-            item: Weapon = get_weapon_instance(screen_pos, item_obj)
+            random_key: str = list(self.ITEMS_DICT.keys())[randrange(len(list(self.ITEMS_DICT.keys())))]
+            item_dict: dict = self.ITEMS_DICT[random_key]
+            item: Weapon = get_weapon_instance(screen_pos, item_dict)
             self.__weapons.append(item)
 
             # and marking its position as taken
@@ -145,7 +143,7 @@ class Game:
         # we pass neighbor tiles only for collisions for better performances
         self.__player.update_from_inputs(inputs, self.__neighbor_tiles(self.__player.rect.center),
                                          self.__weapons, self.__projectiles,
-                                         self.PROJECTILE_OBJECTS, self.__cursor, delta_time)
+                                         self.PROJECTILES_DICT, self.__cursor, delta_time)
 
         for item in self.__weapons:
             if not item.available:

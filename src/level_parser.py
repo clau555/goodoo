@@ -35,7 +35,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
 
     if im.size[0] != WORLD_WIDTH or im.size[1] != WORLD_HEIGHT:
         sys.exit("level map file has a size of {} instead of {}"
-                 .format(im.size, (int(SCREEN_WIDTH / TILE_SCALE), int(SCREEN_HEIGHT / TILE_SCALE))))
+                 .format(im.size, (SCREEN_WIDTH // TILE_SCALE, SCREEN_HEIGHT // TILE_SCALE)))
 
     world: list[list[Tile]] = []
     player: Player = Player((0, 0))
@@ -48,8 +48,8 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
 
             # player spawn point
             if pixel_comparison(current_pixel, (0, 0, 255)) and not player_spawn:
-                player.rect.centerx = i * TILE_SCALE + TILE_SCALE / 2
-                player.rect.centery = j * TILE_SCALE + TILE_SCALE / 2
+                player.rect.centerx = i * TILE_SCALE + TILE_SCALE // 2
+                player.rect.centery = j * TILE_SCALE + TILE_SCALE // 2
                 player_spawn = True
 
             # solid tile
