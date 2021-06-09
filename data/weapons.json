@@ -7,7 +7,7 @@
         "projectile_name": "bullet"
     },
     "heart": {
-        "sprite_file": "heart.png",
+        "sprite_file": "saber.png",
         "cooldown": 0.9,
         "recoil": 0.7,
         "auto_grab": false,

@@ -1,0 +1,10 @@
+{
+    "heart": {
+        "sprite_file": "heart.png",
+        "value": 1
+    },
+    "golden_heart": {
+        "sprite_file": "golden_heart.png",
+        "value": 10
+    }
+}

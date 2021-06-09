@@ -71,15 +71,14 @@ def is_inside_screen(rect: Rect) -> bool:
            (0 < rect.top < SCREEN_HEIGHT or 0 < rect.bottom < SCREEN_HEIGHT)
 
 
-def get_weapons_dict() -> dict:
-    file: IO = open('data/weapons.json')
-    data: dict = json.load(file)
-    file.close()
-    return data
-
-
-def get_projectiles_dict() -> dict:
-    file: IO = open('data/projectiles.json')
+def get_objects_dict(name: str) -> dict:
+    """
+    Returns the corresponding dictionary created from the json file
+    corresponding to the name passed on argument.\n
+    :param name: json file name
+    :return: dictionary corresponding to the json file
+    """
+    file: IO = open("data/" + name + ".json")
     data: dict = json.load(file)
     file.close()
     return data

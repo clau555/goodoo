@@ -7,12 +7,13 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORL
 from player import Player
 from tile import Tile
 
+
 # TODO use pygame instead of pillow?
 
 
 def pixel_comparison(pixel: tuple[int, int, int], color: tuple[int, int, int], margin: int = 75) -> bool:
     """
-    Compares two tuples representing an rgb color.\n
+    Compares two tuples each representing an rgb color.\n
     Two colors are considered the same if their distances are null more or less a given margin.\n
     :param pixel: color of a pixel
     :param color: color to compare the pixel with

@@ -4,12 +4,13 @@ from pygame.math import Vector2
 
 from constants import TILE_SCALE
 from displayable import Displayable
+from src.projectile import Projectile
 
 
 class Collectable(Displayable):
     """
     A collectable object is displayable and is
-    fixed at one position on the screen./n
+    fixed at one position on the screen.\n
     It can be picked up by an entity when it's colliding with it.\n
     """
 

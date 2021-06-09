@@ -7,6 +7,8 @@ from bar import Bar
 from constants import GRAVITY_MAX, TILE_SCALE
 from displayable import Displayable
 from projectile import Projectile
+from src.bonus import Bonus
+from src.collectable import Collectable
 from src.cursor import Cursor
 from tile import Tile
 from weapon import Weapon
@@ -67,6 +69,10 @@ class Entity(Displayable):
         return self.__health
 
     def __weapon_update(self) -> None:
+        """
+        Updates the position and orientation of the wielded weapon.
+        """
+
         if self.__direction.length() > 1:
 
             # weapon position update
@@ -79,6 +85,10 @@ class Entity(Displayable):
                 self.__weapon.rotate_sprite(self.__angle)
 
     def __bars_update(self):
+        """
+        Updates the position, orientation and state of the health bar and cooldown bar.
+        """
+
         # cooldown bar
         self.__cooldown_bar.rect.center = (self.rect.centerx, self.rect.centery + self.rect.height)
         if self.__weapon:
@@ -89,11 +99,11 @@ class Entity(Displayable):
         self.__health_bar.progress = self.__health / self.MAX_HEALTH
 
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
-               weapons: list[Weapon], projectiles: list[Projectile],
-               projectile_objects: dict, cursor: Union[Cursor, None], delta_time: float) -> None:
+               items: list[Collectable], projectiles: list[Projectile],
+               projectiles_dict: dict, cursor: Union[Cursor, None], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
         # FIXME weapon action is possible when target position is at the very center of the entity
-        # TODO block weapon movement when direction_pos is on the entity ?
+        # TODO block weapon movement when direction_pos is on the entity?
 
         # y control movements
         if self.up and self.__on_ground:
@@ -125,8 +135,7 @@ class Entity(Displayable):
         # owned weapon action
         if self.__weapon:
 
-            # owned weapon action if the targeted position
-            # is not near the weapon and the entity
+            # weapon action is possible if the targeted position isn't near the weapon and the entity
             if not (self.rect.centerx < direction_pos[0] < self.__weapon.rect.centerx or
                     self.rect.centery < direction_pos[1] < self.__weapon.rect.centery) \
                     and not (self.rect.centerx > direction_pos[0] > self.__weapon.rect.centerx or
@@ -134,7 +143,7 @@ class Entity(Displayable):
                     and self.__direction.length() > 0:
 
                 # the weapon action is true if its cooldown is finished
-                if self.action and self.__weapon.action(projectiles, projectile_objects):
+                if self.action and self.__weapon.weapon_action(projectiles, projectiles_dict):
                     # recoil physic
                     recoil: Vector2 = -1 * self.__direction
                     recoil.scale_to_length(self.__weapon.recoil)
@@ -145,6 +154,7 @@ class Entity(Displayable):
 
             # if the targeted position does not permit an action,
             # the cursor become "disabled"
+            # TODO should be disabled when cooldown is running
             else:
                 cursor.disable()
 
@@ -209,18 +219,26 @@ class Entity(Displayable):
         # bars update
         self.__bars_update()
 
-        # item grabbing
-        for weapon in weapons:
-            if self.rect.colliderect(weapon.rect) and \
-                    weapon.available and \
-                    weapon != self.__weapon and \
-                    (self.pick or weapon.auto_grab):
-                self.__weapon = weapon
-                weapon.available = False
-                weapon.update_counter()  # cooldown counter init
+        # item picking
+        for item in items:
+            if self.rect.colliderect(item.rect) and item.available and (self.pick or item.auto_grab):
+
+                if type(item) is Weapon and item != self.__weapon:
+                    item: Weapon  # converting item type to Weapon otherwise it's still considered as Collectable
+                    self.__weapon = item  # the entity owns the weapon
+                    item.weapon_update_counter()  # cooldown counter init
+
+                elif type(item) is Bonus:
+                    item: Bonus  # converting item type to Bonus otherwise it's still considered as Collectable
+                    # adding health to the entity while not exceeding the maximum health
+                    self.__health += item.value
+                    self.__health = self.MAX_HEALTH if self.__health > self.MAX_HEALTH else self.__health
+
+                item.available = False  # the item will be removed from the map
 
     def display(self) -> None:
 
+        # sprite flipping depending on orientation
         if self.__direction.length() > 1:
             if self.__direction.x < 0:
                 self.flip_sprite()
@@ -231,6 +249,7 @@ class Entity(Displayable):
         if not (self.__hit and self.__hit_timer % 10 < 5):
             super(Entity, self).display()
 
+        # owned weapon and cooldown display
         if self.__weapon:
             self.__weapon.display()
             self.__cooldown_bar.display()
