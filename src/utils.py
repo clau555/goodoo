@@ -1,9 +1,6 @@
-import json
-from typing import IO
-
 from pygame.rect import Rect
 
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
+from src.constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
 
 
 def get_index_from_screen_position(screen_pos: tuple[int, int]) -> tuple[int, int]:
@@ -69,16 +66,3 @@ def is_inside_screen(rect: Rect) -> bool:
     """
     return (0 < rect.left < SCREEN_WIDTH or 0 < rect.right < SCREEN_WIDTH) and \
            (0 < rect.top < SCREEN_HEIGHT or 0 < rect.bottom < SCREEN_HEIGHT)
-
-
-def get_objects_dict(name: str) -> dict:
-    """
-    Returns the corresponding dictionary created from the json file
-    corresponding to the name passed on argument.\n
-    :param name: json file name
-    :return: dictionary corresponding to the json file
-    """
-    file: IO = open("data/" + name + ".json")
-    data: dict = json.load(file)
-    file.close()
-    return data

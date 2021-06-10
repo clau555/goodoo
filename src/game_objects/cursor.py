@@ -1,7 +1,7 @@
 import pygame.mouse
 
-from constants import TILE_SCALE
-from displayable import Displayable
+from src.game_objects.displayable import Displayable
+from src.constants import TILE_SCALE
 
 
 class Cursor(Displayable):

@@ -2,9 +2,8 @@ import math
 
 from pygame.math import Vector2
 
-from constants import TILE_SCALE
-from displayable import Displayable
-from src.projectile import Projectile
+from src.game_objects.displayable import Displayable
+from src.constants import TILE_SCALE
 
 
 class Collectable(Displayable):
@@ -34,5 +33,9 @@ class Collectable(Displayable):
         self.__available = available
 
     def update(self, delta_time: float) -> None:
+        """
+        Makes the item moving up and down endlessly.\n
+        :param delta_time: time elapsed since the last frame
+        """
         self.__counter = (self.__counter + 10) % 360
         self.rect.y = self.__origin.y + (TILE_SCALE / 6) * math.cos(math.radians(self.__counter)) * delta_time

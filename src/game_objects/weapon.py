@@ -1,7 +1,8 @@
 import pygame
 
-from collectable import Collectable
-from projectile import Projectile
+from src.dictionaries import PROJECTILES_DICT
+from src.game_objects.collectable import Collectable
+from src.game_objects.projectile import Projectile
 from src.constants import TILE_SCALE
 
 
@@ -30,7 +31,7 @@ class Weapon(Collectable):
         super(Weapon, self).__init__(pos, sprite, False)
         self.__recoil: float = recoil                   # acceleration taken by the entity when using th weapon
         self.__cooldown: float = cooldown               # cooldown duration in seconds
-        self.__projectile_type: str = projectile_name   # projectile the weapon will fire
+        self.__projectile_name: str = projectile_name   # projectile the weapon will fire
         self.__counter: int = pygame.time.get_ticks()   # saved time on last action
 
     @property
@@ -52,17 +53,16 @@ class Weapon(Collectable):
         """
         self.__counter = pygame.time.get_ticks()
 
-    def weapon_action(self, projectiles: list[Projectile], projectiles_dict: dict) -> bool:
+    def weapon_action(self, projectiles: list[Projectile]) -> bool:
         """
         Triggers the weapon action (for example throwing a projectile) if its cooldown is finished.\n
         :param projectiles: current list of in game projectiles
-        :param projectiles_dict: list of all projectile instances configurations
         :return: true if the action has been successfully done
         """
         if (pygame.time.get_ticks() - self.__counter) / 1000 > self.__cooldown:
             # FIXME projectile collides with entity when spawned if it's too big
             # TODO storing corresponding projectile dict inside Weapon?
-            projectile: Projectile = get_projectile_instance(projectiles_dict[self.__projectile_type],
+            projectile: Projectile = get_projectile_instance(PROJECTILES_DICT[self.__projectile_name],
                                                              self.rect.center, pygame.mouse.get_pos())
             projectiles.append(projectile)
             self.weapon_update_counter()

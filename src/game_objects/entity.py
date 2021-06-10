@@ -3,15 +3,15 @@ from typing import Union
 import pygame
 from pygame.math import Vector2
 
-from bar import Bar
-from constants import GRAVITY_MAX, TILE_SCALE
-from displayable import Displayable
-from projectile import Projectile
-from src.bonus import Bonus
-from src.collectable import Collectable
-from src.cursor import Cursor
-from tile import Tile
-from weapon import Weapon
+from src.game_objects.bar import Bar
+from src.game_objects.displayable import Displayable
+from src.game_objects.projectile import Projectile
+from src.game_objects.bonus import Bonus
+from src.game_objects.collectable import Collectable
+from src.game_objects.cursor import Cursor
+from src.game_objects.tile import Tile
+from src.game_objects.weapon import Weapon
+from src.constants import GRAVITY_MAX, TILE_SCALE
 
 
 class Entity(Displayable):
@@ -100,7 +100,7 @@ class Entity(Displayable):
 
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
                items: list[Collectable], projectiles: list[Projectile],
-               projectiles_dict: dict, cursor: Union[Cursor, None], delta_time: float) -> None:
+               cursor: Union[Cursor, None], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
         # FIXME weapon action is possible when target position is at the very center of the entity
         # TODO block weapon movement when direction_pos is on the entity?
@@ -143,7 +143,7 @@ class Entity(Displayable):
                     and self.__direction.length() > 0:
 
                 # the weapon action is true if its cooldown is finished
-                if self.action and self.__weapon.weapon_action(projectiles, projectiles_dict):
+                if self.action and self.__weapon.weapon_action(projectiles):
                     # recoil physic
                     recoil: Vector2 = -1 * self.__direction
                     recoil.scale_to_length(self.__weapon.recoil)

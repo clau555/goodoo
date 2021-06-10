@@ -5,18 +5,19 @@ from typing import Union
 
 import pygame
 
-from constants import FPS
-from displayable import Displayable
-from entity import Entity
-from level_parser import level_from_image
-from player import Player
-from projectile import Projectile
-from src.bonus import Bonus
-from src.collectable import Collectable
-from src.cursor import Cursor
-from tile import Tile
-from utils import *
-from weapon import Weapon
+from src.constants import FPS
+from src.dictionaries import WEAPONS_DICT, BONUSES_DICT
+from src.game_objects.bonus import Bonus
+from src.game_objects.collectable import Collectable
+from src.game_objects.cursor import Cursor
+from src.game_objects.displayable import Displayable
+from src.game_objects.entity import Entity
+from src.game_objects.player import Player
+from src.game_objects.projectile import Projectile
+from src.game_objects.tile import Tile
+from src.game_objects.weapon import Weapon
+from src.level_parser import level_from_image
+from src.utils import *
 
 
 def get_weapon_instance(weapon_dict: dict, pos: tuple[int, int]) -> Weapon:
@@ -40,6 +41,28 @@ def get_bonus_instance(bonus_dict: dict, pos: tuple[int, int]) -> Bonus:
     return Bonus(pos, "data/sprites/" + bonus_dict["sprite_file"], bonus_dict["value"])
 
 
+def get_random_weapon(pos: tuple[int, int]) -> Weapon:
+    """
+    Returns a random weapon instance chosen inside the global weapons dictionary.\n
+    :param pos: screen position at which the weapon should spawn
+    :return: weapon instance
+    """
+    random_key: str = list(WEAPONS_DICT.keys())[randrange(len(list(WEAPONS_DICT.keys())))]
+    item_dict: dict = WEAPONS_DICT[random_key]
+    return get_weapon_instance(item_dict, pos)
+
+
+def get_random_bonus(pos: tuple[int, int]) -> Bonus:
+    """
+    Returns a random bonus instance chosen inside the global bonuses dictionary.\n
+    :param pos: screen position at which the bonus should spawn
+    :return: bonus instance
+    """
+    random_key: str = list(BONUSES_DICT.keys())[randrange(len(list(BONUSES_DICT.keys())))]
+    item_dict: dict = BONUSES_DICT[random_key]
+    return get_bonus_instance(item_dict, pos)
+
+
 class Game:
     """
     The game object stores, update, and displays
@@ -48,11 +71,6 @@ class Game:
 
     # time in seconds to pass before an item is created randomly on screen
     ITEM_SPAWN_DELAY: float = 10.
-
-    # TODO global variables instead of static?
-    WEAPON_DICT: dict = get_objects_dict("weapons")
-    BONUSES_DICT: dict = get_objects_dict("bonuses")
-    PROJECTILES_DICT: dict = get_objects_dict("projectiles")
 
     def __init__(self, level_file_name) -> None:
         self.__player: Player  # entity controlled by user
@@ -120,16 +138,6 @@ class Game:
                         tiles.append(self.__tile_map[i][j])
         return tiles
 
-    def __get_random_weapon(self, pos: tuple[int, int]) -> Weapon:
-        random_key: str = list(self.WEAPON_DICT.keys())[randrange(len(list(self.WEAPON_DICT.keys())))]
-        item_dict: dict = self.WEAPON_DICT[random_key]
-        return get_weapon_instance(item_dict, pos)
-
-    def __get_random_bonus(self, pos: tuple[int, int]) -> Bonus:
-        random_key: str = list(self.BONUSES_DICT.keys())[randrange(len(list(self.BONUSES_DICT.keys())))]
-        item_dict: dict = self.BONUSES_DICT[random_key]
-        return get_bonus_instance(item_dict, pos)
-
     def __spawn_random_item(self) -> None:
 
         # indexes stores all free emplacements coordinates
@@ -149,9 +157,9 @@ class Game:
 
             # loading a random item (a weapon or a bonus)
             if bool(randint(0, 2)):  # 2 chances out of 3 to be a weapon
-                item: Weapon = self.__get_random_weapon(screen_pos)
+                item: Weapon = get_random_weapon(screen_pos)
             else:
-                item: Bonus = self.__get_random_bonus(screen_pos)
+                item: Bonus = get_random_bonus(screen_pos)
 
             # adding the item to the global list to make it spawn...
             self.__items.append(item)
@@ -175,7 +183,7 @@ class Game:
         # TODO could pass neighbor items only
         self.__player.update_from_inputs(inputs, self.__neighbor_tiles(self.__player.rect.center),
                                          self.__items, self.__projectiles,
-                                         self.PROJECTILES_DICT, self.__cursor, delta_time)
+                                         self.__cursor, delta_time)
 
         # items update
         for item in self.__items:
@@ -188,7 +196,9 @@ class Game:
                 # idle item
                 item.update(delta_time)
 
+        # projectiles update
         for projectile in self.__projectiles:
+            # the projectile is destroyed when it collides or if it's outside the screen
             if not is_inside_screen(projectile.rect) or not projectile.alive:
                 self.__projectiles.pop(self.__projectiles.index(projectile))
             else:
@@ -206,7 +216,6 @@ class Game:
             item.display()
         for projectile in self.__projectiles:
             projectile.display()
-
         self.__cursor.display()
 
         # DEBUG #####################################################################

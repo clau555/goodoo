@@ -1,5 +1,5 @@
-from constants import TILE_SCALE
-from displayable import Displayable
+from src.game_objects.displayable import Displayable
+from src.constants import TILE_SCALE
 
 
 class Bar(Displayable):
@@ -8,7 +8,7 @@ class Bar(Displayable):
         self.__total_width: float = TILE_SCALE * 2 / 3
         super(Bar, self).__init__(pos, (0, TILE_SCALE // 10), color)
         self.rect.center = pos  # centers the bar at pos immediately
-        self.__progress: float = 0.
+        self.__progress: float = 0.  # varies from 0 to 1, 0 is an empty bar, 1 is a full bar
         self.set_display(False)
 
     @property

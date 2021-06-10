@@ -1,4 +1,4 @@
-from src.collectable import Collectable
+from src.game_objects.collectable import Collectable
 
 
 class Bonus(Collectable):
@@ -12,5 +12,5 @@ class Bonus(Collectable):
         self.__value: int = value  # health to add to an entity when taken
 
     @property
-    def value(self):
+    def value(self) -> int:
         return self.__value

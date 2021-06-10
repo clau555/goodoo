@@ -2,12 +2,12 @@ from typing import Union
 
 import pygame
 
-from constants import TILE_SCALE
-from cursor import Cursor
-from entity import Entity
-from projectile import Projectile
-from src.collectable import Collectable
-from tile import Tile
+from src.game_objects.cursor import Cursor
+from src.game_objects.entity import Entity
+from src.game_objects.projectile import Projectile
+from src.game_objects.collectable import Collectable
+from src.game_objects.tile import Tile
+from src.constants import TILE_SCALE
 
 
 class Player(Entity):
@@ -23,7 +23,8 @@ class Player(Entity):
 
     def update_from_inputs(self, inputs: dict[str, bool], neighbor_tiles: list[Tile],
                            items: list[Collectable], projectiles: list[Projectile],
-                           projectile_objects: dict, cursor: Union[Cursor, None], delta_time: float) -> None:
+                           cursor: Union[Cursor, None], delta_time: float) -> None:
+
         # getting player inputs from main loop
         self.left = inputs["left"]
         self.right = inputs["right"]
@@ -34,7 +35,7 @@ class Player(Entity):
 
         self.update(pygame.mouse.get_pos(), neighbor_tiles,
                     items, projectiles,
-                    projectile_objects, cursor, delta_time)
+                    cursor, delta_time)
 
         if self.health <= 0:
             print("GAME OVER")

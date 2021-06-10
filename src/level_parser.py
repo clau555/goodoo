@@ -3,9 +3,9 @@ from typing import Union
 
 from PIL import Image
 
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
-from player import Player
-from tile import Tile
+from src.game_objects.player import Player
+from src.game_objects.tile import Tile
+from src.constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
 
 
 # TODO use pygame instead of pillow?
@@ -65,7 +65,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
         for j in range(len(world[i])):
             # a tile is considered to be "on top" if it doesn't have any tile above it
             if world[i][j] is not None and j > 0 and world[i][j - 1] is None:
-                world[i][j].set_at_top(True)
+                world[i][j].set_top(True)
 
     if not player_spawn:
         sys.exit("no player spawn point set inside the map")
