@@ -1,14 +1,14 @@
 import pygame
 
-from src.dictionaries import PROJECTILES_DICT
-from src.game_objects.collectable import Collectable
-from src.game_objects.projectile import Projectile
-from src.constants import TILE_SCALE
+from data.dictionaries import PROJECTILES_DICT
+from data.game_objects.collectable import Collectable
+from data.game_objects.projectile import Projectile
+from data.constants import TILE_SCALE
 
 
 def get_projectile_instance(projectile_dict: dict, pos: tuple[int, int], target_pos: tuple[int, int]) -> Projectile:
     """
-    Returns a projectile instance from data stored inside the weapon dictionary object.\n
+    Returns a projectile instance from resources stored inside the weapon dictionary object.\n
     :param projectile_dict: dictionary storing the instance parameters
     :param pos: projectile starting position on screen
     :param target_pos: projectile targeted position on screen

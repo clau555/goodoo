@@ -9,7 +9,7 @@ def get_objects_dict(name: str) -> dict:
     :param name: json file name
     :return: dictionary corresponding to the json file
     """
-    file: IO = open("data/" + name + ".json")
+    file: IO = open("resources/" + name + ".json")
     data: dict = json.load(file)
     file.close()
     return data

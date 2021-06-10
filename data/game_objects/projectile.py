@@ -2,8 +2,8 @@ import math
 
 from pygame.math import Vector2
 
-from src.game_objects.displayable import Displayable
-from src.game_objects.tile import Tile
+from data.game_objects.displayable import Displayable
+from data.game_objects.tile import Tile
 
 
 class Projectile(Displayable):

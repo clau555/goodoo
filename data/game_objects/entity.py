@@ -3,15 +3,15 @@ from typing import Union
 import pygame
 from pygame.math import Vector2
 
-from src.game_objects.bar import Bar
-from src.game_objects.displayable import Displayable
-from src.game_objects.projectile import Projectile
-from src.game_objects.bonus import Bonus
-from src.game_objects.collectable import Collectable
-from src.game_objects.cursor import Cursor
-from src.game_objects.tile import Tile
-from src.game_objects.weapon import Weapon
-from src.constants import GRAVITY_MAX, TILE_SCALE
+from data.game_objects.bar import Bar
+from data.game_objects.displayable import Displayable
+from data.game_objects.projectile import Projectile
+from data.game_objects.bonus import Bonus
+from data.game_objects.collectable import Collectable
+from data.game_objects.cursor import Cursor
+from data.game_objects.tile import Tile
+from data.game_objects.weapon import Weapon
+from data.constants import GRAVITY_MAX, TILE_SCALE
 
 
 class Entity(Displayable):

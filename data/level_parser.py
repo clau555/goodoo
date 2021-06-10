@@ -3,9 +3,9 @@ from typing import Union
 
 from PIL import Image
 
-from src.game_objects.player import Player
-from src.game_objects.tile import Tile
-from src.constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
+from data.game_objects.player import Player
+from data.game_objects.tile import Tile
+from data.constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
 
 
 # TODO use pygame instead of pillow?

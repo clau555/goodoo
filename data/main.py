@@ -4,8 +4,8 @@ import time
 import pygame
 from pygame.time import Clock
 
-from src.game_objects.game import Game
-from src.constants import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
+from data.game_objects.game import Game
+from data.constants import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
 
 
 def main(level_file_name: str = None) -> None:

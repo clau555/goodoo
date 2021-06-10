@@ -5,40 +5,40 @@ from typing import Union
 
 import pygame
 
-from src.constants import FPS
-from src.dictionaries import WEAPONS_DICT, BONUSES_DICT
-from src.game_objects.bonus import Bonus
-from src.game_objects.collectable import Collectable
-from src.game_objects.cursor import Cursor
-from src.game_objects.displayable import Displayable
-from src.game_objects.entity import Entity
-from src.game_objects.player import Player
-from src.game_objects.projectile import Projectile
-from src.game_objects.tile import Tile
-from src.game_objects.weapon import Weapon
-from src.level_parser import level_from_image
-from src.utils import *
+from data.constants import FPS
+from data.dictionaries import WEAPONS_DICT, BONUSES_DICT
+from data.game_objects.bonus import Bonus
+from data.game_objects.collectable import Collectable
+from data.game_objects.cursor import Cursor
+from data.game_objects.displayable import Displayable
+from data.game_objects.entity import Entity
+from data.game_objects.player import Player
+from data.game_objects.projectile import Projectile
+from data.game_objects.tile import Tile
+from data.game_objects.weapon import Weapon
+from data.level_parser import level_from_image
+from data.utils import *
 
 
 def get_weapon_instance(weapon_dict: dict, pos: tuple[int, int]) -> Weapon:
     """
-    Returns a weapon instance from data stored inside the weapon dictionary object.\n
+    Returns a weapon instance from resources stored inside the weapon dictionary object.\n
     :param weapon_dict: dictionary storing the instance parameters
     :param pos: weapon position on screen
     :return: weapon object
     """
-    return Weapon(pos, "data/sprites/" + weapon_dict["sprite_file"], weapon_dict["cooldown"],
+    return Weapon(pos, "resources/sprites/" + weapon_dict["sprite_file"], weapon_dict["cooldown"],
                   TILE_SCALE * weapon_dict["recoil"], weapon_dict["projectile_name"])
 
 
 def get_bonus_instance(bonus_dict: dict, pos: tuple[int, int]) -> Bonus:
     """
-    Returns a bonus instance from data stored inside the bonus dictionary object.\n
+    Returns a bonus instance from resources stored inside the bonus dictionary object.\n
     :param bonus_dict: dictionary storing the instance parameters
     :param pos: weapon position on screen
     :return: bonus object
     """
-    return Bonus(pos, "data/sprites/" + bonus_dict["sprite_file"], bonus_dict["value"])
+    return Bonus(pos, "resources/sprites/" + bonus_dict["sprite_file"], bonus_dict["value"])
 
 
 def get_random_weapon(pos: tuple[int, int]) -> Weapon:
@@ -78,7 +78,7 @@ class Game:
         self.__player, self.__tile_map = level_from_image(level_file_name)  # level parsing
 
         self.__tiles: list[Tile] = self.__get_existing_tiles()  # list of all solid tiles in the map
-        self.__sky: Displayable = Displayable((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), sprite="data/sprites/sky.jpg")
+        self.__sky: Displayable = Displayable((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), sprite="resources/sprites/sky.jpg")
 
         self.__entities: list[Entity] = [self.__player]     # current list of entities in game
         self.__items: list[Collectable] = []                # current list of items in game

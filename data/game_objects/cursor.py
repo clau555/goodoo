@@ -1,7 +1,7 @@
 import pygame.mouse
 
-from src.game_objects.displayable import Displayable
-from src.constants import TILE_SCALE
+from data.game_objects.displayable import Displayable
+from data.constants import TILE_SCALE
 
 
 class Cursor(Displayable):
@@ -10,8 +10,8 @@ class Cursor(Displayable):
     displayed every frame at the user mouse position.\n
     """
 
-    ENABLED_SPRITE: str = "data/sprites/cursor.png"
-    DISABLED_SPRITE: str = "data/sprites/cursor_disabled.png"
+    ENABLED_SPRITE: str = "resources/sprites/cursor.png"
+    DISABLED_SPRITE: str = "resources/sprites/cursor_disabled.png"
 
     def __init__(self) -> None:
         super().__init__(pygame.mouse.get_pos(),

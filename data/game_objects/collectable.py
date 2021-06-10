@@ -2,8 +2,8 @@ import math
 
 from pygame.math import Vector2
 
-from src.game_objects.displayable import Displayable
-from src.constants import TILE_SCALE
+from data.game_objects.displayable import Displayable
+from data.constants import TILE_SCALE
 
 
 class Collectable(Displayable):

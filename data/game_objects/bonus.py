@@ -1,4 +1,4 @@
-from src.game_objects.collectable import Collectable
+from data.game_objects.collectable import Collectable
 
 
 class Bonus(Collectable):
