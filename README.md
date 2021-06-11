@@ -6,10 +6,9 @@ Started as a second year video game project, Goodoo is now a WIP side project.
 
 Python 3.9 or above
 
-## Dependencies
+## Dependency
 
 - [Pygame](https://pypi.org/project/pygame/) ```pip install pygame```
-- [Pillow](https://pythonexamples.org/python-pillow-read-image/) ```pip install pillow```
 
 ## Execution example
 
