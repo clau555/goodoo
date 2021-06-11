@@ -4,7 +4,7 @@ Started as a second year video game project, Goodoo is now a WIP side project.
 
 ## Requirement
 
-Python 3.9
+Python 3.9 or above
 
 ## Dependencies
 
@@ -13,7 +13,7 @@ Python 3.9
 
 ## Execution example
 
-```python goodoo.py data/maps/map1.jpg```
+```python goodoo.py resources/maps/map1.jpg```
 
 ## Key Bindings
 
