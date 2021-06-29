@@ -17,7 +17,7 @@ class Displayable:
 
         self.__rect: Rect = pygame.Rect(pos, size)
         self.__color: tuple[int, int, int] = color
-        self.__display: bool = True
+        self.__visible: bool = True
 
         self.__sprite_to_scale: bool = sprite_to_scale
 
@@ -34,6 +34,14 @@ class Displayable:
     def color(self) -> tuple[int, int, int]:
         return self.__color
 
+    @property
+    def visible(self) -> bool:
+        return self.__visible
+
+    @visible.setter
+    def visible(self, visible: bool) -> None:
+        self.__visible = visible
+
     def set_sprite(self, sprite: str) -> None:
         if self.__sprite_to_scale:
             self.__sprite = pygame.transform.scale(pygame.image.load(sprite), self.__rect.size)
@@ -47,18 +55,20 @@ class Displayable:
     def flip_sprite(self) -> None:
         self.__sprite = pygame.transform.flip(self.__original_sprite, True, False)
 
-    def set_display(self, display: bool) -> None:
-        self.__display = display
-
-    def rotate_sprite(self, angle: float, flipped: bool = False) -> None:
+    def rotate_sprite(self, angle: float, original_rect: rect, flipped: bool = False) -> None:
         if flipped:
-            self.__sprite = pygame.transform.flip(self.__original_sprite, True, False)
-            self.__sprite = pygame.transform.rotate(self.__sprite, angle - 180)
+            self.flip_sprite()
+            self.__sprite = pygame.transform.rotate(self.__sprite, angle - 180.)
         else:
             self.__sprite = pygame.transform.rotate(self.__original_sprite, angle)
 
+        # rotating a sprite changes its rectangle in size, so its position is changed too.
+        # we correct this by replacing the new rectangle to its original position.
+        self.__rect = self.__sprite.get_rect()
+        self.__rect.center = original_rect.center
+
     def display(self) -> None:
-        if self.__display:
+        if self.__visible:
             screen = pygame.display.get_surface()
             if self.__sprite:
                 screen.blit(self.__sprite, (self.rect.x, self.rect.y))

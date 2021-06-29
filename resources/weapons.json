@@ -19,5 +19,12 @@
         "recoil": 0.15,
         "auto_grab": false,
         "projectile_name": "bullet"
+    },
+    "test_weapon": {
+        "sprite_file": "test_weapon.png",
+        "cooldown": 0.5,
+        "recoil": 0.0,
+        "auto_grab": false,
+        "projectile_name": "bullet"
     }
 }

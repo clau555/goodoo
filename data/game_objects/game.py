@@ -228,9 +228,13 @@ class Game:
                                  pygame.Rect((tile.rect.x, tile.rect.y), tile.rect.size))
 
             # player direction
-            start_point = self.__player.rect.center
-            end_point = (self.__player.rect.center + self.__player.direction)
-            pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), start_point, end_point)
+            pygame.draw.line(pygame.display.get_surface(), (255, 0, 0),
+                             self.__player.rect.center, self.__player.rect.center + self.__player.direction)
+
+            # player weapon direction
+            if self.__player.weapon:
+                pygame.draw.line(pygame.display.get_surface(), (0, 255, 0),
+                                 self.__player.rect.center, self.__player.weapon.rect.center)
 
             # fps
             fps_str = str(int(1 / (delta_time / FPS)))

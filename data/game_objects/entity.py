@@ -73,16 +73,16 @@ class Entity(Displayable):
         Updates the position and orientation of the wielded weapon.
         """
 
-        if self.__direction.length() > 1:
+        if abs(self.__direction.length()) > 1.:
 
             # weapon position update
             self.__weapon.rect.center = self.rect.center + self.__direction.normalize() * self.rect.width * (4 / 3)
 
             # direction and angle
-            if self.__direction.x < 0:
-                self.__weapon.rotate_sprite(self.__angle, True)
-            elif self.__direction.x > 0:
-                self.__weapon.rotate_sprite(self.__angle)
+            if self.__direction.x < 0.:
+                self.__weapon.rotate_sprite(self.__angle, self.__weapon.rect, True)
+            else:
+                self.__weapon.rotate_sprite(self.__angle, self.__weapon.rect)
 
     def __bars_update(self):
         """
@@ -239,10 +239,10 @@ class Entity(Displayable):
     def display(self) -> None:
 
         # sprite flipping depending on orientation
-        if self.__direction.length() > 1:
-            if self.__direction.x < 0:
+        if abs(self.__direction.length()) > 1.:
+            if self.__direction.x < 0.:
                 self.flip_sprite()
-            elif self.__direction.x > 0:
+            else:
                 self.reset_sprite()
 
         # blinks when hit

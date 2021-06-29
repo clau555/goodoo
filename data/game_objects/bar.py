@@ -9,7 +9,7 @@ class Bar(Displayable):
         super(Bar, self).__init__(pos, (0, TILE_SCALE // 10), color)
         self.rect.center = pos  # centers the bar at pos immediately
         self.__progress: float = 0.  # varies from 0 to 1, 0 is an empty bar, 1 is a full bar
-        self.set_display(False)
+        self.visible = False
 
     @property
     def progress(self) -> float:
@@ -20,11 +20,11 @@ class Bar(Displayable):
         # the bar is displayed only if it's not full or empty
         if progress <= 0.:
             self.__progress = 0.
-            self.set_display(False)
+            self.visible = False
         elif progress >= 1.:
             self.__progress = 1.
-            self.set_display(False)
+            self.visible = False
         else:
             self.__progress = progress
             self.rect.width = int(self.__progress * self.__total_width)
-            self.set_display(True)
+            self.visible = True
