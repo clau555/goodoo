@@ -12,7 +12,7 @@ def main(level_file_name: str = None) -> None:
     pygame.init()
     pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT),
                             pygame.FULLSCREEN | pygame.SCALED | pygame.HWSURFACE | pygame.DOUBLEBUF)
-    pygame.display.set_caption("Impulsive Goo")
+    pygame.display.set_caption("Goodoo")
     pygame.mouse.set_visible(False)
 
     game: Game = Game(level_file_name)

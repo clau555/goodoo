@@ -29,10 +29,10 @@ class Weapon(Collectable):
     def __init__(self, pos: tuple[int, int], sprite: str, cooldown: float,
                  recoil: float, projectile_name: str) -> None:
         super(Weapon, self).__init__(pos, sprite, False)
-        self.__recoil: float = recoil                   # acceleration taken by the entity when using th weapon
-        self.__cooldown: float = cooldown               # cooldown duration in seconds
-        self.__projectile_name: str = projectile_name   # projectile the weapon will fire
-        self.__counter: int = pygame.time.get_ticks()   # saved time on last action
+        self.__recoil: float = recoil                           # acceleration taken by the entity when using th weapon
+        self.__cooldown: float = cooldown                                   # cooldown duration in seconds
+        self.__projectile_dict: dict = PROJECTILES_DICT[projectile_name]    # projectile fired by weapon
+        self.__counter: int = pygame.time.get_ticks()                       # saved time on last action
 
     @property
     def recoil(self) -> float:
@@ -61,8 +61,7 @@ class Weapon(Collectable):
         """
         if (pygame.time.get_ticks() - self.__counter) / 1000 > self.__cooldown:
             # FIXME projectile collides with entity when spawned if it's too big
-            # TODO storing corresponding projectile dict inside Weapon?
-            projectile: Projectile = get_projectile_instance(PROJECTILES_DICT[self.__projectile_name],
+            projectile: Projectile = get_projectile_instance(self.__projectile_dict,
                                                              self.rect.center, pygame.mouse.get_pos())
             projectiles.append(projectile)
             self.weapon_update_counter()
