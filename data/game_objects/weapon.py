@@ -53,7 +53,6 @@ class Weapon(Collectable):
     def weapon_update_counter(self) -> None:
         """
         Sets the weapon counter at the current time.\n
-        :return:
         """
         self.__counter = pygame.time.get_ticks()
 

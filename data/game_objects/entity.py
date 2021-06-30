@@ -71,9 +71,14 @@ class Entity(Displayable):
     def health(self) -> int:
         return self.__health
 
+    @health.setter
+    def health(self, health) -> None:
+        # adding health to the entity while not exceeding the maximum health
+        self.__health = self.MAX_HEALTH if health > self.MAX_HEALTH else health
+
     def __weapon_update(self) -> None:
         """
-        Updates the position and orientation of the wielded weapon.
+        Updates the position and orientation of the wielded weapon.\n
         """
         if self.__direction.length() > 1.:
 
@@ -88,7 +93,7 @@ class Entity(Displayable):
 
     def __bars_update(self) -> None:
         """
-        Updates the position, orientation, health bar and cooldown bar.
+        Updates the position and orientation of health bar and cooldown bar.\n
         """
 
         # cooldown bar
@@ -103,6 +108,15 @@ class Entity(Displayable):
     def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
                items: list[Collectable], projectiles: list[Projectile],
                cursor: Union[Cursor, None], delta_time: float) -> None:
+        """
+        Handles movements physics, interactions with items and projectiles, and wielded weapon disposition and action.\n
+        :param direction_pos: on-screen coordinates the entity is aiming at
+        :param tiles: tiles the entity can collide with (preferably neighbor tiles)
+        :param items: items the entity can pick up (preferably surrounding items)
+        :param projectiles: projectiles the entity can collide with
+        :param cursor: user cursor indicating if the entity can shoot
+        :param delta_time: time elapsed between the last two frames
+        """
         # FIXME entity falls off a tile too soon when it's near the right screen edge
 
         # y control movements
@@ -158,7 +172,7 @@ class Entity(Displayable):
             if self.rect.colliderect(projectile.rect) and not self.__hit:
                 self.__velocity += projectile.strength
                 self.__recoil = True
-                self.__health -= 1
+                self.health -= 1
                 self.__hit = True
                 projectile.alive = False
 
@@ -225,10 +239,7 @@ class Entity(Displayable):
 
                 elif type(item) is Bonus:
                     item: Bonus  # converting item type to Bonus otherwise it's still considered as Collectable
-                    # adding health to the entity while not exceeding the maximum health
-                    # TODO use a method for this
-                    self.__health += item.value
-                    self.__health = self.MAX_HEALTH if self.__health > self.MAX_HEALTH else self.__health
+                    self.health += item.value
 
                 item.available = False  # the item will be removed from the map
 
