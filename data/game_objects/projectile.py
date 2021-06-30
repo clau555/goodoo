@@ -1,5 +1,3 @@
-import math
-
 from pygame.math import Vector2
 
 from data.game_objects.displayable import Displayable
@@ -14,19 +12,16 @@ class Projectile(Displayable):
     """
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], color: tuple[int, int, int],
-                 target_pos: tuple[int, int], speed: float) -> None:
+                 direction: Vector2, speed: float) -> None:
 
         super(Projectile, self).__init__(pos, size, color)
-
         self.__pos: Vector2 = Vector2(pos)
-        self.__target_pos: Vector2 = Vector2(target_pos)
+        self.__direction: Vector2 = direction.normalize()
+        self.__velocity: Vector2 = self.__direction * speed
+        self.alive: bool = True
 
-        angle: float = math.atan2(self.__target_pos.y - self.__pos.y, self.__target_pos.x - self.__pos.x)
-        self.__velocity: Vector2 = Vector2(math.cos(angle) * speed, math.sin(angle) * speed)
-
-        self.alive = True
-
-    def get_strength(self) -> Vector2:
+    @property
+    def strength(self) -> Vector2:
         return self.__velocity * 1.2
 
     def update(self, tiles: list[Tile], delta_time: float) -> None:

@@ -1,4 +1,5 @@
 import pygame
+from pygame.math import Vector2
 
 from data.dictionaries import PROJECTILES_DICT
 from data.game_objects.collectable import Collectable
@@ -6,16 +7,16 @@ from data.game_objects.projectile import Projectile
 from data.constants import TILE_SCALE
 
 
-def get_projectile_instance(projectile_dict: dict, pos: tuple[int, int], target_pos: tuple[int, int]) -> Projectile:
+def get_projectile_instance(projectile_dict: dict, pos: tuple[int, int], direction: Vector2) -> Projectile:
     """
     Returns a projectile instance from resources stored inside the weapon dictionary object.\n
     :param projectile_dict: dictionary storing the instance parameters
     :param pos: projectile starting position on screen
-    :param target_pos: projectile targeted position on screen
+    :param direction: vector indicating projectile direction
     :return: projectile object
     """
     return Projectile(pos, (TILE_SCALE * projectile_dict["size"], TILE_SCALE * projectile_dict["size"]),
-                      projectile_dict["color"], target_pos, TILE_SCALE * projectile_dict["speed"])
+                      projectile_dict["color"], direction, TILE_SCALE * projectile_dict["speed"])
 
 
 class Weapon(Collectable):
@@ -46,6 +47,9 @@ class Weapon(Collectable):
     def counter(self) -> int:
         return self.__counter
 
+    def cooldown_finished(self) -> bool:
+        return (pygame.time.get_ticks() - self.__counter) / 1000 > self.__cooldown
+
     def weapon_update_counter(self) -> None:
         """
         Sets the weapon counter at the current time.\n
@@ -53,16 +57,16 @@ class Weapon(Collectable):
         """
         self.__counter = pygame.time.get_ticks()
 
-    def weapon_action(self, projectiles: list[Projectile]) -> bool:
+    def weapon_action(self, projectiles: list[Projectile], direction: Vector2) -> bool:
         """
         Triggers the weapon action (for example throwing a projectile) if its cooldown is finished.\n
         :param projectiles: current list of in game projectiles
+        :param direction: director vector the fired projectile must follow
         :return: true if the action has been successfully done
         """
-        if (pygame.time.get_ticks() - self.__counter) / 1000 > self.__cooldown:
+        if self.cooldown_finished():
             # FIXME projectile collides with entity when spawned if it's too big
-            projectile: Projectile = get_projectile_instance(self.__projectile_dict,
-                                                             self.rect.center, pygame.mouse.get_pos())
+            projectile: Projectile = get_projectile_instance(self.__projectile_dict, self.rect.center, direction)
             projectiles.append(projectile)
             self.weapon_update_counter()
             return True

@@ -39,8 +39,11 @@ class Entity(Displayable):
 
         self.__on_ground: bool = False
 
+        # distance at which a weapon should be from the entity wielding it
+        self.WEAPON_DISTANCE: float = self.rect.width * (4 / 3)
+
         self.__weapon: Union[Weapon, None] = None
-        self.__coil: bool = False
+        self.__recoil: bool = False
 
         self.__health: int = self.MAX_HEALTH
         self.__hit: bool = False
@@ -72,11 +75,10 @@ class Entity(Displayable):
         """
         Updates the position and orientation of the wielded weapon.
         """
-
-        if abs(self.__direction.length()) > 1.:
+        if self.__direction.length() > 1.:
 
             # weapon position update
-            self.__weapon.rect.center = self.rect.center + self.__direction.normalize() * self.rect.width * (4 / 3)
+            self.__weapon.rect.center = self.rect.center + self.__direction.normalize() * self.WEAPON_DISTANCE
 
             # direction and angle
             if self.__direction.x < 0.:
@@ -84,9 +86,9 @@ class Entity(Displayable):
             else:
                 self.__weapon.rotate_sprite(self.__angle, self.__weapon.rect)
 
-    def __bars_update(self):
+    def __bars_update(self) -> None:
         """
-        Updates the position, orientation and state of the health bar and cooldown bar.
+        Updates the position, orientation, health bar and cooldown bar.
         """
 
         # cooldown bar
@@ -102,27 +104,26 @@ class Entity(Displayable):
                items: list[Collectable], projectiles: list[Projectile],
                cursor: Union[Cursor, None], delta_time: float) -> None:
         # FIXME entity falls off a tile too soon when it's near the right screen edge
-        # FIXME weapon action is possible when target position is at the very center of the entity
-        # TODO block weapon movement when direction_pos is on the entity?
 
         # y control movements
         if self.up and self.__on_ground:
             self.__velocity.y -= self.__velocity_max.y
 
         # gravity
+        # TODO gravity is an acceleration
         self.__velocity.y += 1 if self.__velocity.y <= GRAVITY_MAX else 0
 
         # friction
         if -1 < self.__velocity.x < 1:
             self.__velocity.x = 0
-            self.__coil = False
+            self.__recoil = False
         elif self.__velocity.x > 0:
             self.__velocity.x -= 1
         elif self.__velocity.x < 0:
             self.__velocity.x += 1
 
         # x control movements (overrides friction)
-        if not self.__coil:
+        if not self.__recoil:
             if self.left and not self.right:
                 self.__velocity.x = -self.__velocity_max.x
             elif self.right and not self.left:
@@ -135,34 +136,28 @@ class Entity(Displayable):
         # owned weapon action
         if self.__weapon:
 
-            # weapon action is possible if the targeted position isn't near the weapon and the entity
-            if not (self.rect.centerx < direction_pos[0] < self.__weapon.rect.centerx or
-                    self.rect.centery < direction_pos[1] < self.__weapon.rect.centery) \
-                    and not (self.rect.centerx > direction_pos[0] > self.__weapon.rect.centerx or
-                             self.rect.centery > direction_pos[1] > self.__weapon.rect.centery) \
-                    and self.__direction.length() > 0:
+            cursor.disable()
 
-                # the weapon action is true if its cooldown is finished
-                if self.action and self.__weapon.weapon_action(projectiles):
+            # weapon action is possible if the targeted position isn't on the entity
+            if self.__direction.length() > self.WEAPON_DISTANCE:
+
+                # weapon firing, without effects if cooldown isn't finished
+                if self.action and self.__weapon.weapon_action(projectiles, self.__direction):
+
                     # recoil physic
                     recoil: Vector2 = -1 * self.__direction
                     recoil.scale_to_length(self.__weapon.recoil)
                     self.__velocity += recoil
-                    self.__coil = True
+                    self.__recoil = True
 
-                cursor.enable()
-
-            # if the targeted position does not permit an action,
-            # the cursor become "disabled"
-            # TODO should be disabled when cooldown is running
-            else:
-                cursor.disable()
+                if self.__weapon.cooldown_finished():
+                    cursor.enable()
 
         # projectiles collision and effect
         for projectile in projectiles:
             if self.rect.colliderect(projectile.rect) and not self.__hit:
-                self.__velocity += projectile.get_strength()
-                self.__coil = True
+                self.__velocity += projectile.strength
+                self.__recoil = True
                 self.__health -= 1
                 self.__hit = True
                 projectile.alive = False
@@ -231,6 +226,7 @@ class Entity(Displayable):
                 elif type(item) is Bonus:
                     item: Bonus  # converting item type to Bonus otherwise it's still considered as Collectable
                     # adding health to the entity while not exceeding the maximum health
+                    # TODO use a method for this
                     self.__health += item.value
                     self.__health = self.MAX_HEALTH if self.__health > self.MAX_HEALTH else self.__health
 
@@ -239,7 +235,7 @@ class Entity(Displayable):
     def display(self) -> None:
 
         # sprite flipping depending on orientation
-        if abs(self.__direction.length()) > 1.:
+        if self.__direction.length() > 1.:
             if self.__direction.x < 0.:
                 self.flip_sprite()
             else:

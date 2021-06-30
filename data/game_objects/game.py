@@ -86,10 +86,7 @@ class Game:
         # an index marked as True indicates an item is already at this emplacement
         self.__item_map: list[list[bool]] = [[False for _ in range(WORLD_HEIGHT)] for _ in range(WORLD_WIDTH)]
 
-        # hardcoded projectile object to test entity/projectile collision
-        test_projectile: Projectile = Projectile((0, 500), (TILE_SCALE // 8, TILE_SCALE // 8),
-                                                 (255, 255, 255), self.__player.rect.center, TILE_SCALE / 2)
-        self.__projectiles: list[Projectile] = [test_projectile]  # current list of projectiles in game
+        self.__projectiles: list[Projectile] = []  # current list of projectiles in game
 
         self.__cursor: Cursor = Cursor()
 
