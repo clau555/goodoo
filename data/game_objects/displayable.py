@@ -13,11 +13,14 @@ class Displayable:
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int],
                  color: tuple[int, int, int] = (255, 0, 0),
-                 sprite: str = None, sprite_to_scale: bool = True) -> None:
+                 sprite: str = None, sprite_to_scale: bool = True, centered: bool = False) -> None:
 
         self.__rect: Rect = pygame.Rect(pos, size)
         self.__color: tuple[int, int, int] = color
         self.__visible: bool = True
+
+        if centered:
+            self.__rect.center = pos
 
         self.__sprite_to_scale: bool = sprite_to_scale
 

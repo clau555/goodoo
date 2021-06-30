@@ -64,7 +64,6 @@ class Weapon(Collectable):
         :return: true if the action has been successfully done
         """
         if self.cooldown_finished():
-            # FIXME projectile collides with entity when spawned if it's too big
             projectile: Projectile = get_projectile_instance(self.__projectile_dict, self.rect.center, direction)
             projectiles.append(projectile)
             self.weapon_update_counter()

@@ -14,7 +14,7 @@ class Projectile(Displayable):
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], color: tuple[int, int, int],
                  direction: Vector2, speed: float) -> None:
 
-        super(Projectile, self).__init__(pos, size, color)
+        super(Projectile, self).__init__(pos, size, color, centered=True)
         self.__pos: Vector2 = Vector2(pos)
         self.__direction: Vector2 = direction.normalize()
         self.__velocity: Vector2 = self.__direction * speed
