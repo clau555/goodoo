@@ -63,6 +63,27 @@ def get_random_bonus(pos: tuple[int, int]) -> Bonus:
     return get_bonus_instance(item_dict, pos)
 
 
+def neighbor_objects(pos: tuple[int, int], object_map: list[list]) -> list:
+    """
+    Returns the existing neighbor objects of a given position on screen.\n
+    These objects are stored in the object_map argument, in which each index corresponds to a tile position.\n
+    These objects can be for example tiles or items.\n
+    The neighbors include at most the 8 surrounding tiles of the position and the tile on the given position itself.\n
+    :param pos: position on screen
+    :param object_map: 2D array map storing all objects
+    :return: neighbor objects
+    """
+    tile_pos: tuple[int, int] = (pos[0] // TILE_SCALE, pos[1] // TILE_SCALE)
+    objects: list = []
+    if 0 <= tile_pos[0] < SCREEN_WIDTH / TILE_SCALE and 0 <= tile_pos[1] < SCREEN_HEIGHT / TILE_SCALE:
+        for i in range(tile_pos[0] - 1, tile_pos[0] + 2):
+            for j in range(tile_pos[1] - 1, tile_pos[1] + 2):
+                if 0 <= i < len(object_map) and 0 <= j < len(object_map[j]) and \
+                        object_map[i][j] is not None:
+                    objects.append(object_map[i][j])
+    return objects
+
+
 class Game:
     """
     The game object stores, update, and displays
@@ -83,8 +104,9 @@ class Game:
         self.__entities: list[Entity] = [self.__player]     # current list of entities in game
         self.__items: list[Collectable] = []                # current list of items in game
 
-        # an index marked as True indicates an item is already at this emplacement
-        self.__item_map: list[list[bool]] = [[False for _ in range(WORLD_HEIGHT)] for _ in range(WORLD_WIDTH)]
+        # 2D array storing existing items in their correct index on map
+        self.__item_map: list[list[Union[None, Collectable]]] = \
+            [[None for _ in range(WORLD_HEIGHT)] for _ in range(WORLD_WIDTH)]
 
         self.__projectiles: list[Projectile] = []  # current list of projectiles in game
 
@@ -117,24 +139,6 @@ class Game:
                     tiles.append(tile)
         return tiles
 
-    def __neighbor_tiles(self, pos: tuple[int, int]) -> list[Tile]:
-        """
-        Returns the existing neighbor tiles of a given position on screen.
-        The neighbors include at most the 8 surrounding tiles of the position
-        and the tile on the position itself.
-        :param pos: position on screen
-        :return: neighbor tiles
-        """
-        tile_pos: tuple[int, int] = (int(pos[0] / TILE_SCALE), int(pos[1] / TILE_SCALE))
-        tiles: list[Tile] = []
-        if 0 <= tile_pos[0] < SCREEN_WIDTH / TILE_SCALE and 0 <= tile_pos[1] < SCREEN_HEIGHT / TILE_SCALE:
-            for i in range(tile_pos[0] - 1, tile_pos[0] + 2):
-                for j in range(tile_pos[1] - 1, tile_pos[1] + 2):
-                    if 0 <= i < len(self.__tile_map) and 0 <= j < len(self.__tile_map[j]) and \
-                            self.__tile_map[i][j] is not None:
-                        tiles.append(self.__tile_map[i][j])
-        return tiles
-
     def __spawn_random_item(self) -> None:
 
         # indexes stores all free emplacements coordinates
@@ -160,8 +164,8 @@ class Game:
 
             # adding the item to the global list to make it spawn...
             self.__items.append(item)
-            # ...and marking its position as taken
-            self.__item_map[map_pos[0]][map_pos[1]] = True
+            # ...and marking it in its corresponding position
+            self.__item_map[map_pos[0]][map_pos[1]] = item
 
     def update_and_display(self, inputs: dict[str, bool], delta_time: float) -> None:
 
@@ -177,17 +181,17 @@ class Game:
 
         # player entity updated according to user inputs
         # we pass neighbor tiles only for collisions for better performances
-        # TODO could pass neighbor items only
-        self.__player.update_from_inputs(inputs, self.__neighbor_tiles(self.__player.rect.center),
-                                         self.__items, self.__projectiles,
-                                         self.__cursor, delta_time)
+        self.__player.update_from_inputs(inputs,
+                                         neighbor_objects(self.__player.rect.center, self.__tile_map),
+                                         neighbor_objects(self.__player.rect.center, self.__item_map),
+                                         self.__projectiles, self.__cursor, delta_time)
 
         # items update
         for item in self.__items:
             if not item.available:
                 # the item has been picked up, we can delete it from the map
                 index: tuple[int, int] = get_index_from_screen_position(item.rect.center)
-                self.__item_map[index[0]][index[1]] = False
+                self.__item_map[index[0]][index[1]] = None
                 self.__items.pop(self.__items.index(item))
             else:
                 # idle item
@@ -199,7 +203,7 @@ class Game:
             if not is_inside_screen(projectile.rect) or not projectile.alive:
                 self.__projectiles.pop(self.__projectiles.index(projectile))
             else:
-                projectile.update(self.__neighbor_tiles(projectile.rect.center), delta_time)
+                projectile.update(neighbor_objects(projectile.rect.center, self.__tile_map), delta_time)
 
         # DISPLAY UPDATE ############################################################
 
@@ -220,7 +224,7 @@ class Game:
         if self.__debug:
 
             # player collisions
-            for tile in self.__neighbor_tiles(self.__player.rect.center):
+            for tile in neighbor_objects(self.__player.rect.center, self.__tile_map):
                 pygame.draw.rect(pygame.display.get_surface(), (255, 0, 0),
                                  pygame.Rect((tile.rect.x, tile.rect.y), tile.rect.size))
 
