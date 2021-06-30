@@ -21,8 +21,10 @@ class Player(Entity):
         super(Player, self).__init__(pos, (TILE_SCALE * 2 // 3, TILE_SCALE * 2 // 3),
                                      sprite="resources/sprites/player.png")
 
-    def update_from_inputs(self, inputs: dict[str, bool], neighbor_tiles: list[Tile],
-                           items: list[Collectable], projectiles: list[Projectile],
+    def update_from_inputs(self, inputs: dict[str, bool],
+                           neighbor_tiles: list[Tile],
+                           neighbor_items: list[Collectable],
+                           projectiles: list[Projectile],
                            cursor: Union[Cursor, None], delta_time: float) -> None:
 
         # getting player inputs from main loop
@@ -34,7 +36,7 @@ class Player(Entity):
         self.action = inputs["action"]
 
         self.update(pygame.mouse.get_pos(), neighbor_tiles,
-                    items, projectiles,
+                    neighbor_items, projectiles,
                     cursor, delta_time)
 
         if self.health <= 0 or self.rect.top > SCREEN_HEIGHT + TILE_SCALE:

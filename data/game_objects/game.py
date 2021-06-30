@@ -11,6 +11,7 @@ from data.game_objects.bonus import Bonus
 from data.game_objects.collectable import Collectable
 from data.game_objects.cursor import Cursor
 from data.game_objects.displayable import Displayable
+from data.game_objects.enemy import Enemy
 from data.game_objects.entity import Entity
 from data.game_objects.player import Player
 from data.game_objects.projectile import Projectile
@@ -95,14 +96,15 @@ class Game:
 
     def __init__(self, level_file_name) -> None:
         self.__player: Player  # entity controlled by user
+        self.__enemy: Enemy
         self.__tile_map: list[list[Union[Tile, None]]]  # 2D array storing solid tiles of the map in their correct index
-        self.__player, self.__tile_map = level_from_image(level_file_name)  # level parsing
+        self.__player, self.__enemy, self.__tile_map = level_from_image(level_file_name)  # level parsing
 
         self.__tiles: list[Tile] = self.__get_existing_tiles()  # list of all solid tiles in the map
         self.__sky: Displayable = Displayable((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), sprite="resources/sprites/sky.jpg")
 
-        self.__entities: list[Entity] = [self.__player]     # current list of entities in game
-        self.__items: list[Collectable] = []                # current list of items in game
+        self.__entities: list[Entity] = [self.__player, self.__enemy]  # current list of entities in game
+        self.__items: list[Collectable] = []  # current list of items in game
 
         # 2D array storing existing items in their correct index on map
         self.__item_map: list[list[Union[None, Collectable]]] = \
@@ -185,6 +187,11 @@ class Game:
                                          neighbor_objects(self.__player.rect.center, self.__tile_map),
                                          neighbor_objects(self.__player.rect.center, self.__item_map),
                                          self.__projectiles, self.__cursor, delta_time)
+
+        # enemy update
+        self.__enemy.update_from_ai(neighbor_objects(self.__enemy.rect.center, self.__tile_map),
+                                    neighbor_objects(self.__enemy.rect.center, self.__item_map),
+                                    self.__projectiles, delta_time)
 
         # items update
         for item in self.__items:

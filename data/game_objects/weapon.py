@@ -16,7 +16,8 @@ def get_projectile_instance(projectile_dict: dict, pos: tuple[int, int], directi
     :return: projectile object
     """
     return Projectile(pos, (TILE_SCALE * projectile_dict["size"], TILE_SCALE * projectile_dict["size"]),
-                      projectile_dict["color"], direction, TILE_SCALE * projectile_dict["speed"])
+                      projectile_dict["color"], direction, TILE_SCALE * projectile_dict["speed"],
+                      projectile_dict["damage"])
 
 
 class Weapon(Collectable):
@@ -30,7 +31,7 @@ class Weapon(Collectable):
     def __init__(self, pos: tuple[int, int], sprite: str, cooldown: float,
                  recoil: float, projectile_name: str) -> None:
         super(Weapon, self).__init__(pos, sprite, False)
-        self.__recoil: float = recoil                           # acceleration taken by the entity when using th weapon
+        self.__recoil: float = recoil                           # acceleration taken by the entity when using the weapon
         self.__cooldown: float = cooldown                                   # cooldown duration in seconds
         self.__projectile_dict: dict = PROJECTILES_DICT[projectile_name]    # projectile fired by weapon
         self.__counter: int = pygame.time.get_ticks()                       # saved time on last action

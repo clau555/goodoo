@@ -7,6 +7,7 @@ from pygame.pixelarray import PixelArray
 from pygame.surface import Surface
 
 from data.constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SCALE, WORLD_WIDTH, WORLD_HEIGHT
+from data.game_objects.enemy import Enemy
 from data.game_objects.player import Player
 from data.game_objects.tile import Tile
 
@@ -25,7 +26,7 @@ def color_comparison(color1: Color, color2: Color, margin: int = 75) -> bool:
            color2.b - margin <= color1.b <= color2.b + margin
 
 
-def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None]]]]:
+def level_from_image(file_name: str) -> tuple[Player, Enemy, list[list[Union[Tile, None]]]]:
     """
     Creates a 2D array of tiles according to the given image file.\n
     Returns also a player object initialized at its spawn point.\n
@@ -40,8 +41,12 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
                  .format(im.get_size(), (SCREEN_WIDTH // TILE_SCALE, SCREEN_HEIGHT // TILE_SCALE)))
 
     world: list[list[Tile]] = []
+
     player: Player = Player((0, 0))
     player_spawn: bool = False
+
+    enemy: Enemy = Enemy((0, 0))
+    enemy_spawn: bool = False
 
     for i in range(im.get_width()):
         line: list[Union[Tile, None]] = []
@@ -53,6 +58,12 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
                 player.rect.centerx = i * TILE_SCALE + TILE_SCALE // 2
                 player.rect.centery = j * TILE_SCALE + TILE_SCALE // 2
                 player_spawn = True
+
+            # enemy spawn point
+            if color_comparison(current_pixel, Color((255, 0, 0))) and not enemy_spawn:
+                enemy.rect.centerx = i * TILE_SCALE + TILE_SCALE // 2
+                enemy.rect.centery = j * TILE_SCALE + TILE_SCALE // 2
+                enemy_spawn = True
 
             # solid tile
             if color_comparison(current_pixel, Color((255, 255, 255))):
@@ -70,5 +81,7 @@ def level_from_image(file_name: str) -> tuple[Player, list[list[Union[Tile, None
 
     if not player_spawn:
         sys.exit("no player spawn point set inside the map")
+    elif not enemy_spawn:
+        sys.exit("no enemy spawn point set inside the map")
 
-    return player, world
+    return player, enemy, world

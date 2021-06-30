@@ -172,7 +172,7 @@ class Entity(Displayable):
             if self.rect.colliderect(projectile.rect) and not self.__hit:
                 self.__velocity += projectile.strength
                 self.__recoil = True
-                self.health -= 1
+                self.health -= projectile.damage
                 self.__hit = True
                 projectile.alive = False
 
