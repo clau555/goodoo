@@ -7,7 +7,7 @@ from data.game_objects.entity import Entity
 from data.game_objects.projectile import Projectile
 from data.game_objects.collectable import Collectable
 from data.game_objects.tile import Tile
-from data.constants import TILE_SCALE
+from data.constants import TILE_SCALE, SCREEN_HEIGHT
 
 
 class Player(Entity):
@@ -37,7 +37,7 @@ class Player(Entity):
                     items, projectiles,
                     cursor, delta_time)
 
-        if self.health <= 0:
+        if self.health <= 0 or self.rect.top > SCREEN_HEIGHT + TILE_SCALE:
             print("GAME OVER")
             pygame.quit()
             quit()
