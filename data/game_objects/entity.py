@@ -95,7 +95,6 @@ class Entity(Displayable):
         """
         Updates the position and orientation of health bar and cooldown bar.\n
         """
-
         # cooldown bar
         self.__cooldown_bar.rect.center = (self.rect.centerx, self.rect.centery + self.rect.height)
         if self.__weapon:
@@ -180,6 +179,7 @@ class Entity(Displayable):
             self.__hit_timer -= delta_time
             if self.__hit_timer <= 0:
                 self.__hit = False
+                self.__hit_timer = self.HIT_DELAY
 
         # x axis movement execution
         self.rect.x += int(self.__velocity.x * delta_time)
