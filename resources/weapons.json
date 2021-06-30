@@ -6,24 +6,17 @@
         "auto_grab": false,
         "projectile_name": "bullet"
     },
-    "heart": {
-        "sprite_file": "saber.png",
+    "canon": {
+        "sprite_file": "canon.png",
         "cooldown": 0.9,
-        "recoil": 0.7,
+        "recoil": 0.6,
         "auto_grab": false,
-        "projectile_name": "boulet"
+        "projectile_name": "ball"
     },
     "gatling": {
-        "sprite_file": "sword.png",
+        "sprite_file": "gatling.png",
         "cooldown": 0.1,
         "recoil": 0.15,
-        "auto_grab": false,
-        "projectile_name": "bullet"
-    },
-    "test_weapon": {
-        "sprite_file": "test_weapon.png",
-        "cooldown": 0.5,
-        "recoil": 0.0,
         "auto_grab": false,
         "projectile_name": "bullet"
     }
