@@ -11,7 +11,7 @@ from data.game_objects.collectable import Collectable
 from data.game_objects.cursor import Cursor
 from data.game_objects.tile import Tile
 from data.game_objects.weapon import Weapon
-from data.constants import GRAVITY_MAX, TILE_SCALE
+from data.constants import GRAVITY_MAX, TILE_SCALE, GRAVITY
 
 
 class Entity(Displayable):
@@ -26,7 +26,7 @@ class Entity(Displayable):
     HIT_DELAY: float = 100.
 
     def __init__(self, pos: tuple[int, int], size: tuple[int, int], sprite: str = None,
-                 velocity_max: tuple[int, int] = (TILE_SCALE // 10, TILE_SCALE // 3.5),
+                 velocity_max: tuple[float, float] = (TILE_SCALE / 10., TILE_SCALE / 3.5),
                  sprite_to_scale: bool = True) -> None:
 
         super().__init__(pos, size, sprite=sprite, sprite_to_scale=sprite_to_scale)
@@ -123,17 +123,18 @@ class Entity(Displayable):
             self.__velocity.y -= self.__velocity_max.y
 
         # gravity
-        # TODO gravity is an acceleration
-        self.__velocity.y += 1 if self.__velocity.y <= GRAVITY_MAX else 0
+        self.__velocity.y += GRAVITY
+        if self.__velocity.y > GRAVITY_MAX:
+            self.__velocity.y = GRAVITY_MAX
 
         # friction
         if -1 < self.__velocity.x < 1:
             self.__velocity.x = 0
             self.__recoil = False
         elif self.__velocity.x > 0:
-            self.__velocity.x -= 1
+            self.__velocity.x -= GRAVITY
         elif self.__velocity.x < 0:
-            self.__velocity.x += 1
+            self.__velocity.x += GRAVITY
 
         # x control movements (overrides friction)
         if not self.__recoil:
