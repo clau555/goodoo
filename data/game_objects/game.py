@@ -91,8 +91,8 @@ class Game:
     every displayable objects of the program.\n
     """
 
-    # time in seconds to pass before an item is created randomly on screen
-    ITEM_SPAWN_DELAY: float = 10.
+    ITEM_SPAWN_DELAY: float = 10.   # time in seconds to pass before an item is created randomly on screen
+    MAX_IN_GAME_ITEMS: int = 3      # maximum number of items present in game
 
     def __init__(self, level_file_name) -> None:
         self.__player: Player  # entity controlled by user
@@ -119,8 +119,8 @@ class Game:
         self.__last_item_spawn_time: float = time.time()
 
         # first two items spawn
-        self.__spawn_random_item()
-        self.__spawn_random_item()
+        self.__spawn_random_item("weapon")
+        self.__spawn_random_item("weapon")
 
     @property
     def player(self) -> Player:
@@ -141,7 +141,11 @@ class Game:
                     tiles.append(tile)
         return tiles
 
-    def __spawn_random_item(self) -> None:
+    def __spawn_random_item(self, item_type: str) -> None:
+        """
+        Spawns a random item (weapon or bonus) on an empty tile above a physic tile.\n
+        :param item_type: string indicating the item type to be spawn (weapon or bonus)
+        """
 
         # indexes stores all free emplacements coordinates
         indexes: list[tuple[int, int]] = []
@@ -158,11 +162,13 @@ class Game:
             # ...and converting it to a position on screen
             screen_pos: tuple[int, int] = get_item_placement_from_index(map_pos)
 
-            # loading a random item (a weapon or a bonus)
-            if bool(randint(0, 2)):  # 2 chances out of 3 to be a weapon
+            # loading a random item depending on argument
+            if item_type == "weapon":
                 item: Weapon = get_random_weapon(screen_pos)
-            else:
+            elif item_type == "bonus":
                 item: Bonus = get_random_bonus(screen_pos)
+            else:
+                return None
 
             # adding the item to the global list to make it spawn...
             self.__items.append(item)
@@ -170,6 +176,12 @@ class Game:
             self.__item_map[map_pos[0]][map_pos[1]] = item
 
     def update_and_display(self, inputs: dict[str, bool], delta_time: float) -> None:
+        """
+        Updates the game screen every frames.\n
+        :param inputs: user input dictionary
+        :param delta_time: time elapsed between the last two frames
+        :return:
+        """
 
         # MODEL UPDATE ##############################################################
 
@@ -177,9 +189,16 @@ class Game:
         self.__cursor.update()
 
         # spawns an item randomly when ITEM_SPAWN_DELAY is elapsed
-        if (time.time() - self.__last_item_spawn_time) * delta_time > self.ITEM_SPAWN_DELAY:
-            self.__spawn_random_item()
-            self.__last_item_spawn_time = time.time()
+        if (time.time() - self.__last_item_spawn_time) * delta_time > self.ITEM_SPAWN_DELAY \
+                and len(self.__items) < self.MAX_IN_GAME_ITEMS:
+
+            # 2 chances out of 3 to be a weapon
+            if bool(randint(0, 2)):
+                self.__spawn_random_item("weapon")
+            else:
+                self.__spawn_random_item("bonus")
+
+            self.__last_item_spawn_time = time.time()  # next item spawn delay reset
 
         # player entity updated according to user inputs
         # we pass neighbor tiles only for collisions for better performances
@@ -195,11 +214,15 @@ class Game:
 
         # items update
         for item in self.__items:
+
+            # the item has been picked up, we can delete it from the map
             if not item.available:
-                # the item has been picked up, we can delete it from the map
                 index: tuple[int, int] = get_index_from_screen_position(item.rect.center)
                 self.__item_map[index[0]][index[1]] = None
                 self.__items.pop(self.__items.index(item))
+
+                self.__last_item_spawn_time = time.time()  # next item spawn delay reset
+
             else:
                 # idle item
                 item.update(delta_time)

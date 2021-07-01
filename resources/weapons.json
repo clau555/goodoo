@@ -3,21 +3,18 @@
         "sprite_file": "gun.png",
         "cooldown": 0.6,
         "recoil": 0.3,
-        "auto_grab": false,
         "projectile_name": "bullet"
     },
     "canon": {
         "sprite_file": "canon.png",
         "cooldown": 2.0,
         "recoil": 0.6,
-        "auto_grab": false,
         "projectile_name": "ball"
     },
     "gatling": {
         "sprite_file": "gatling.png",
         "cooldown": 0.1,
         "recoil": 0.1,
-        "auto_grab": false,
-        "projectile_name": "bullet"
+        "projectile_name": "little_bullet"
     }
 }

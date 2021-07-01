@@ -30,7 +30,7 @@ class Weapon(Collectable):
 
     def __init__(self, pos: tuple[int, int], sprite: str, cooldown: float,
                  recoil: float, projectile_name: str) -> None:
-        super(Weapon, self).__init__(pos, sprite, False)
+        super(Weapon, self).__init__(pos, sprite, auto_grab=False)
         self.__recoil: float = recoil                           # acceleration taken by the entity when using the weapon
         self.__cooldown: float = cooldown                                   # cooldown duration in seconds
         self.__projectile_dict: dict = PROJECTILES_DICT[projectile_name]    # projectile fired by weapon

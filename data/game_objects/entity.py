@@ -93,7 +93,7 @@ class Entity(Displayable):
 
     def __bars_update(self) -> None:
         """
-        Updates the position and orientation of health bar and cooldown bar.\n
+        Updates the position and state of health bar and cooldown bar.\n
         """
         # cooldown bar
         self.__cooldown_bar.rect.center = (self.rect.centerx, self.rect.centery + self.rect.height)
@@ -222,8 +222,8 @@ class Entity(Displayable):
                 # the next frame even if the entity is on it
                 self.__velocity.y = 0.1
 
+        # wielded weapon update
         if self.__weapon:
-            # weapon position update
             self.__weapon_update()
 
         # bars update
@@ -237,12 +237,12 @@ class Entity(Displayable):
                     item: Weapon  # converting item type to Weapon otherwise it's still considered as Collectable
                     self.__weapon = item  # the entity owns the weapon
                     item.weapon_update_counter()  # cooldown counter init
+                    item.available = False  # the item will be removed from the map
 
-                elif type(item) is Bonus:
+                elif type(item) is Bonus and self.__health < self.MAX_HEALTH:
                     item: Bonus  # converting item type to Bonus otherwise it's still considered as Collectable
                     self.health += item.value
-
-                item.available = False  # the item will be removed from the map
+                    item.available = False  # the item will be removed from the map
 
     def display(self) -> None:
 

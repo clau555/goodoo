@@ -31,7 +31,7 @@ class Projectile(Displayable):
 
     @property
     def strength(self) -> Vector2:
-        return self.__velocity * 1.2
+        return self.__velocity * 0.8
 
     @alive.setter
     def alive(self, alive: bool) -> None:

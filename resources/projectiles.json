@@ -2,7 +2,13 @@
     "bullet": {
         "size": 0.15,
         "color": [255, 255, 255],
-        "speed": 0.5,
+        "speed": 0.4,
+        "damage": 2
+    },
+    "little_bullet": {
+        "size": 0.12,
+        "color": [255, 255, 255],
+        "speed": 0.6,
         "damage": 1
     },
     "ball": {
