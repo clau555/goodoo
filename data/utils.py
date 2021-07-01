@@ -66,3 +66,7 @@ def is_inside_screen(rect: Rect) -> bool:
     """
     return (0 < rect.left < SCREEN_WIDTH or 0 < rect.right < SCREEN_WIDTH) and \
            (0 < rect.top < SCREEN_HEIGHT or 0 < rect.bottom < SCREEN_HEIGHT)
+
+
+def clamp(n, minn, maxn):
+    return max(min(maxn, n), minn)

@@ -74,14 +74,14 @@ def neighbor_objects(pos: tuple[int, int], object_map: list[list]) -> list:
     :param object_map: 2D array map storing all objects
     :return: neighbor objects
     """
-    tile_pos: tuple[int, int] = (pos[0] // TILE_SCALE, pos[1] // TILE_SCALE)
+    tile_pos: tuple[int, int] = (clamp(pos[0], 0, SCREEN_WIDTH) // TILE_SCALE,
+                                 clamp(pos[1], 0, SCREEN_HEIGHT) // TILE_SCALE)
     objects: list = []
-    if 0 <= tile_pos[0] < SCREEN_WIDTH / TILE_SCALE and 0 <= tile_pos[1] < SCREEN_HEIGHT / TILE_SCALE:
-        for i in range(tile_pos[0] - 1, tile_pos[0] + 2):
-            for j in range(tile_pos[1] - 1, tile_pos[1] + 2):
-                if 0 <= i < len(object_map) and 0 <= j < len(object_map[j]) and \
-                        object_map[i][j] is not None:
-                    objects.append(object_map[i][j])
+    for i in range(tile_pos[0] - 1, tile_pos[0] + 2):
+        for j in range(tile_pos[1] - 1, tile_pos[1] + 2):
+            if 0 <= i < len(object_map) and 0 <= j < len(object_map[j]) and \
+                    object_map[i][j] is not None:
+                objects.append(object_map[i][j])
     return objects
 
 

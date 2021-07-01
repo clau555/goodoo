@@ -116,7 +116,6 @@ class Entity(Displayable):
         :param cursor: user cursor indicating if the entity can shoot
         :param delta_time: time elapsed between the last two frames
         """
-        # FIXME entity falls off a tile too soon when it's near the right screen edge
 
         # y control movements
         if self.up and self.__on_ground:
