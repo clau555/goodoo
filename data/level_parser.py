@@ -81,7 +81,7 @@ def level_from_image(file_name: str) -> tuple[Player, Enemy, list[list[Union[Til
 
     if not player_spawn:
         sys.exit("no player spawn point set inside the map")
-    elif not enemy_spawn:
+    if not enemy_spawn:
         sys.exit("no enemy spawn point set inside the map")
 
     return player, enemy, world
