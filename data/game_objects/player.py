@@ -1,13 +1,11 @@
-from typing import Union
-
 import pygame
 
+from data.constants import TILE_SCALE, SCREEN_HEIGHT
+from data.game_objects.collectable import Collectable
 from data.game_objects.cursor import Cursor
 from data.game_objects.entity import Entity
 from data.game_objects.projectile import Projectile
-from data.game_objects.collectable import Collectable
 from data.game_objects.tile import Tile
-from data.constants import TILE_SCALE, SCREEN_HEIGHT
 
 
 class Player(Entity):
@@ -25,7 +23,7 @@ class Player(Entity):
                            neighbor_tiles: list[Tile],
                            neighbor_items: list[Collectable],
                            projectiles: list[Projectile],
-                           cursor: Union[Cursor, None], delta_time: float) -> None:
+                           cursor: Cursor, delta_time: float) -> None:
 
         # getting player inputs from main loop
         self.left = inputs["left"]
@@ -35,9 +33,13 @@ class Player(Entity):
         self.pick = inputs["pick"]
         self.action = inputs["action"]
 
-        self.update(pygame.mouse.get_pos(), neighbor_tiles,
-                    neighbor_items, projectiles,
-                    cursor, delta_time)
+        self.update(pygame.mouse.get_pos(),
+                    neighbor_tiles, neighbor_items, projectiles,
+                    delta_time)
+
+        cursor.disable()
+        if self.action_possible:
+            cursor.enable()
 
         if self.health <= 0 or self.rect.top > SCREEN_HEIGHT + TILE_SCALE:
             print("GAME OVER")

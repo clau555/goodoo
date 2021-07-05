@@ -29,9 +29,9 @@ def color_comparison(color1: Color, color2: Color, margin: int = 75) -> bool:
 def level_from_image(file_name: str) -> tuple[Player, Enemy, list[list[Union[Tile, None]]]]:
     """
     Creates a 2D array of tiles according to the given image file.\n
-    Returns also a player object initialized at its spawn point.\n
+    Returns also a player and enemy objects initialized at their spawn point.\n
     :param file_name: path of the image file
-    :return: player and tile 2D array
+    :return: player and enemy at their correct coordinates, and a 2D array of tile representing the world
     """
     im: Surface = pygame.image.load(file_name)
     pixel_array: PixelArray = pygame.PixelArray(im)
@@ -45,7 +45,7 @@ def level_from_image(file_name: str) -> tuple[Player, Enemy, list[list[Union[Til
     player: Player = Player((0, 0))
     player_spawn: bool = False
 
-    enemy: Enemy = Enemy((0, 0))
+    enemy: Enemy = Enemy((0, 0), player)
     enemy_spawn: bool = False
 
     for i in range(im.get_width()):

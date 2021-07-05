@@ -3,15 +3,14 @@ from typing import Union
 import pygame
 from pygame.math import Vector2
 
+from data.constants import GRAVITY_MAX, TILE_SCALE, GRAVITY
 from data.game_objects.bar import Bar
-from data.game_objects.displayable import Displayable
-from data.game_objects.projectile import Projectile
 from data.game_objects.bonus import Bonus
 from data.game_objects.collectable import Collectable
-from data.game_objects.cursor import Cursor
+from data.game_objects.displayable import Displayable
+from data.game_objects.projectile import Projectile
 from data.game_objects.tile import Tile
 from data.game_objects.weapon import Weapon
-from data.constants import GRAVITY_MAX, TILE_SCALE, GRAVITY
 
 
 class Entity(Displayable):
@@ -44,6 +43,7 @@ class Entity(Displayable):
 
         self.__weapon: Union[Weapon, None] = None
         self.__recoil: bool = False
+        self.__action_possible: bool = False
 
         self.__health: int = self.MAX_HEALTH
         self.__hit: bool = False
@@ -68,12 +68,16 @@ class Entity(Displayable):
         return self.__weapon
 
     @property
+    def action_possible(self) -> bool:
+        return self.__action_possible
+
+    @property
     def health(self) -> int:
         return self.__health
 
     @health.setter
     def health(self, health) -> None:
-        # adding health to the entity while not exceeding the maximum health
+        # setting health of the entity while not exceeding the maximum health
         self.__health = self.MAX_HEALTH if health > self.MAX_HEALTH else health
 
     def __weapon_update(self) -> None:
@@ -104,16 +108,15 @@ class Entity(Displayable):
         self.__health_bar.rect.center = (self.rect.centerx, self.rect.centery - self.rect.height)
         self.__health_bar.progress = self.__health / self.MAX_HEALTH
 
-    def update(self, direction_pos: tuple[int, int], tiles: list[Tile],
+    def update(self, target_pos: tuple[int, int], tiles: list[Tile],
                items: list[Collectable], projectiles: list[Projectile],
-               cursor: Union[Cursor, None], delta_time: float) -> None:
+               delta_time: float) -> None:
         """
         Handles movements physics, interactions with items and projectiles, and wielded weapon disposition and action.\n
-        :param direction_pos: on-screen coordinates the entity is aiming at
+        :param target_pos: on-screen coordinates the entity is aiming at
         :param tiles: tiles the entity can collide with (preferably neighbor tiles)
         :param items: items the entity can pick up (preferably surrounding items)
         :param projectiles: projectiles the entity can collide with
-        :param cursor: user cursor indicating if the entity can shoot
         :param delta_time: time elapsed between the last two frames
         """
 
@@ -143,13 +146,13 @@ class Entity(Displayable):
                 self.__velocity.x = self.__velocity_max.x
 
         # direction and angle
-        self.__direction = (Vector2(direction_pos) - self.rect.center)
+        self.__direction = (Vector2(target_pos) - self.rect.center)
         self.__angle = self.__direction.angle_to(Vector2(1, 0))
 
         # owned weapon action
         if self.__weapon:
 
-            cursor.disable()
+            self.__action_possible = False
 
             # weapon action is possible if the targeted position isn't on the entity
             if self.__direction.length() > self.WEAPON_DISTANCE:
@@ -164,7 +167,7 @@ class Entity(Displayable):
                     self.__recoil = True
 
                 if self.__weapon.cooldown_finished():
-                    cursor.enable()
+                    self.__action_possible = True
 
         # projectiles collision and effect
         for projectile in projectiles:

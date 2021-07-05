@@ -91,7 +91,7 @@ class Game:
     every displayable objects of the program.\n
     """
 
-    ITEM_SPAWN_DELAY: float = 10.   # time in seconds to pass before an item is created randomly on screen
+    ITEM_SPAWN_DELAY: float = 30.   # time in seconds to pass before an item is created randomly on screen
     MAX_IN_GAME_ITEMS: int = 3      # maximum number of items present in game
 
     def __init__(self, level_file_name) -> None:
