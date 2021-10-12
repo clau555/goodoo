@@ -219,9 +219,8 @@ class Entity(Displayable):
                 elif self.__velocity.y < 0:
                     self.rect.top = tile.rect.bottom
 
-                # setting vertical velocity above zero
-                # to avoid not colliding with the ground on
-                # the next frame even if the entity is on it
+                # setting vertical velocity above zero to avoid not colliding with
+                # the ground on the next frame even if the entity is on it
                 self.__velocity.y = 0.1
 
         # wielded weapon update

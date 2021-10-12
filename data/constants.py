@@ -6,4 +6,4 @@ WORLD_HEIGHT: int = 18                          # number of tiles for the in-gam
 TILE_SCALE: int = SCREEN_WIDTH // WORLD_WIDTH   # size of a tile in pixels
 GRAVITY: float = TILE_SCALE / 35                # gravity acceleration in pixels
 GRAVITY_MAX: float = TILE_SCALE / 3             # maximum gravitational velocity of an entity
-FPS: int = 60                                   # frame per second
+FPS: int = 60                                   # frames per second

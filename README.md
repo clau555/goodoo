@@ -1,18 +1,21 @@
 # Goodoo
 
-Started as a second year video game project, Goodoo is now a WIP side project.
+<img src="screenshot.jpg" alt="img"/>
 
-## Requirement
+## Requirement and dependency
 
 Python 3.9 or above
 
-## Dependency
+[Pygame](https://pypi.org/project/pygame/) ```pip install pygame```
 
-- [Pygame](https://pypi.org/project/pygame/) ```pip install pygame```
+## Execution examples
 
-## Execution example
-
-```python goodoo.py resources/maps/map1.jpg```
+```
+python goodoo.py resources/maps/map1.jpg
+python goodoo.py resources/maps/map2.jpg
+python goodoo.py resources/maps/map3.jpg
+python goodoo.py resources/maps/map4.jpg
+```
 
 ## Key Bindings
 

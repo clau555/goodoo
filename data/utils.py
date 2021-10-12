@@ -70,3 +70,24 @@ def is_inside_screen(rect: Rect) -> bool:
 
 def clamp(n, minn, maxn):
     return max(min(maxn, n), minn)
+
+
+def neighbor_objects(pos: tuple[int, int], object_map: list[list]) -> list:
+    """
+    Returns the existing neighbor objects of a given position on screen.\n
+    These objects are stored in the object_map argument, in which each index corresponds to a tile position.\n
+    These objects can be for example tiles or items.\n
+    The neighbors include at most the 8 surrounding tiles of the position and the tile on the given position itself.\n
+    :param pos: position on screen
+    :param object_map: 2D array map storing all objects
+    :return: neighbor objects
+    """
+    tile_pos: tuple[int, int] = (clamp(pos[0], 0, SCREEN_WIDTH) // TILE_SCALE,
+                                 clamp(pos[1], 0, SCREEN_HEIGHT) // TILE_SCALE)
+    objects: list = []
+    for i in range(tile_pos[0] - 1, tile_pos[0] + 2):
+        for j in range(tile_pos[1] - 1, tile_pos[1] + 2):
+            if 0 <= i < len(object_map) and 0 <= j < len(object_map[j]) and \
+                    object_map[i][j] is not None:
+                objects.append(object_map[i][j])
+    return objects
