@@ -14,6 +14,16 @@ from data.tileData import TileData
 Grid = List[List[Optional[TileData]]]
 
 
+def color_comparison(
+        color1: Tuple[int, int, int],
+        color2: Tuple[int, int, int],
+        margin: int = 75
+) -> bool:
+    return color2[0] - margin <= color1[0] <= color2[0] + margin and \
+           color2[1] - margin <= color1[1] <= color2[1] + margin and \
+           color2[2] - margin <= color1[2] <= color2[2] + margin
+
+
 def init_world(file_name: str) -> Tuple[PlayerData, Grid]:
     """
     Loads a level from an image file.
@@ -41,7 +51,7 @@ def init_world(file_name: str) -> Tuple[PlayerData, Grid]:
 
             rgb: Tuple[int, int, int] = im.unmap_rgb(pixel_array[i, j])[0:3]
 
-            if rgb >= BLUE and not player:
+            if color_comparison(rgb, BLUE) and not player:
                 # spawn position at the center of the tile
                 pos: Tuple[int, int] = (
                     i * TILE_EDGE + TILE_EDGE // 2 - PLAYER_EDGE // 2,
@@ -53,7 +63,7 @@ def init_world(file_name: str) -> Tuple[PlayerData, Grid]:
                 )
                 player = PlayerData(Rect(pos, PLAYER_SIZE), sprite)
 
-            elif rgb >= WHITE:
+            elif color_comparison(rgb, WHITE):
                 pos: Tuple[int, int] = (i * TILE_EDGE, j * TILE_EDGE)
                 top: bool = j > 0 and not tile_grid[i][j - 1]
                 tile_grid[i][j] = TileData(Rect(pos, TILE_SIZE), top)

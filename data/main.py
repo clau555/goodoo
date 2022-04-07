@@ -62,7 +62,7 @@ def main() -> None:
         # Model update
         # ------------
 
-        beam = update_beam(beam, player, delta)
+        beam = update_beam(beam, player, tiles, delta)
         if click and on_ground:
             beam = fire(beam)
             on_ground = False
@@ -83,11 +83,8 @@ def main() -> None:
 
         for tile in tiles:
             display_tile(tile, screen)
-
-        display_player(player, screen)
-
         display_beam(beam, screen)
-
+        display_player(player, screen)
         screen.blit(
             CURSOR_SPRITE,
             Vector2(pygame.mouse.get_pos()) - Vector2(CURSOR_SIZE) * 0.5

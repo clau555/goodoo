@@ -30,10 +30,13 @@ BEAM_STRENGTH: float = PLAYER_MAX_V / 5             # beam impulse velocity leng
 BEAM_DURATION: float = 0.2                          # beam duration in seconds
 BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)    # beam deterioration at each frame in percentage
 
+BEAM_VECTOR_STEP: float = TILE_EDGE / 4
+BEAM_MAX_VECTOR_STEP: int = int(Vector2(SCREEN_SIZE).length() / BEAM_VECTOR_STEP)
+
 CURSOR_SPRITE: Surface = pygame.image.load("resources/sprites/cursor.png")
 CURSOR_SIZE: Tuple[int, int] = CURSOR_SPRITE.get_size()
 
-WHITE: Tuple[int, int, int] = (250, 250, 250)
+WHITE: Tuple[int, int, int] = (255, 255, 255)
 BLACK: Tuple[int, int, int] = (0, 0, 0)
-BLUE: Tuple[int, int, int] = (0, 0, 250)
+BLUE: Tuple[int, int, int] = (0, 0, 255)
 RED: Tuple[int, int, int] = (250, 0, 0)
