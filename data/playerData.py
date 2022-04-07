@@ -6,5 +6,5 @@ from pygame import Rect, Vector2, Surface
 class PlayerData:
     rect: Rect
     sprite: Surface
-    velocity: Vector2 = Vector2(0, 0)
+    velocity: Vector2 = Vector2(0)
     on_ground: bool = False

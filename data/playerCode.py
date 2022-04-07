@@ -1,8 +1,10 @@
 import dataclasses
+from typing import Tuple
+
 import pygame.display
 from pygame import Rect, Vector2
 
-from data.constants import GRAVITY
+from data.constants import GRAVITY, PLAYER_MAX_V, TILE_EDGE
 from data.playerData import PlayerData
 from data.tileData import TileData
 
@@ -16,34 +18,26 @@ def display_player(player: PlayerData) -> None:
     pygame.display.get_surface().blit(player.sprite, player.rect.topleft)
 
 
-def update_velocity(player: PlayerData, input_v: Vector2) -> PlayerData:
+def get_grid_index(player: PlayerData) -> Tuple[int, int]:
+    return player.rect.centerx // TILE_EDGE, player.rect.centery // TILE_EDGE
+
+
+def update_velocity(player: PlayerData, beam_velocity: Vector2) -> PlayerData:
     """
-    Update the player's velocity based on user inputs
-    and environmental factors such as gravity and frictions.
+    Update the player's velocity based on the beam's velocity.
+    Normal gravity is applied if beam's velocity is zero.
 
     :param player: player object
-    :param input_v: velocity inputted by user
+    :param beam_velocity: beam's velocity
     :return: updated player object
     """
 
-    v: Vector2 = Vector2(0, 0)
-
-    v.x = input_v.x
-
-    # gravity
-    v.y = player.velocity.y + input_v.y + GRAVITY
-
-    """
-    # x-axis friction
-    if input_v.x > 0:
-        v.x -= FRICTION
-    elif input_v.x < 0:
-        v.x += FRICTION
+    v: Vector2 = player.velocity + GRAVITY
+    v = beam_velocity if beam_velocity.xy != (0.0, 0.0) else v
 
     # clamp velocity
     if v.length() > PLAYER_MAX_V:
         v.scale_to_length(PLAYER_MAX_V)
-    """
 
     return dataclasses.replace(player, velocity=v)
 
@@ -76,10 +70,12 @@ def move_and_collide(
             if v.x > 0:
                 rect.right = tile.rect.left
                 v.x = 0
+                break
 
             elif v.x < 0:
                 rect.left = tile.rect.right
                 v.x = 0
+                break
 
     # y movement and collision
     rect.y += int(v.y * delta)
@@ -90,11 +86,13 @@ def move_and_collide(
             if v.y > 0:
                 rect.bottom = tile.rect.top
                 on_ground = True
-                v.y = 0
+                v.xy = 0, 0
+                break
 
             elif v.y < 0:
                 rect.top = tile.rect.bottom
                 v.y = 0
+                break
 
     return dataclasses.replace(
         player, rect=rect, velocity=v, on_ground=on_ground
