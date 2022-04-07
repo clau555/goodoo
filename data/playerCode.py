@@ -1,21 +1,22 @@
 import dataclasses
 from typing import Tuple
 
-import pygame.display
 from pygame import Rect, Vector2
+from pygame.surface import Surface
 
 from data.constants import GRAVITY, PLAYER_MAX_V, TILE_EDGE
 from data.playerData import PlayerData
 from data.tileData import TileData
 
 
-def display_player(player: PlayerData) -> None:
+def display_player(player: PlayerData, screen: Surface) -> None:
     """
     Display the player's sprite on the screen.
 
     :param player: player object
+    :param screen: screen surface
     """
-    pygame.display.get_surface().blit(player.sprite, player.rect.topleft)
+    screen.blit(player.sprite, player.rect.topleft)
 
 
 def get_grid_index(player: PlayerData) -> Tuple[int, int]:

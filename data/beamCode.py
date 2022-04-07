@@ -2,15 +2,16 @@ import dataclasses
 
 import pygame
 from pygame.math import Vector2
+from pygame.surface import Surface
 
 from data.constants import BEAM_STRENGTH, RED, BEAM_DECREASE
 from data.beamData import BeamData
 from data.playerData import PlayerData
 
 
-def display_beam(beam: BeamData) -> None:
+def display_beam(beam: BeamData, screen: Surface) -> None:
     pygame.draw.line(
-        pygame.display.get_surface(),
+        screen,
         RED,
         beam.start,
         beam.end,

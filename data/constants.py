@@ -1,5 +1,7 @@
 from typing import Tuple, List
 
+import pygame.image
+from pygame import Surface
 from pygame.math import Vector2
 
 RESOLUTIONS: List[Tuple[int, int]] = [(1920, 1080), (1280, 720), (960, 540)]
@@ -27,6 +29,9 @@ GRAVITY: Vector2 = Vector2(0, PLAYER_MAX_V / 75)    # gravity acceleration in pi
 BEAM_STRENGTH: float = PLAYER_MAX_V / 5             # beam impulse velocity length
 BEAM_DURATION: float = 0.2                          # beam duration in seconds
 BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)    # beam deterioration at each frame in percentage
+
+CURSOR_SPRITE: Surface = pygame.image.load("resources/sprites/cursor.png")
+CURSOR_SIZE: Tuple[int, int] = CURSOR_SPRITE.get_size()
 
 WHITE: Tuple[int, int, int] = (250, 250, 250)
 BLACK: Tuple[int, int, int] = (0, 0, 0)
