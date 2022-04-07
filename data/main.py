@@ -1,83 +1,76 @@
-import sys
 import time
+from typing import List, Tuple, Sequence
 
 import pygame
+from pygame.math import Vector2
 from pygame.time import Clock
 
-from data.game_objects.game import Game
-from data.constants import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
+from data.constants import SCREEN_SIZE, FPS, TILE_EDGE, PLAYER_INPUT_VX, PLAYER_MAX_V, PLAYER_INPUT_VY
+from data.playerCode import display_player, update_velocity, move_and_collide
+from data.tileCode import display_tile
+from data.tileData import TileData
+from data.world import init_world, get_grid_tiles, get_neighbor_tiles
 
 
-def main(level_file_name: str = None) -> None:
+def main(level_file_name: str) -> None:
+
     pygame.init()
-    pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT),
-                            pygame.FULLSCREEN | pygame.SCALED | pygame.HWSURFACE | pygame.DOUBLEBUF)
-    pygame.display.set_caption("Goodoo")
+    pygame.display.set_mode(
+        SCREEN_SIZE, pygame.FULLSCREEN | pygame.SCALED | pygame.HWSURFACE | pygame.DOUBLEBUF
+    )
+    pygame.display.set_caption("Data Oriented Goodoo")
     pygame.mouse.set_visible(False)
 
-    game: Game = Game(level_file_name)
+    player, tile_grid = init_world(level_file_name)
+    tiles: List[TileData] = get_grid_tiles(tile_grid)
+
     clock: Clock = pygame.time.Clock()
     last_time: float = time.time()
 
     while True:
 
-        inputs: dict[str, bool] = {
-            "left": False,
-            "right": False,
-            "up": False,
-            "down": False,
-            "action": False,
-            "pick": False
-        }
-
-        # events
+        # user inputs
+        input_v: Vector2 = Vector2(0, 0)
         for event in pygame.event.get():
-
-            if event.type == pygame.KEYDOWN:
-
-                # user event inputs
-                if event.key == pygame.K_z or event.key == pygame.K_UP or event.key == pygame.K_SPACE:
-                    inputs["up"] = True
-                if event.key == pygame.K_r or event.key == pygame.K_LSHIFT:
-                    inputs["pick"] = True
-
-                # quit shortcut
-                elif event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    quit()
-
-                # debug
-                elif event.key == pygame.K_ASTERISK:
-                    game.toggle_debug()
-
-            elif event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    quit()
+                if event.key == pygame.K_UP and player.on_ground:
+                    input_v.y = -PLAYER_INPUT_VY
+        keys: Sequence[bool] = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
+            input_v.x = -PLAYER_INPUT_VX
+        elif keys[pygame.K_RIGHT] and not keys[pygame.K_LEFT]:
+            input_v.x = PLAYER_INPUT_VX
 
-        # user movement inputs
-        keys = pygame.key.get_pressed()
-        if (keys[pygame.K_q] or keys[pygame.K_LEFT]) and not (keys[pygame.K_d] or keys[pygame.K_RIGHT]):
-            inputs["left"] = True
-        elif (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and not (keys[pygame.K_q] or keys[pygame.K_LEFT]):
-            inputs["right"] = True
-
-        # left click detection
-        if pygame.mouse.get_pressed(3)[0]:
-            inputs["action"] = True
-
-        # delta time update
-        delta_time: float = (time.time() - last_time) * FPS
+        delta: float = (time.time() - last_time) * FPS
         last_time: float = time.time()
 
-        # game update and display update
-        if delta_time <= 2.:
-            game.update_and_display(inputs, delta_time)
-            pygame.display.flip()
-            clock.tick(FPS)
+        # Model update
+        player = update_velocity(player, input_v)
+        player_grid_idx: Tuple[int, int] = (
+            player.rect.centerx // TILE_EDGE,
+            player.rect.centery // TILE_EDGE
+        )
+        player = move_and_collide(
+            player,
+            get_neighbor_tiles(tile_grid, player_grid_idx),
+            delta
+        )
+
+        # display
+        pygame.display.get_surface().fill((0, 0, 0))
+        for tile in tiles:
+            display_tile(tile)
+        display_player(player)
+
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        main(sys.argv[1])
-    else:
-        sys.exit("not enough arguments")
+    main("resources/maps/map1.jpg")
