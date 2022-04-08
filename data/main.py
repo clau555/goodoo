@@ -6,14 +6,12 @@ from pygame.math import Vector2
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.beamCode import update_beam, get_beam_velocity, fire, display_beam
-from data.beamData import BeamData
+from data.beam import update_beam, get_beam_velocity, fire, display_beam, Beam
 from data.constants import SCREEN_SIZE, FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
-from data.playerCode import display_player, update_velocity, move_and_collide, \
+from data.player import display_player, update_velocity, move_and_collide
+from data.tile import display_tile, Tile
+from data.world import init_world, get_grid_tiles, get_neighbor_tiles, \
     get_grid_index
-from data.tileCode import display_tile
-from data.tileData import TileData
-from data.world import init_world, get_grid_tiles, get_neighbor_tiles
 
 
 def main() -> None:
@@ -24,8 +22,8 @@ def main() -> None:
     pygame.mouse.set_visible(False)
 
     player, tile_grid = init_world("resources/maps/map1.jpg")
-    tiles: List[TileData] = get_grid_tiles(tile_grid)
-    beam: BeamData = BeamData()
+    tiles: List[Tile] = get_grid_tiles(tile_grid)
+    beam: Beam = Beam()
 
     clock: Clock = pygame.time.Clock()
     last_time: float = time.time()
@@ -69,8 +67,8 @@ def main() -> None:
         input_v: Vector2 = get_beam_velocity(beam)
 
         player = update_velocity(player, input_v)
-        neighbor_tiles: List[TileData] = get_neighbor_tiles(
-            tile_grid, get_grid_index(player)
+        neighbor_tiles: List[Tile] = get_neighbor_tiles(
+            tile_grid, get_grid_index(player.rect)
         )
         player = move_and_collide(player, neighbor_tiles, delta)
 

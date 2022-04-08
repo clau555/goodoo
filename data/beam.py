@@ -1,18 +1,30 @@
-import dataclasses
+from dataclasses import dataclass, replace
 from typing import List
 
 import pygame
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-from data.beamData import BeamData
 from data.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, TILE_EDGE, BEAM_VECTOR_STEP, \
     BEAM_MAX_VECTOR_STEP
-from data.playerData import PlayerData
-from data.tileData import TileData
+from data.player import Player
+from data.tile import Tile
 
 
-def display_beam(beam: BeamData, screen: Surface) -> None:
+@dataclass(frozen=True)
+class Beam:
+    start: Vector2 = Vector2(0)
+    end: Vector2 = Vector2(0)
+    power: float = 0.0
+
+
+def display_beam(beam: Beam, screen: Surface) -> None:
+    """
+    Displays the beam on the screen.
+
+    :param beam: beam object
+    :param screen: screen surface
+    """
     pygame.draw.line(
         screen,
         RED,
@@ -22,8 +34,21 @@ def display_beam(beam: BeamData, screen: Surface) -> None:
     )
 
 
-def update_beam(beam: BeamData, player: PlayerData, tiles: List[TileData], delta: float) -> BeamData:
+def update_beam(
+        beam: Beam,
+        player: Player,
+        tiles: List[Tile],
+        delta: float
+) -> Beam:
+    """
+    Updates the beam, decreasing its power and setting its start and end points.
 
+    :param beam: beam object
+    :param player: player object
+    :param tiles: list of tile objects
+    :param delta: delta time
+    :return: updated beam object
+    """
     start: Vector2 = Vector2(player.rect.center)
     end: Vector2 = Vector2(start)
 
@@ -48,14 +73,20 @@ def update_beam(beam: BeamData, player: PlayerData, tiles: List[TileData], delta
     power: float = beam.power - BEAM_DECREASE * delta
     power = power if beam.power > 0 else 0  # clamp power to 0
 
-    return dataclasses.replace(beam, start=start, end=end, power=power)
+    return replace(beam, start=start, end=end, power=power)
 
 
-def fire(beam: BeamData) -> BeamData:
-    return dataclasses.replace(beam, power=1)
+def fire(beam: Beam) -> Beam:
+    """
+    Fires the beam, setting its power to the maximum.
+
+    :param beam: beam object
+    :return: updated beam object
+    """
+    return replace(beam, power=1)
 
 
-def get_beam_velocity(beam: BeamData) -> Vector2:
+def get_beam_velocity(beam: Beam) -> Vector2:
     """
     Returns the velocity impulse the beam would give to the player.
     Returns a zero vector if the beam has no power left.

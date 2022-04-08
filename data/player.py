@@ -1,15 +1,21 @@
-import dataclasses
-from typing import Tuple
+from dataclasses import dataclass, replace
 
 from pygame import Rect, Vector2
 from pygame.surface import Surface
 
-from data.constants import GRAVITY, PLAYER_MAX_V, TILE_EDGE
-from data.playerData import PlayerData
-from data.tileData import TileData
+from data.constants import GRAVITY, PLAYER_MAX_V
+from data.tile import Tile
 
 
-def display_player(player: PlayerData, screen: Surface) -> None:
+@dataclass(frozen=True)
+class Player:
+    rect: Rect
+    sprite: Surface
+    velocity: Vector2 = Vector2(0)
+    on_ground: bool = False
+
+
+def display_player(player: Player, screen: Surface) -> None:
     """
     Display the player's sprite on the screen.
 
@@ -19,11 +25,7 @@ def display_player(player: PlayerData, screen: Surface) -> None:
     screen.blit(player.sprite, player.rect.topleft)
 
 
-def get_grid_index(player: PlayerData) -> Tuple[int, int]:
-    return player.rect.centerx // TILE_EDGE, player.rect.centery // TILE_EDGE
-
-
-def update_velocity(player: PlayerData, beam_velocity: Vector2) -> PlayerData:
+def update_velocity(player: Player, beam_velocity: Vector2) -> Player:
     """
     Update the player's velocity based on the beam's velocity.
     Normal gravity is applied if beam's velocity is zero.
@@ -32,7 +34,6 @@ def update_velocity(player: PlayerData, beam_velocity: Vector2) -> PlayerData:
     :param beam_velocity: beam's velocity
     :return: updated player object
     """
-
     v: Vector2 = player.velocity + GRAVITY
     v = beam_velocity if beam_velocity.xy != (0.0, 0.0) else v
 
@@ -40,14 +41,14 @@ def update_velocity(player: PlayerData, beam_velocity: Vector2) -> PlayerData:
     if v.length() > PLAYER_MAX_V:
         v.scale_to_length(PLAYER_MAX_V)
 
-    return dataclasses.replace(player, velocity=v)
+    return replace(player, velocity=v)
 
 
 def move_and_collide(
-        player: PlayerData,
-        tiles: list[TileData],
+        player: Player,
+        tiles: list[Tile],
         delta: float
-) -> PlayerData:
+) -> Player:
     """
     Move the player with its current velocity then collide with the tiles.
     If any collision occurs, the player is moved to the appropriate position.
@@ -57,7 +58,6 @@ def move_and_collide(
     :param delta: time elapsed since last frame
     :return: updated player object
     """
-
     rect: Rect = Rect(player.rect.topleft, player.rect.size)
     on_ground: bool = False
     v: Vector2 = Vector2(player.velocity)
@@ -95,6 +95,6 @@ def move_and_collide(
                 v.y = 0
                 break
 
-    return dataclasses.replace(
+    return replace(
         player, rect=rect, velocity=v, on_ground=on_ground
     )

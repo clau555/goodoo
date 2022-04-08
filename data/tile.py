@@ -1,12 +1,19 @@
+from dataclasses import dataclass
+
 import pygame
 from pygame.rect import Rect
 from pygame.surface import Surface
 
 from data.constants import TILE_COLOR, GROUND_COLOR, GROUND_SIZE
-from data.tileData import TileData
 
 
-def display_tile(tile: TileData, screen: Surface) -> None:
+@dataclass(frozen=True)
+class Tile:
+    rect: Rect
+    top: bool
+
+
+def display_tile(tile: Tile, screen: Surface) -> None:
     """
     Displays the tile on the screen.
     Displays also the ground if the tile is a ground tile.
