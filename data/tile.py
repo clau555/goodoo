@@ -4,7 +4,8 @@ from pygame.math import Vector2
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.constants import tuple_to_screen, GROUND_SPRITE, GRASS_SPRITE
+from data.utils import GROUND_SPRITE
+from data.utils.screen import tuple_to_screen
 
 
 @dataclass(frozen=True)
@@ -20,7 +21,8 @@ def display_tile(tile: Tile, screen: Surface) -> None:
     :param tile: tile object
     :param screen: screen surface
     """
-    screen.blit(tile.sprite, tuple_to_screen(tile.rect.topleft))
     if tile.sprite == GROUND_SPRITE:
         grass_pos = tile.rect.topleft - Vector2(2)
-        screen.blit(GRASS_SPRITE, tuple_to_screen(grass_pos))
+        screen.blit(tile.sprite, tuple_to_screen(grass_pos))
+    else:
+        screen.blit(tile.sprite, tuple_to_screen(tile.rect.topleft))

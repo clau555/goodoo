@@ -3,8 +3,9 @@ from dataclasses import dataclass, replace
 from pygame import Rect, Vector2
 from pygame.surface import Surface
 
-from data.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, tuple_to_screen
+from data.utils import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE
 from data.tile import Tile
+from data.utils.screen import tuple_to_screen
 
 
 @dataclass(frozen=True)

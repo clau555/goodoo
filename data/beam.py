@@ -5,10 +5,10 @@ import pygame
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-from data.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, \
-    BEAM_VECTOR_STEP, BEAM_MAX_VECTOR_STEP, TILE_EDGE, tuple_to_pix, \
-    vec_to_screen
+from data.utils import BEAM_STRENGTH, RED, BEAM_DECREASE, \
+    BEAM_VECTOR_STEP, BEAM_MAX_VECTOR_STEP, TILE_EDGE, vec_to_screen
 from data.player import Player
+from data.utils.screen import tuple_to_pix
 from data.tile import Tile
 
 

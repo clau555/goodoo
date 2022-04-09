@@ -6,13 +6,17 @@ from pygame.pixelarray import PixelArray
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.constants import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, \
-    TILE_SPRITE, GROUND_SPRITE, GRID_HEIGHT, GRID_WIDTH
+from data.utils import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, \
+    TILE_SPRITE, GROUND_SPRITE
 from data.goal import Goal
 from data.player import Player
 from data.tile import Tile
 
 Grid = List[List[Optional[Tile]]]
+
+GRID_SIZE: Tuple[int, int] = 32, 18  # world size in tiles
+GRID_WIDTH: int = GRID_SIZE[0]
+GRID_HEIGHT: int = GRID_SIZE[1]
 
 
 def color_comparison(

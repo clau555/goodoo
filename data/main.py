@@ -8,10 +8,11 @@ from pygame.time import Clock
 
 from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, \
     Beam
-from data.constants import SCREEN_SIZE, FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
+from data.utils import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
 from data.player import display_player, update_velocity, move_and_collide
+from data.utils.screen import SCREEN_SIZE
 from data.tile import display_tile, Tile
-from data.world import init_world, get_grid_tiles, get_neighbor_tiles, \
+from data.utils.grid import init_world, get_grid_tiles, get_neighbor_tiles, \
     get_grid_index
 
 
