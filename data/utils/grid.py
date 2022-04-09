@@ -6,11 +6,13 @@ from pygame.pixelarray import PixelArray
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.utils import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, \
-    TILE_SPRITE, GROUND_SPRITE
 from data.goal import Goal
 from data.player import Player
 from data.tile import Tile
+from data.utils import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, \
+    TILE_SPRITE, GROUND_SPRITE, GROUND_SPRITE_SIZE, TILE_SPRITE_SIZE, GOAL_SIZE, \
+    GREY, PILLAR_TOP_SPRITE_SIZE, PILLAR_TOP_SPRITE, PILLAR_SPRITE_SIZE, \
+    PILLAR_SPRITE
 
 Grid = List[List[Optional[Tile]]]
 
@@ -37,7 +39,7 @@ def color_comparison(
            color2[2] - margin <= color1[2] <= color2[2] + margin
 
 
-def init_world(file_path: str) -> Tuple[Player, Grid]:
+def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
     """
     Loads a level from an image file.
     The image must be of `WORLD_WIDTH` by `WORLD_HEIGHT` size.
@@ -64,29 +66,59 @@ def init_world(file_path: str) -> Tuple[Player, Grid]:
 
             idx: Vector2 = Vector2(i, j)
             rgb: Tuple[int, int, int] = im.unmap_rgb(pixel_array[i, j])[0:3]
+            pos: Vector2 = idx.elementwise() * TILE_SIZE
+
+            if color_comparison(rgb, GREY):
+                # rock tiles
+                if j > 0 and not tile_grid[i][j - 1]:
+                    tile_grid[i][j] = Tile(
+                        Rect(pos, TILE_SIZE),
+                        GROUND_SPRITE,
+                        GROUND_SPRITE_SIZE
+                    )
+                else:
+                    tile_grid[i][j] = Tile(
+                        Rect(pos, TILE_SIZE),
+                        TILE_SPRITE,
+                        TILE_SPRITE_SIZE
+                    )
 
             if color_comparison(rgb, WHITE):
-                pos: Vector2 = idx.elementwise() * TILE_SIZE
+                # pillar tiles
                 if j > 0 and not tile_grid[i][j - 1]:
-                    tile_grid[i][j] = Tile(Rect(pos, TILE_SIZE), GROUND_SPRITE)
+                    tile_grid[i][j] = Tile(
+                        Rect(pos, TILE_SIZE),
+                        PILLAR_TOP_SPRITE,
+                        PILLAR_TOP_SPRITE_SIZE
+
+                    )
                 else:
-                    tile_grid[i][j] = Tile(Rect(pos, TILE_SIZE), TILE_SPRITE)
+                    tile_grid[i][j] = Tile(
+                        Rect(pos, TILE_SIZE),
+                        PILLAR_SPRITE,
+                        PILLAR_SPRITE_SIZE
+                    )
 
             elif color_comparison(rgb, BLUE) and not player:
                 # spawn position at the center of the tile
-                pos: Vector2 = idx.elementwise() * TILE_SIZE \
+                pos = idx.elementwise() * TILE_SIZE \
                                + TILE_SIZE // 2 \
                                - PLAYER_SIZE // 2
                 player = Player(Rect(pos, PLAYER_SIZE))
 
             elif color_comparison(rgb, RED) and not goal:
-                pos: Vector2 = idx.elementwise() * TILE_SIZE
+                # goal at the center of the tile
+                pos = idx.elementwise() * TILE_SIZE \
+                               + TILE_SIZE // 2 \
+                               - GOAL_SIZE // 2
                 goal = Goal(Rect(pos, TILE_SIZE))
 
     if not player:
         raise ValueError("No player spawn point detected inside the map.")
+    if not goal:
+        raise ValueError("No goal detected inside the map.")
 
-    return player, tile_grid
+    return player, goal, tile_grid
 
 
 def get_grid_tiles(tile_grid: Grid) -> List[Tile]:

@@ -8,6 +8,7 @@ from pygame.time import Clock
 
 from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, \
     Beam
+from data.goal import display_goal
 from data.utils import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
 from data.player import display_player, update_velocity, move_and_collide
 from data.utils.screen import SCREEN_SIZE
@@ -22,7 +23,7 @@ def main() -> None:
     pygame.display.set_caption("Data Oriented Goodoo")
     pygame.mouse.set_visible(False)
 
-    player, tile_grid = init_world("resources/maps/map1.jpg")
+    player, goal, tile_grid = init_world("resources/maps/map1.jpg")
     tiles: List[Tile] = get_grid_tiles(tile_grid)
     beam: Beam = Beam()
 
@@ -72,6 +73,9 @@ def main() -> None:
             tile_grid, get_grid_index(player.rect)
         )
         player = move_and_collide(player, neighbor_tiles, delta)
+        if player.rect.colliderect(goal.rect):
+            pygame.quit()
+            quit()
 
         # -------
         # display
@@ -80,6 +84,7 @@ def main() -> None:
         screen: Surface = pygame.display.get_surface()
         screen.fill(BLACK)
 
+        display_goal(goal, screen)
         display_beam(beam, screen)
         display_player(player, screen)
         for tile in tiles:

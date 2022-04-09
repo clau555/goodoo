@@ -13,5 +13,6 @@ class Goal:
     sprite: Surface = GOAL_SPRITE
 
 
-def display_tile(goal: Goal, screen: Surface) -> None:
+def display_goal(goal: Goal, screen: Surface) -> None:
+    # TODO animation
     screen.blit(goal.sprite, tuple_to_screen(goal.rect.topleft))
