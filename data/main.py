@@ -6,7 +6,8 @@ from pygame.math import Vector2
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.beam import update_beam, get_beam_velocity, fire, display_beam, Beam
+from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, \
+    Beam
 from data.constants import SCREEN_SIZE, FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
 from data.player import display_player, update_velocity, move_and_collide
 from data.tile import display_tile, Tile
@@ -15,9 +16,8 @@ from data.world import init_world, get_grid_tiles, get_neighbor_tiles, \
 
 
 def main() -> None:
-
     pygame.init()
-    pygame.display.set_mode(SCREEN_SIZE)
+    pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN | pygame.SCALED)
     pygame.display.set_caption("Data Oriented Goodoo")
     pygame.mouse.set_visible(False)
 
@@ -62,7 +62,7 @@ def main() -> None:
 
         beam = update_beam(beam, player, tiles, delta)
         if click and on_ground:
-            beam = fire(beam)
+            beam = fire_beam(beam)
             on_ground = False
         input_v: Vector2 = get_beam_velocity(beam)
 
@@ -79,10 +79,10 @@ def main() -> None:
         screen: Surface = pygame.display.get_surface()
         screen.fill(BLACK)
 
-        for tile in tiles:
-            display_tile(tile, screen)
         display_beam(beam, screen)
         display_player(player, screen)
+        for tile in tiles:
+            display_tile(tile, screen)
         screen.blit(
             CURSOR_SPRITE,
             Vector2(pygame.mouse.get_pos()) - Vector2(CURSOR_SIZE) * 0.5

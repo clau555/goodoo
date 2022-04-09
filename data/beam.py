@@ -5,8 +5,9 @@ import pygame
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-from data.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, TILE_EDGE, BEAM_VECTOR_STEP, \
-    BEAM_MAX_VECTOR_STEP
+from data.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, \
+    BEAM_VECTOR_STEP, BEAM_MAX_VECTOR_STEP, TILE_EDGE, tuple_to_pix, \
+    vec_to_screen
 from data.player import Player
 from data.tile import Tile
 
@@ -28,17 +29,17 @@ def display_beam(beam: Beam, screen: Surface) -> None:
     pygame.draw.line(
         screen,
         RED,
-        beam.start,
-        beam.end,
+        vec_to_screen(beam.start),
+        vec_to_screen(beam.end),
         int(beam.power * TILE_EDGE / 2)
     )
 
 
 def update_beam(
-        beam: Beam,
-        player: Player,
-        tiles: List[Tile],
-        delta: float
+    beam: Beam,
+    player: Player,
+    tiles: List[Tile],
+    delta: float
 ) -> Beam:
     """
     Updates the beam, decreasing its power and setting its start and end points.
@@ -52,7 +53,7 @@ def update_beam(
     start: Vector2 = Vector2(player.rect.center)
     end: Vector2 = Vector2(start)
 
-    step: Vector2 = pygame.mouse.get_pos() - start
+    step: Vector2 = tuple_to_pix(pygame.mouse.get_pos()) - start
     step.scale_to_length(BEAM_VECTOR_STEP)
 
     # increasing vector until it collides with a tile
@@ -76,7 +77,7 @@ def update_beam(
     return replace(beam, start=start, end=end, power=power)
 
 
-def fire(beam: Beam) -> Beam:
+def fire_beam(beam: Beam) -> Beam:
     """
     Fires the beam, setting its power to the maximum.
 

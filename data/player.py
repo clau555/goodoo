@@ -3,14 +3,14 @@ from dataclasses import dataclass, replace
 from pygame import Rect, Vector2
 from pygame.surface import Surface
 
-from data.constants import GRAVITY, PLAYER_MAX_V
+from data.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, tuple_to_screen
 from data.tile import Tile
 
 
 @dataclass(frozen=True)
 class Player:
     rect: Rect
-    sprite: Surface
+    sprite: Surface = PLAYER_SPRITE
     velocity: Vector2 = Vector2(0)
     on_ground: bool = False
 
@@ -22,7 +22,7 @@ def display_player(player: Player, screen: Surface) -> None:
     :param player: player object
     :param screen: screen surface
     """
-    screen.blit(player.sprite, player.rect.topleft)
+    screen.blit(player.sprite, tuple_to_screen(player.rect.topleft))
 
 
 def update_velocity(player: Player, beam_velocity: Vector2) -> Player:
@@ -45,9 +45,9 @@ def update_velocity(player: Player, beam_velocity: Vector2) -> Player:
 
 
 def move_and_collide(
-        player: Player,
-        tiles: list[Tile],
-        delta: float
+    player: Player,
+    tiles: list[Tile],
+    delta: float
 ) -> Player:
     """
     Move the player with its current velocity then collide with the tiles.
