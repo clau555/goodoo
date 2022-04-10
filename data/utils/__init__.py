@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 import pygame.image
 from pygame import Surface
@@ -32,11 +32,16 @@ PILLAR_SPRITE: Surface = pygame.transform.scale(
     PILLAR_IMG, vec_to_screen(PILLAR_SPRITE_SIZE)
 )
 
-GOAL_IMG: Surface = pygame.image.load("resources/sprites/test.png")
+GOAL_IMAGES: List[Surface] = [
+    pygame.image.load("resources/sprites/goal_1.png"),
+    pygame.image.load("resources/sprites/goal_2.png"),
+    pygame.image.load("resources/sprites/goal_3.png"),
+]
 GOAL_SIZE: Vector2 = Vector2(10)
-GOAL_SPRITE: Surface = pygame.transform.scale(
-    GOAL_IMG, vec_to_screen(GOAL_SIZE)
-)
+GOAL_SPRITES: List[Surface] = list(map(
+    lambda img: pygame.transform.scale(img, vec_to_screen(GOAL_SIZE)),
+    GOAL_IMAGES
+))
 
 PLAYER_IMG: Surface = pygame.image.load("resources/sprites/player.png")
 PLAYER_SIZE: Vector2 = Vector2(8)
@@ -54,9 +59,7 @@ BEAM_DECREASE: float = 1 / \
        (BEAM_DURATION * FPS)  # beam deterioration at each frame in percentage
 
 BEAM_VECTOR_STEP: float = TILE_SIZE.x / 4
-BEAM_MAX_VECTOR_STEP: int = int(
-    Vector2(SCREEN_SIZE).length() / BEAM_VECTOR_STEP
-)
+BEAM_MAX_VECTOR_STEP: int = 140
 
 CURSOR_SPRITE: Surface = pygame.image.load("resources/sprites/cursor.png")
 CURSOR_SIZE: Tuple[int, int] = CURSOR_SPRITE.get_size()  # cursor size on screen

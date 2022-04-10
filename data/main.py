@@ -8,7 +8,7 @@ from pygame.time import Clock
 
 from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, \
     Beam
-from data.goal import display_goal
+from data.goal import display_goal, update_goal
 from data.utils import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
 from data.player import display_player, update_velocity, move_and_collide
 from data.utils.screen import SCREEN_SIZE
@@ -76,6 +76,7 @@ def main() -> None:
         if player.rect.colliderect(goal.rect):
             pygame.quit()
             quit()
+        goal = update_goal(goal)
 
         # -------
         # display

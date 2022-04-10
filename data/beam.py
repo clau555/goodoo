@@ -54,22 +54,24 @@ def update_beam(
     end: Vector2 = Vector2(start)
 
     step: Vector2 = tuple_to_pix(pygame.mouse.get_pos()) - start
-    step.scale_to_length(BEAM_VECTOR_STEP)
 
-    # increasing vector until it collides with a tile
-    end += step
-    collide: bool = False
-    for _ in range(BEAM_MAX_VECTOR_STEP):
+    if step.length() != 0:
+        step.scale_to_length(BEAM_VECTOR_STEP)
 
-        for tile in tiles:
-            if tile.rect.collidepoint(tuple(end)):
-                collide = True
+        # increasing vector until it collides with a tile
+        end += step
+        collide: bool = False
+        for _ in range(BEAM_MAX_VECTOR_STEP):
+
+            for tile in tiles:
+                if tile.rect.collidepoint(tuple(end)):
+                    collide = True
+                    break
+
+            if collide:
                 break
 
-        if collide:
-            break
-
-        end += step
+            end += step
 
     power: float = beam.power - BEAM_DECREASE * delta
     power = power if beam.power > 0 else 0  # clamp power to 0
