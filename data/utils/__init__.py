@@ -55,11 +55,8 @@ GRAVITY: Vector2 = Vector2(0, PLAYER_MAX_V / 75)
 
 BEAM_STRENGTH: float = PLAYER_MAX_V / 4  # beam impulse velocity length
 BEAM_DURATION: float = 0.3  # beam duration in seconds
-BEAM_DECREASE: float = 1 / \
-       (BEAM_DURATION * FPS)  # beam deterioration at each frame in percentage
-
+BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)
 BEAM_VECTOR_STEP: float = TILE_SIZE.x / 4
-BEAM_MAX_VECTOR_STEP: int = 140
 
 CURSOR_SPRITE: Surface = pygame.image.load("resources/sprites/cursor.png")
 CURSOR_SIZE: Tuple[int, int] = CURSOR_SPRITE.get_size()  # cursor size on screen

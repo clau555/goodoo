@@ -5,11 +5,11 @@ import pygame
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-from data.utils import BEAM_STRENGTH, RED, BEAM_DECREASE, \
-    BEAM_VECTOR_STEP, BEAM_MAX_VECTOR_STEP, TILE_EDGE, vec_to_screen
 from data.player import Player
-from data.utils.screen import tuple_to_pix
 from data.tile import Tile
+from data.utils import BEAM_STRENGTH, RED, BEAM_DECREASE, \
+    BEAM_VECTOR_STEP, TILE_EDGE, vec_to_screen
+from data.utils.screen import tuple_to_pix, is_inside_screen
 
 
 @dataclass(frozen=True)
@@ -58,18 +58,16 @@ def update_beam(
     if step.length() != 0:
         step.scale_to_length(BEAM_VECTOR_STEP)
 
-        # increasing vector until it collides with a tile
         end += step
         collide: bool = False
-        for _ in range(BEAM_MAX_VECTOR_STEP):
+
+        # increasing vector until it collides with a tile or goes out of screen
+        while not collide and is_inside_screen(end):
 
             for tile in tiles:
                 if tile.rect.collidepoint(tuple(end)):
                     collide = True
                     break
-
-            if collide:
-                break
 
             end += step
 

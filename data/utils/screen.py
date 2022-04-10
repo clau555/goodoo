@@ -37,3 +37,13 @@ def tuple_to_pix(pos: Tuple[int, int]) -> Vector2:
     :return: model coordinates
     """
     return Vector2(pos[0] / PIX_TO_SCREEN, pos[1] / PIX_TO_SCREEN)
+
+
+def is_inside_screen(pos: Vector2) -> bool:
+    """
+    Checks if a position is inside the screen.
+
+    :param pos: position to check
+    :return: True if inside screen, False otherwise
+    """
+    return 0 <= pos.x < SCREEN_SIZE[0] and 0 <= pos.y < SCREEN_SIZE[1]
