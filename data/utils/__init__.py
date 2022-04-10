@@ -9,28 +9,20 @@ from data.utils.screen import vec_to_screen, SCREEN_SIZE
 TILE_IMG: Surface = pygame.image.load("resources/sprites/tile.png")
 TILE_SIZE: Vector2 = Vector2(12)
 TILE_SPRITE_SIZE: Vector2 = Vector2(14)
-TILE_SPRITE: Surface = pygame.transform.scale(
-    TILE_IMG, vec_to_screen(TILE_SPRITE_SIZE)
-)
+TILE_SPRITE: Surface = pygame.transform.scale(TILE_IMG, vec_to_screen(TILE_SPRITE_SIZE))
 TILE_EDGE = vec_to_screen(TILE_SIZE)[0]  # screen length of a tile rect
 
 GROUND_IMG: Surface = pygame.image.load("resources/sprites/ground.png")
 GROUND_SPRITE_SIZE: Vector2 = Vector2(16)
-GROUND_SPRITE: Surface = pygame.transform.scale(
-    GROUND_IMG, vec_to_screen(GROUND_SPRITE_SIZE)
-)
+GROUND_SPRITE: Surface = pygame.transform.scale(GROUND_IMG, vec_to_screen(GROUND_SPRITE_SIZE))
 
 PILLAR_TOP_IMG: Surface = pygame.image.load("resources/sprites/pillar_top.png")
 PILLAR_TOP_SPRITE_SIZE: Vector2 = Vector2(16)
-PILLAR_TOP_SPRITE: Surface = pygame.transform.scale(
-    PILLAR_TOP_IMG, vec_to_screen(PILLAR_TOP_SPRITE_SIZE)
-)
+PILLAR_TOP_SPRITE: Surface = pygame.transform.scale(PILLAR_TOP_IMG, vec_to_screen(PILLAR_TOP_SPRITE_SIZE))
 
 PILLAR_IMG: Surface = pygame.image.load("resources/sprites/pillar.png")
 PILLAR_SPRITE_SIZE: Vector2 = Vector2(12)
-PILLAR_SPRITE: Surface = pygame.transform.scale(
-    PILLAR_IMG, vec_to_screen(PILLAR_SPRITE_SIZE)
-)
+PILLAR_SPRITE: Surface = pygame.transform.scale(PILLAR_IMG, vec_to_screen(PILLAR_SPRITE_SIZE))
 
 GOAL_IMAGES: List[Surface] = [
     pygame.image.load("resources/sprites/goal_1.png"),
@@ -45,9 +37,7 @@ GOAL_SPRITES: List[Surface] = list(map(
 
 PLAYER_IMG: Surface = pygame.image.load("resources/sprites/player.png")
 PLAYER_SIZE: Vector2 = Vector2(8)
-PLAYER_SPRITE: Surface = pygame.transform.scale(
-    PLAYER_IMG, vec_to_screen(PLAYER_SIZE)
-)
+PLAYER_SPRITE: Surface = pygame.transform.scale(PLAYER_IMG, vec_to_screen(PLAYER_SIZE))
 PLAYER_MAX_V: int = TILE_SIZE.x - 1
 
 FPS: int = 60

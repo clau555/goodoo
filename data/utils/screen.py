@@ -4,7 +4,7 @@ from pygame import Vector2
 
 
 RESOLUTIONS: List[Tuple[int, int]] = [(1920, 1080), (1280, 720), (960, 540)]
-SCREEN_SIZE: Tuple[int, int] = RESOLUTIONS[0]
+SCREEN_SIZE: Tuple[int, int] = RESOLUTIONS[2]
 WORLD_SIZE: Tuple[int, int] = 384, 216  # world size in pixels
 PIX_TO_SCREEN: float = SCREEN_SIZE[0] / WORLD_SIZE[0]
 

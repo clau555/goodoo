@@ -9,10 +9,9 @@ from pygame.surface import Surface
 from data.goal import Goal
 from data.player import Player
 from data.tile import Tile
-from data.utils import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, \
-    TILE_SPRITE, GROUND_SPRITE, GROUND_SPRITE_SIZE, TILE_SPRITE_SIZE, \
-    GOAL_SIZE, GREY, PILLAR_TOP_SPRITE_SIZE, PILLAR_TOP_SPRITE, \
-    PILLAR_SPRITE_SIZE, PILLAR_SPRITE
+from data.utils import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, TILE_SPRITE, GROUND_SPRITE, \
+    GROUND_SPRITE_SIZE, TILE_SPRITE_SIZE, GOAL_SIZE, GREY, PILLAR_TOP_SPRITE_SIZE, \
+    PILLAR_TOP_SPRITE, PILLAR_SPRITE_SIZE, PILLAR_SPRITE
 
 Grid = List[List[Optional[Tile]]]
 
@@ -71,46 +70,25 @@ def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
             if color_comparison(rgb, GREY):
                 # rock tiles
                 if j > 0 and not tile_grid[i][j - 1]:
-                    tile_grid[i][j] = Tile(
-                        Rect(pos, TILE_SIZE),
-                        GROUND_SPRITE,
-                        GROUND_SPRITE_SIZE
-                    )
+                    tile_grid[i][j] = Tile(Rect(pos, TILE_SIZE), GROUND_SPRITE, GROUND_SPRITE_SIZE)
                 else:
-                    tile_grid[i][j] = Tile(
-                        Rect(pos, TILE_SIZE),
-                        TILE_SPRITE,
-                        TILE_SPRITE_SIZE
-                    )
+                    tile_grid[i][j] = Tile(Rect(pos, TILE_SIZE), TILE_SPRITE, TILE_SPRITE_SIZE)
 
             if color_comparison(rgb, WHITE):
                 # pillar tiles
                 if j > 0 and not tile_grid[i][j - 1]:
-                    tile_grid[i][j] = Tile(
-                        Rect(pos, TILE_SIZE),
-                        PILLAR_TOP_SPRITE,
-                        PILLAR_TOP_SPRITE_SIZE
-
-                    )
+                    tile_grid[i][j] = Tile(Rect(pos, TILE_SIZE), PILLAR_TOP_SPRITE, PILLAR_TOP_SPRITE_SIZE)
                 else:
-                    tile_grid[i][j] = Tile(
-                        Rect(pos, TILE_SIZE),
-                        PILLAR_SPRITE,
-                        PILLAR_SPRITE_SIZE
-                    )
+                    tile_grid[i][j] = Tile(Rect(pos, TILE_SIZE), PILLAR_SPRITE, PILLAR_SPRITE_SIZE)
 
             elif color_comparison(rgb, BLUE) and not player:
                 # spawn position at the center of the tile
-                pos = idx.elementwise() * TILE_SIZE \
-                               + TILE_SIZE // 2 \
-                               - PLAYER_SIZE // 2
+                pos = idx.elementwise() * TILE_SIZE + TILE_SIZE // 2 - PLAYER_SIZE // 2
                 player = Player(Rect(pos, PLAYER_SIZE))
 
             elif color_comparison(rgb, RED) and not goal:
                 # goal at the center of the tile
-                pos = idx.elementwise() * TILE_SIZE \
-                               + TILE_SIZE // 2 \
-                               - GOAL_SIZE // 2
+                pos = idx.elementwise() * TILE_SIZE + TILE_SIZE // 2 - GOAL_SIZE // 2
                 goal = Goal(Rect(pos, TILE_SIZE))
 
     if not player:
@@ -124,18 +102,27 @@ def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
 def get_grid_tiles(tile_grid: Grid) -> List[Tile]:
     """
     Returns the list of all the non-null tiles in the grid.
+    All tiles representing pillars are placed at the end of the list
+    for them to be rendered last.
 
     :param tile_grid: world grid
     :return: tile objects of the world
     """
     tiles: List[Tile] = []
+    pillars: List[Tile] = []
 
-    for i in range(GRID_WIDTH):
-        for j in range(GRID_HEIGHT):
+    for j in range(GRID_HEIGHT):
+        for i in range(GRID_WIDTH):
 
-            if tile_grid[i][j]:
-                tiles.append(tile_grid[i][j])
+            tile: Tile = tile_grid[i][j]
 
+            if tile:
+                if tile.sprite == PILLAR_SPRITE or tile.sprite == PILLAR_TOP_SPRITE:
+                    pillars.append(tile)
+                else:
+                    tiles.append(tile)
+
+    tiles.extend(pillars)
     return tiles
 
 
@@ -152,8 +139,7 @@ def get_neighbor_tiles(tile_grid: Grid, idx: Tuple[int, int]) -> List[Tile]:
     for i in range(idx[0] - 1, idx[0] + 2):
         for j in range(idx[1] - 1, idx[1] + 2):
 
-            if 0 <= i < GRID_WIDTH and 0 <= j < GRID_HEIGHT \
-                    and tile_grid[i][j]:
+            if 0 <= i < GRID_WIDTH and 0 <= j < GRID_HEIGHT and tile_grid[i][j]:
                 tiles.append(tile_grid[i][j])
 
     return tiles

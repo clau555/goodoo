@@ -6,20 +6,18 @@ from pygame.math import Vector2
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, \
-    Beam
+from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, Beam
 from data.goal import display_goal, update_goal
 from data.utils import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
 from data.player import display_player, update_velocity, move_and_collide
 from data.utils.screen import SCREEN_SIZE
 from data.tile import display_tile, Tile
-from data.utils.grid import init_world, get_grid_tiles, get_neighbor_tiles, \
-    get_grid_index
+from data.utils.grid import init_world, get_grid_tiles, get_neighbor_tiles, get_grid_index
 
 
 def main() -> None:
     pygame.init()
-    pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN | pygame.SCALED)
+    pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Data Oriented Goodoo")
     pygame.mouse.set_visible(False)
 
