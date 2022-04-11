@@ -95,7 +95,3 @@ def main() -> None:
 
         pygame.display.flip()
         clock.tick(FPS)
-
-
-if __name__ == "__main__":
-    main()
