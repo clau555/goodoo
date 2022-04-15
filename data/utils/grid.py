@@ -9,9 +9,9 @@ from pygame.surface import Surface
 from data.goal import Goal
 from data.player import Player
 from data.tile import Tile
-from data.utils import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, TILE_SPRITE, GROUND_SPRITE, \
-    GROUND_SPRITE_SIZE, TILE_SPRITE_SIZE, GOAL_SIZE, GREY, PILLAR_TOP_SPRITE_SIZE, \
-    PILLAR_TOP_SPRITE, PILLAR_SPRITE_SIZE, PILLAR_SPRITE
+from data.utils.constants import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, TILE_SPRITE, GROUND_SPRITE, \
+    GROUND_SPRITE_SIZE, TILE_SPRITE_SIZE, GOAL_SIZE, GREY, PILLAR_TOP_SPRITE_SIZE, PILLAR_TOP_SPRITE, \
+    PILLAR_SPRITE_SIZE, PILLAR_SPRITE
 
 Grid = List[List[Optional[Tile]]]
 

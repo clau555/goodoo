@@ -3,7 +3,7 @@ from dataclasses import dataclass, replace
 from pygame import Rect, Vector2
 from pygame.surface import Surface
 
-from data.utils import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE
+from data.utils.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE
 from data.tile import Tile
 from data.utils.screen import world_to_screen
 

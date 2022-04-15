@@ -4,7 +4,7 @@ from pygame.math import Vector2
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.utils import TILE_SIZE
+from data.utils.constants import TILE_SIZE
 from data.utils.screen import world_to_screen
 
 

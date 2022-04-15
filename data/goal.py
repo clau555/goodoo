@@ -4,7 +4,7 @@ from typing import List
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.utils import GOAL_SPRITES
+from data.utils.constants import GOAL_SPRITES
 from data.utils.screen import world_to_screen
 
 

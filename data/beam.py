@@ -7,7 +7,7 @@ from pygame.surface import Surface
 
 from data.player import Player
 from data.tile import Tile
-from data.utils import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
+from data.utils.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
 from data.utils.screen import screen_to_world, is_inside_screen, world_to_screen
 
 
