@@ -1,42 +1,32 @@
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 from pygame import Vector2
 
 
 RESOLUTIONS: List[Tuple[int, int]] = [(1920, 1080), (1280, 720), (960, 540)]
-SCREEN_SIZE: Tuple[int, int] = RESOLUTIONS[2]
+SCREEN_SIZE: Tuple[int, int] = RESOLUTIONS[0]
 WORLD_SIZE: Tuple[int, int] = 384, 216  # world size in pixels
-PIX_TO_SCREEN: float = SCREEN_SIZE[0] / WORLD_SIZE[0]
+WORLD_TO_SCREEN: float = SCREEN_SIZE[0] / WORLD_SIZE[0]
 
 
-def vec_to_screen(pos: Vector2) -> Tuple[int, int]:
+def world_to_screen(pos: Union[Tuple[int, int], Vector2]) -> Tuple[int, int]:
     """
-    Converts a vector to screen coordinates.
-
-    :param pos: vector to convert
-    :return: screen coordinates
-    """
-    return int(pos.x * PIX_TO_SCREEN), int(pos.y * PIX_TO_SCREEN)
-
-
-def tuple_to_screen(pos: Tuple[int, int]) -> Tuple[int, int]:
-    """
-    Converts a tuple to screen coordinates.
+    Converts a world position to screen coordinates.
 
     :param pos: tuple to convert
     :return: screen coordinates
     """
-    return int(pos[0] * PIX_TO_SCREEN), int(pos[1] * PIX_TO_SCREEN)
+    return int(pos[0] * WORLD_TO_SCREEN), int(pos[1] * WORLD_TO_SCREEN)
 
 
-def tuple_to_pix(pos: Tuple[int, int]) -> Vector2:
+def screen_to_world(pos: Union[Tuple[int, int], Vector2]) -> Tuple[int, int]:
     """
-    Converts a tuple to model coordinates.
+    Converts a screen position to world coordinates.
 
     :param pos: tuple to convert
-    :return: model coordinates
+    :return: world coordinates
     """
-    return Vector2(pos[0] / PIX_TO_SCREEN, pos[1] / PIX_TO_SCREEN)
+    return int(pos[0] / WORLD_TO_SCREEN), int(pos[1] / WORLD_TO_SCREEN)
 
 
 def is_inside_screen(pos: Vector2) -> bool:

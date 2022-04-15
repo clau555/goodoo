@@ -5,7 +5,7 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 
 from data.utils import GOAL_SPRITES
-from data.utils.screen import tuple_to_screen
+from data.utils.screen import world_to_screen
 
 
 @dataclass(frozen=True)
@@ -24,5 +24,5 @@ def update_goal(goal: Goal) -> Goal:
 def display_goal(goal: Goal, screen: Surface) -> None:
     screen.blit(
         goal.sprites[int(goal.current_sprite)],
-        tuple_to_screen(goal.rect.topleft)
+        world_to_screen(goal.rect.topleft)
     )

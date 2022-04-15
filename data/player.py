@@ -5,7 +5,7 @@ from pygame.surface import Surface
 
 from data.utils import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE
 from data.tile import Tile
-from data.utils.screen import tuple_to_screen
+from data.utils.screen import world_to_screen
 
 
 @dataclass(frozen=True)
@@ -23,7 +23,7 @@ def display_player(player: Player, screen: Surface) -> None:
     :param player: player object
     :param screen: screen surface
     """
-    screen.blit(player.sprite, tuple_to_screen(player.rect.topleft))
+    screen.blit(player.sprite, world_to_screen(player.rect.topleft))
 
 
 def update_velocity(player: Player, beam_velocity: Vector2) -> Player:
@@ -63,9 +63,10 @@ def move_and_collide(
     on_ground: bool = False
     v: Vector2 = Vector2(player.velocity)
 
-    # x movement and collision
+    # x movement clipped to world pixels
     rect.x += int(v.x * delta)
 
+    # x collision
     for tile in tiles:
         if rect.colliderect(tile.rect):
 
@@ -79,9 +80,10 @@ def move_and_collide(
                 v.x = 0
                 break
 
-    # y movement and collision
+    # y movement clipped to world pixels
     rect.y += int(v.y * delta)
 
+    # y collisions
     for tile in tiles:
         if rect.colliderect(tile.rect):
 

@@ -7,9 +7,8 @@ from pygame.surface import Surface
 
 from data.player import Player
 from data.tile import Tile
-from data.utils import BEAM_STRENGTH, RED, BEAM_DECREASE, \
-    BEAM_VECTOR_STEP, TILE_EDGE, vec_to_screen
-from data.utils.screen import tuple_to_pix, is_inside_screen
+from data.utils import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
+from data.utils.screen import screen_to_world, is_inside_screen, world_to_screen
 
 
 @dataclass(frozen=True)
@@ -29,8 +28,8 @@ def display_beam(beam: Beam, screen: Surface) -> None:
     pygame.draw.line(
         screen,
         RED,
-        vec_to_screen(beam.start),
-        vec_to_screen(beam.end),
+        world_to_screen(beam.start),
+        world_to_screen(beam.end),
         int(beam.power * TILE_EDGE / 2)
     )
 
@@ -53,7 +52,7 @@ def update_beam(
     start: Vector2 = Vector2(player.rect.center)
     end: Vector2 = Vector2(start)
 
-    step: Vector2 = tuple_to_pix(pygame.mouse.get_pos()) - start
+    step: Vector2 = screen_to_world(pygame.mouse.get_pos()) - start
 
     if step.length() != 0:
         step.scale_to_length(BEAM_VECTOR_STEP)
@@ -97,6 +96,7 @@ def get_beam_velocity(beam: Beam) -> Vector2:
     """
     if beam.power > 0:
         v: Vector2 = beam.start - beam.end
-        v.scale_to_length(BEAM_STRENGTH)
-        return v
+        if v.length() != 0:
+            v.scale_to_length(BEAM_STRENGTH)
+            return v
     return Vector2(0)

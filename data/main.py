@@ -10,14 +10,14 @@ from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, B
 from data.goal import display_goal, update_goal
 from data.utils import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
 from data.player import display_player, update_velocity, move_and_collide
-from data.utils.screen import SCREEN_SIZE
+from data.utils.screen import SCREEN_SIZE, screen_to_world, WORLD_TO_SCREEN
 from data.tile import display_tile, Tile
 from data.utils.grid import init_world, get_grid_tiles, get_neighbor_tiles, get_grid_index
 
 
 def main() -> None:
     pygame.init()
-    pygame.display.set_mode(SCREEN_SIZE)
+    pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN | pygame.SCALED)
     pygame.display.set_caption("Data Oriented Goodoo")
     pygame.mouse.set_visible(False)
 
@@ -30,9 +30,19 @@ def main() -> None:
 
     on_ground: bool = False
 
+    click: bool
+    input_v: Vector2
+
+    delta: float
+    last_time: float
+
+    neighbor_tiles: List[Tile]
+    cursor_screen_pos: Vector2
+    screen: Surface
+
     while True:
 
-        click: bool = False
+        click = False
 
         for event in pygame.event.get():
 
@@ -53,8 +63,8 @@ def main() -> None:
         if player.on_ground:
             on_ground = True
 
-        delta: float = (time.time() - last_time) * FPS
-        last_time: float = time.time()
+        delta = (time.time() - last_time) * FPS
+        last_time = time.time()
 
         # ------------
         # Model update
@@ -64,13 +74,16 @@ def main() -> None:
         if click and on_ground:
             beam = fire_beam(beam)
             on_ground = False
-        input_v: Vector2 = get_beam_velocity(beam)
+        input_v = get_beam_velocity(beam)
 
+        # player movement and collisions
         player = update_velocity(player, input_v)
-        neighbor_tiles: List[Tile] = get_neighbor_tiles(
+        neighbor_tiles = get_neighbor_tiles(
             tile_grid, get_grid_index(player.rect)
         )
         player = move_and_collide(player, neighbor_tiles, delta)
+
+        # game ends if goal is reached
         if player.rect.colliderect(goal.rect):
             pygame.quit()
             quit()
@@ -80,17 +93,20 @@ def main() -> None:
         # display
         # -------
 
-        screen: Surface = pygame.display.get_surface()
+        screen = pygame.display.get_surface()
         screen.fill(BLACK)
 
         display_goal(goal, screen)
         display_beam(beam, screen)
         display_player(player, screen)
+
         for tile in tiles:
             display_tile(tile, screen)
+
+        cursor_screen_pos = Vector2(pygame.mouse.get_pos()) - Vector2(CURSOR_SIZE) * 0.5
         screen.blit(
             CURSOR_SPRITE,
-            Vector2(pygame.mouse.get_pos()) - Vector2(CURSOR_SIZE) * 0.5
+            Vector2(screen_to_world(cursor_screen_pos)).elementwise() * WORLD_TO_SCREEN
         )
 
         pygame.display.flip()

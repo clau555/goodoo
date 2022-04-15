@@ -5,7 +5,7 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 
 from data.utils import TILE_SIZE
-from data.utils.screen import tuple_to_screen
+from data.utils.screen import world_to_screen
 
 
 @dataclass(frozen=True)
@@ -23,4 +23,4 @@ def display_tile(tile: Tile, screen: Surface) -> None:
     :param screen: screen surface
     """
     offset_pos = tile.rect.topleft - (tile.sprite_size - TILE_SIZE) // 2
-    screen.blit(tile.sprite, tuple_to_screen(offset_pos))
+    screen.blit(tile.sprite, world_to_screen(offset_pos))
