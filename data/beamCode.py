@@ -1,61 +1,50 @@
-from dataclasses import dataclass, replace
-from typing import List
+from dataclasses import replace
 
 import pygame
-from pygame.math import Vector2
+from numpy import ndarray, array
+from numpy.linalg import linalg
 from pygame.surface import Surface
 
-from data.player import Player
-from data.tile import Tile
+from data.beamData import Beam
+from data.playerData import Player
+from data.tileData import Tile
 from data.utils.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
+from data.utils.math import scale
 from data.utils.screen import screen_to_world, is_inside_screen, world_to_screen
-
-
-@dataclass(frozen=True)
-class Beam:
-    start: Vector2 = Vector2(0)
-    end: Vector2 = Vector2(0)
-    power: float = 0.0
 
 
 def display_beam(beam: Beam, screen: Surface) -> None:
     """
     Displays the beam on the screen.
 
-    :param beam: beam object
+    :param beam: beam data
     :param screen: screen surface
     """
     pygame.draw.line(
         screen,
         RED,
-        world_to_screen(beam.start),
-        world_to_screen(beam.end),
+        tuple(world_to_screen(beam.start)),
+        tuple(world_to_screen(beam.end)),
         int(beam.power * TILE_EDGE / 2)
     )
 
 
-def update_beam(
-    beam: Beam,
-    player: Player,
-    tiles: List[Tile],
-    delta: float
-) -> Beam:
+def update_beam(beam: Beam, player: Player, tiles: "ndarray[Tile]", delta: float) -> Beam:
     """
     Updates the beam, decreasing its power and setting its start and end points.
 
-    :param beam: beam object
-    :param player: player object
-    :param tiles: list of tile objects
+    :param beam: beam data
+    :param player: player data
+    :param tiles: list of tile data
     :param delta: delta time
-    :return: updated beam object
+    :return: updated beam data
     """
-    start: Vector2 = Vector2(player.rect.center)
-    end: Vector2 = Vector2(start)
+    start: ndarray = array(player.rect.center).astype(float)
+    end: ndarray = array(start)
+    step: ndarray = screen_to_world(array(pygame.mouse.get_pos())) - start
 
-    step: Vector2 = screen_to_world(pygame.mouse.get_pos()) - start
-
-    if step.length() != 0:
-        step.scale_to_length(BEAM_VECTOR_STEP)
+    if linalg.norm(step) != 0:
+        step = scale(step, BEAM_VECTOR_STEP)
 
         end += step
         collide: bool = False
@@ -80,23 +69,23 @@ def fire_beam(beam: Beam) -> Beam:
     """
     Fires the beam, setting its power to the maximum.
 
-    :param beam: beam object
-    :return: updated beam object
+    :param beam: beam data
+    :return: updated beam data
     """
     return replace(beam, power=1)
 
 
-def get_beam_velocity(beam: Beam) -> Vector2:
+def get_beam_velocity(beam: Beam) -> ndarray:
     """
     Returns the velocity impulse the beam would give to the player.
     Returns a zero vector if the beam has no power left.
 
-    :param beam: beam object
-    :return: updated beam object
+    :param beam: beam data
+    :return: updated beam data
     """
     if beam.power > 0:
-        v: Vector2 = beam.start - beam.end
-        if v.length() != 0:
-            v.scale_to_length(BEAM_STRENGTH)
-            return v
-    return Vector2(0)
+        v: ndarray = beam.start - beam.end
+        if linalg.norm(v) != 0:
+            v = scale(v, BEAM_STRENGTH)
+            return array(v)
+    return array((0, 0))

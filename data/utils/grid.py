@@ -1,30 +1,26 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import pygame.image
-from pygame.math import Vector2
+from numpy import ndarray, array
 from pygame.pixelarray import PixelArray
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.goal import Goal
-from data.player import Player
-from data.tile import Tile
+from data.goalData import Goal
+from data.playerData import Player
+from data.tileData import Tile
 from data.utils.constants import BLUE, TILE_SIZE, PLAYER_SIZE, WHITE, RED, TILE_SPRITE, GROUND_SPRITE, \
     GROUND_SPRITE_SIZE, TILE_SPRITE_SIZE, GOAL_SIZE, GREY, PILLAR_TOP_SPRITE_SIZE, PILLAR_TOP_SPRITE, \
-    PILLAR_SPRITE_SIZE, PILLAR_SPRITE
+    PILLAR_SPRITE_SIZE, PILLAR_SPRITE, color
 
 Grid = List[List[Optional[Tile]]]
 
-GRID_SIZE: Tuple[int, int] = 32, 18  # world size in tiles
+GRID_SIZE: ndarray = array((32, 18))  # world size in tiles
 GRID_WIDTH: int = GRID_SIZE[0]
 GRID_HEIGHT: int = GRID_SIZE[1]
 
 
-def color_comparison(
-    color1: Tuple[int, int, int],
-    color2: Tuple[int, int, int],
-    margin: int = 10
-) -> bool:
+def color_comparison(color1: color, color2: color, margin: int = 10) -> bool:
     """
     Compares two colors and returns True if they are close enough.
 
@@ -33,9 +29,10 @@ def color_comparison(
     :param margin: maximum difference between colors
     :return: comparison result
     """
-    return color2[0] - margin <= color1[0] <= color2[0] + margin and \
-           color2[1] - margin <= color1[1] <= color2[1] + margin and \
-           color2[2] - margin <= color1[2] <= color2[2] + margin
+    return \
+        color2[0] - margin <= color1[0] <= color2[0] + margin and \
+        color2[1] - margin <= color1[1] <= color2[1] + margin and \
+        color2[2] - margin <= color1[2] <= color2[2] + margin
 
 
 def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
@@ -46,7 +43,7 @@ def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
     and a blue pixel representing the player spawn position.
 
     :param file_path: path to the image file
-    :return: the player object and the 2D array of tile objects
+    :return: player data and the 2D array of tile data
     """
     im: Surface = pygame.image.load(file_path)
     pixel_array: PixelArray = pygame.PixelArray(im)
@@ -63,9 +60,9 @@ def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
     for i in range(GRID_WIDTH):
         for j in range(GRID_HEIGHT):
 
-            idx: Vector2 = Vector2(i, j)
-            rgb: Tuple[int, int, int] = im.unmap_rgb(pixel_array[i, j])[0:3]
-            pos: Vector2 = idx.elementwise() * TILE_SIZE
+            idx: ndarray = array((i, j))
+            rgb: color = im.unmap_rgb(pixel_array[i, j])[0:3]
+            pos: ndarray = idx * TILE_SIZE
 
             if color_comparison(rgb, GREY):
                 # rock tiles
@@ -83,12 +80,12 @@ def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
 
             elif color_comparison(rgb, BLUE) and not player:
                 # spawn position at the center of the tile
-                pos = idx.elementwise() * TILE_SIZE + TILE_SIZE // 2 - PLAYER_SIZE // 2
-                player = Player(Rect(pos, PLAYER_SIZE))
+                pos = idx * TILE_SIZE + TILE_SIZE // 2 - PLAYER_SIZE // 2
+                player = Player(Rect(tuple(pos), tuple(PLAYER_SIZE)))
 
             elif color_comparison(rgb, RED) and not goal:
                 # goal at the center of the tile
-                pos = idx.elementwise() * TILE_SIZE + TILE_SIZE // 2 - GOAL_SIZE // 2
+                pos = idx * TILE_SIZE + TILE_SIZE // 2 - GOAL_SIZE // 2
                 goal = Goal(Rect(pos, TILE_SIZE))
 
     if not player:
@@ -99,14 +96,14 @@ def init_world(file_path: str) -> Tuple[Player, Goal, Grid]:
     return player, goal, tile_grid
 
 
-def get_grid_tiles(tile_grid: Grid) -> List[Tile]:
+def get_grid_tiles(tile_grid: Grid) -> "ndarray[Tile]":
     """
     Returns the list of all the non-null tiles in the grid.
     All tiles representing pillars are placed at the end of the list
     for them to be rendered last.
 
     :param tile_grid: world grid
-    :return: tile objects of the world
+    :return: world's tile data list
     """
     tiles: List[Tile] = []
     pillars: List[Tile] = []
@@ -123,10 +120,10 @@ def get_grid_tiles(tile_grid: Grid) -> List[Tile]:
                     tiles.append(tile)
 
     tiles.extend(pillars)
-    return tiles
+    return array(tiles)
 
 
-def get_neighbor_tiles(tile_grid: Grid, idx: Tuple[int, int]) -> List[Tile]:
+def get_neighbor_tiles(tile_grid: Grid, idx: ndarray) -> "ndarray[Tile]":
     """
     Returns the list of all the neighbor tiles of the given tile position.
 
@@ -142,14 +139,14 @@ def get_neighbor_tiles(tile_grid: Grid, idx: Tuple[int, int]) -> List[Tile]:
             if 0 <= i < GRID_WIDTH and 0 <= j < GRID_HEIGHT and tile_grid[i][j]:
                 tiles.append(tile_grid[i][j])
 
-    return tiles
+    return array(tiles)
 
 
-def get_grid_index(rect: Rect) -> Tuple[int, int]:
+def get_grid_index(rect: Rect) -> ndarray:
     """
     Returns the grid index of the given rectangle.
 
     :param rect: pygame rectangle
     :return: corresponding grid index
     """
-    return int(rect.centerx // TILE_SIZE.x), int(rect.centery // TILE_SIZE.y)
+    return rect.center // TILE_SIZE

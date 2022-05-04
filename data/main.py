@@ -1,18 +1,19 @@
 import time
-from typing import List
 
 import pygame
-from pygame.math import Vector2
+from numpy import ndarray, array
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.beam import update_beam, get_beam_velocity, fire_beam, display_beam, Beam
-from data.goal import display_goal, update_goal
+from data.beamCode import update_beam, fire_beam, get_beam_velocity, display_beam
+from data.beamData import Beam
+from data.goalCode import update_goal, display_goal
+from data.playerCode import update_velocity, move_and_collide, display_player
+from data.tileCode import display_tile
+from data.tileData import Tile
 from data.utils.constants import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
-from data.player import display_player, update_velocity, move_and_collide
-from data.utils.screen import SCREEN_SIZE, screen_to_world, WORLD_TO_SCREEN
-from data.tile import display_tile, Tile
 from data.utils.grid import init_world, get_grid_tiles, get_neighbor_tiles, get_grid_index
+from data.utils.screen import SCREEN_SIZE, screen_to_world, WORLD_TO_SCREEN
 
 
 def main() -> None:
@@ -22,7 +23,7 @@ def main() -> None:
     pygame.mouse.set_visible(False)
 
     player, goal, tile_grid = init_world("resources/maps/map1.jpg")
-    tiles: List[Tile] = get_grid_tiles(tile_grid)
+    tiles: "ndarray[Tile]" = get_grid_tiles(tile_grid)
     beam: Beam = Beam()
 
     clock: Clock = pygame.time.Clock()
@@ -31,13 +32,13 @@ def main() -> None:
     on_ground: bool = False
 
     click: bool
-    input_v: Vector2
+    input_v: ndarray
 
     delta: float
     last_time: float
 
-    neighbor_tiles: List[Tile]
-    cursor_screen_pos: Vector2
+    neighbor_tiles: "ndarray[Tile]"
+    cursor_screen_pos: ndarray
     screen: Surface
 
     while True:
@@ -74,13 +75,12 @@ def main() -> None:
         if click and on_ground:
             beam = fire_beam(beam)
             on_ground = False
+
         input_v = get_beam_velocity(beam)
 
         # player movement and collisions
         player = update_velocity(player, input_v)
-        neighbor_tiles = get_neighbor_tiles(
-            tile_grid, get_grid_index(player.rect)
-        )
+        neighbor_tiles = get_neighbor_tiles(tile_grid, get_grid_index(player.rect))
         player = move_and_collide(player, neighbor_tiles, delta)
 
         # game ends if goal is reached
@@ -103,11 +103,8 @@ def main() -> None:
         for tile in tiles:
             display_tile(tile, screen)
 
-        cursor_screen_pos = Vector2(pygame.mouse.get_pos()) - Vector2(CURSOR_SIZE) * 0.5
-        screen.blit(
-            CURSOR_SPRITE,
-            Vector2(screen_to_world(cursor_screen_pos)).elementwise() * WORLD_TO_SCREEN
-        )
+        cursor_screen_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
+        screen.blit(CURSOR_SPRITE, screen_to_world(cursor_screen_pos) * WORLD_TO_SCREEN)
 
         pygame.display.flip()
         clock.tick(FPS)
