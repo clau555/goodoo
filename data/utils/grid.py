@@ -75,11 +75,15 @@ def init_world(file_path: str) -> Tuple[ndarray, Player, Goal]:
 def get_grid_index(pos: ndarray) -> ndarray:
     """
     Returns the grid index of the given position.
+    Raise an exception if the position is outside the grid.
 
     :param pos: screen position
     :return: grid index
     """
-    return pos // TILE_SIZE
+    idx: ndarray = pos // TILE_SIZE
+    if not (0 <= idx[0] < GRID_WIDTH and 0 <= idx[1] < GRID_HEIGHT):
+        raise ValueError("Index out of bound.")
+    return idx
 
 
 def get_position(idx: ndarray) -> ndarray:

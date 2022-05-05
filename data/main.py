@@ -95,6 +95,7 @@ def main() -> None:
         display_beam(beam, screen)
         display_player(player, screen)
 
+        # TODO: optimize this
         for (i, j), tile in ndenumerate(tile_grid):
             if tile:
                 screen.blit(TILE_SPRITE, get_position(array((i, j))))
@@ -104,4 +105,4 @@ def main() -> None:
 
         pygame.display.flip()
         clock.tick(FPS)
-        print(clock.get_fps())
+        # print(clock.get_fps())
