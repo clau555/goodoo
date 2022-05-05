@@ -9,38 +9,40 @@ from pygame.surface import Surface
 from data.beamData import Beam
 from data.playerData import Player
 from data.utils.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
-from data.utils.utils import scale, is_inside_screen, get_grid_index
+from data.utils.utils import scale, pos_inside_screen, get_grid_index, pos_inside_grid
 
 
-def display_beam(beam: Beam, screen: Surface) -> None:
+def display_beam(beam: Beam, screen: Surface, camera_offset: ndarray) -> None:
     """
     Displays the beam on the screen.
 
     :param beam: beam data
     :param screen: screen surface
+    :param camera_offset: camera offset
     """
     pygame.draw.line(
         screen,
         RED,
-        tuple(beam.start),
-        tuple(beam.end),
+        tuple(beam.start) + camera_offset,
+        tuple(beam.end) + camera_offset,
         int(beam.power * TILE_EDGE / 2)
     )
 
 
-def update_beam(beam: Beam, player: Player, tile_grid: List, delta: float) -> Beam:
+def update_beam(beam: Beam, player: Player, tile_grid: List, camera_offset: ndarray, delta: float) -> Beam:
     """
     Updates the beam, decreasing its power and setting its start and end points.
 
     :param beam: beam data
     :param player: player data
     :param tile_grid: world grid
+    :param camera_offset: camera offset, used to calculate mouse position in world
     :param delta: delta time
     :return: updated beam data
     """
     start: ndarray = array(player.rect.center).astype(float)
     end: ndarray = array(start)
-    step: ndarray = array(pygame.mouse.get_pos()) - start
+    step: ndarray = array(pygame.mouse.get_pos()) - camera_offset - start
 
     if linalg.norm(step) != 0:
 
@@ -49,7 +51,7 @@ def update_beam(beam: Beam, player: Player, tile_grid: List, delta: float) -> Be
         end += step
 
         # increasing vector until it collides with a tile or goes out of screen
-        while not collide and is_inside_screen(end):
+        while not collide and pos_inside_screen(end, camera_offset) and pos_inside_grid(end):
 
             idx: ndarray = get_grid_index(end)
             if tile_grid[idx[0]][idx[1]]:

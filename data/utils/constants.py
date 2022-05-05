@@ -2,7 +2,7 @@ from typing import Tuple, List
 
 import pygame.image
 from numpy import array, ndarray
-from pygame import Surface
+from pygame import Surface, Rect
 
 
 def tupint(v: ndarray) -> Tuple[int, int]:
@@ -19,6 +19,7 @@ def tupint(v: ndarray) -> Tuple[int, int]:
 # screen
 RESOLUTIONS: ndarray = array(((1920, 1080), (1280, 720), (960, 540)))
 SCREEN_SIZE: ndarray = RESOLUTIONS[0]  # select resolution
+SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 
 # world grid
 GRID_SIZE: ndarray = array((32, 18))  # world size in tiles

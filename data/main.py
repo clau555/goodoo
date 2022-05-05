@@ -10,7 +10,7 @@ from data.beamData import Beam
 from data.goalCode import update_goal, display_goal
 from data.playerCode import update_velocity, move_and_collide, display_player
 from data.utils.constants import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE
-from data.utils.utils import init_world
+from data.utils.utils import init_world, rect_inside_screen
 
 
 def main() -> None:
@@ -27,19 +27,13 @@ def main() -> None:
 
     on_ground: bool = False
 
-    click: bool
-    input_v: ndarray
-
-    delta: float
-    last_time: float
-
-    neighbor_tiles: ndarray
-    cursor_pos: ndarray
-    screen: Surface
-
     while True:
 
-        click = False
+        # ------
+        # Events
+        # ------
+
+        click: bool = False
 
         for event in pygame.event.get():
 
@@ -55,24 +49,26 @@ def main() -> None:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 click = True
 
+        # ------------
+        # Model update
+        # ------------
+
+        delta: float = (time.time() - last_time) * FPS
+        last_time = time.time()
+
         # using an alternate variable rather than player.on_ground because
         # it keeps looping to true/false when on ground due to rect collision
         if player.on_ground:
             on_ground = True
 
-        delta = (time.time() - last_time) * FPS
-        last_time = time.time()
+        camera_offset: ndarray = -array(player.rect.center) + SCREEN_SIZE / 2
 
-        # ------------
-        # Model update
-        # ------------
-
-        beam = update_beam(beam, player, tile_grid, delta)
+        beam = update_beam(beam, player, tile_grid, camera_offset, delta)
         if click and on_ground:
             beam = fire_beam(beam)
             on_ground = False
 
-        input_v = get_beam_velocity(beam)
+        input_v: ndarray = get_beam_velocity(beam)
 
         # player movement and collisions
         player = update_velocity(player, input_v)
@@ -88,15 +84,16 @@ def main() -> None:
         # display
         # -------
 
-        screen = pygame.display.get_surface()
+        screen: Surface = pygame.display.get_surface()
         screen.fill(BLACK)
 
-        display_goal(goal, screen)
-        display_beam(beam, screen)
-        display_player(player, screen)
+        display_goal(goal, screen, camera_offset)
+        display_beam(beam, screen, camera_offset)
+        display_player(player, screen, camera_offset)
 
         for tile in non_empty_tiles:
-            screen.blit(tile.sprite, tile.rect.topleft)
+            if rect_inside_screen(tile.rect, camera_offset):
+                screen.blit(tile.sprite, tile.rect.topleft + camera_offset)
 
         cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
         screen.blit(CURSOR_SPRITE, cursor_pos)

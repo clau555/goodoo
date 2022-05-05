@@ -8,17 +8,18 @@ from pygame.surface import Surface
 
 from data.playerData import Player
 from data.utils.constants import GRAVITY, PLAYER_MAX_V
-from data.utils.utils import scale, get_grid_index, get_neighbor_tiles
+from data.utils.utils import scale, get_grid_index, get_neighbor_tiles, idx_inside_grid
 
 
-def display_player(player: Player, screen: Surface) -> None:
+def display_player(player: Player, screen: Surface, camera_offset: ndarray) -> None:
     """
     Displays the player's sprite on the screen.
 
     :param player: player data
     :param screen: screen surface
+    :param camera_offset: camera offset
     """
-    screen.blit(player.sprite, array(player.rect.topleft))
+    screen.blit(player.sprite, player.rect.topleft + camera_offset)
 
 
 def update_velocity(player: Player, beam_velocity: ndarray) -> Player:
@@ -57,6 +58,8 @@ def move_and_collide(player: Player, tile_grid: List, delta: float) -> Player:
 
     # getting neighbor tiles
     player_idx: ndarray = get_grid_index(array(player.rect.center))
+    if not idx_inside_grid(player_idx):
+        raise ValueError("Player out of bounds")
     neighbor_tiles: List = get_neighbor_tiles(tile_grid, player_idx)
 
     # x movement executes first
