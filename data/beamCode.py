@@ -7,10 +7,9 @@ from pygame.surface import Surface
 
 from data.beamData import Beam
 from data.playerData import Player
-from data.tileData import Tile
 from data.utils.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
-from data.utils.math import scale
-from data.utils.screen import screen_to_world, is_inside_screen, world_to_screen
+from data.utils.grid import get_grid_index, is_empty
+from data.utils.utils import scale, is_inside_screen
 
 
 def display_beam(beam: Beam, screen: Surface) -> None:
@@ -23,13 +22,13 @@ def display_beam(beam: Beam, screen: Surface) -> None:
     pygame.draw.line(
         screen,
         RED,
-        tuple(world_to_screen(beam.start)),
-        tuple(world_to_screen(beam.end)),
+        tuple(beam.start),
+        tuple(beam.end),
         int(beam.power * TILE_EDGE / 2)
     )
 
 
-def update_beam(beam: Beam, player: Player, tiles: "ndarray[Tile]", delta: float) -> Beam:
+def update_beam(beam: Beam, player: Player, tiles: ndarray, delta: float) -> Beam:
     """
     Updates the beam, decreasing its power and setting its start and end points.
 
@@ -41,21 +40,19 @@ def update_beam(beam: Beam, player: Player, tiles: "ndarray[Tile]", delta: float
     """
     start: ndarray = array(player.rect.center).astype(float)
     end: ndarray = array(start)
-    step: ndarray = screen_to_world(array(pygame.mouse.get_pos())) - start
+    step: ndarray = array(pygame.mouse.get_pos()) - start
 
     if linalg.norm(step) != 0:
-        step = scale(step, BEAM_VECTOR_STEP)
 
-        end += step
         collide: bool = False
+        step = scale(step, BEAM_VECTOR_STEP)
+        end += step
 
         # increasing vector until it collides with a tile or goes out of screen
         while not collide and is_inside_screen(end):
 
-            for tile in tiles:
-                if tile.rect.collidepoint(tuple(end)):
-                    collide = True
-                    break
+            if not is_empty(tiles, get_grid_index(end)):
+                collide = True
 
             end += step
 

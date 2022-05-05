@@ -1,7 +1,7 @@
 import time
 
 import pygame
-from numpy import ndarray, array
+from numpy import ndarray, array, ndenumerate
 from pygame.surface import Surface
 from pygame.time import Clock
 
@@ -9,11 +9,8 @@ from data.beamCode import update_beam, fire_beam, get_beam_velocity, display_bea
 from data.beamData import Beam
 from data.goalCode import update_goal, display_goal
 from data.playerCode import update_velocity, move_and_collide, display_player
-from data.tileCode import display_tile
-from data.tileData import Tile
-from data.utils.constants import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE
-from data.utils.grid import init_world, get_grid_tiles, get_neighbor_tiles, get_grid_index
-from data.utils.screen import SCREEN_SIZE, screen_to_world, WORLD_TO_SCREEN
+from data.utils.constants import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE, TILE_SPRITE
+from data.utils.grid import init_world, get_position
 
 
 def main() -> None:
@@ -22,8 +19,7 @@ def main() -> None:
     pygame.display.set_caption("Data Oriented Goodoo")
     pygame.mouse.set_visible(False)
 
-    player, goal, tile_grid = init_world("resources/maps/map1.jpg")
-    tiles: "ndarray[Tile]" = get_grid_tiles(tile_grid)
+    tile_grid, player, goal = init_world("resources/maps/map1.jpg")
     beam: Beam = Beam()
 
     clock: Clock = pygame.time.Clock()
@@ -37,8 +33,8 @@ def main() -> None:
     delta: float
     last_time: float
 
-    neighbor_tiles: "ndarray[Tile]"
-    cursor_screen_pos: ndarray
+    neighbor_tiles: ndarray
+    cursor_pos: ndarray
     screen: Surface
 
     while True:
@@ -71,7 +67,7 @@ def main() -> None:
         # Model update
         # ------------
 
-        beam = update_beam(beam, player, tiles, delta)
+        beam = update_beam(beam, player, tile_grid, delta)
         if click and on_ground:
             beam = fire_beam(beam)
             on_ground = False
@@ -80,8 +76,7 @@ def main() -> None:
 
         # player movement and collisions
         player = update_velocity(player, input_v)
-        neighbor_tiles = get_neighbor_tiles(tile_grid, get_grid_index(player.rect))
-        player = move_and_collide(player, neighbor_tiles, delta)
+        player = move_and_collide(player, tile_grid, delta)
 
         # game ends if goal is reached
         if player.rect.colliderect(goal.rect):
@@ -100,11 +95,13 @@ def main() -> None:
         display_beam(beam, screen)
         display_player(player, screen)
 
-        for tile in tiles:
-            display_tile(tile, screen)
+        for (i, j), tile in ndenumerate(tile_grid):
+            if tile:
+                screen.blit(TILE_SPRITE, get_position(array((i, j))))
 
-        cursor_screen_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
-        screen.blit(CURSOR_SPRITE, screen_to_world(cursor_screen_pos) * WORLD_TO_SCREEN)
+        cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
+        screen.blit(CURSOR_SPRITE, cursor_pos)
 
         pygame.display.flip()
         clock.tick(FPS)
+        print(clock.get_fps())

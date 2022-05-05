@@ -1,16 +1,16 @@
-from typing import Tuple
-
 from numpy import ndarray, sqrt, sum
 
+from data.utils.constants import SCREEN_SIZE
 
-def tupint(v: ndarray) -> Tuple[int, int]:
+
+def is_inside_screen(pos: ndarray) -> bool:
     """
-    Converts a numpy vector to a tuple of ints.
-    
-    :param v: 2D numpy array
-    :return: tuple of ints
+    Checks if a position is inside the screen.
+
+    :param pos: screen position to check
+    :return: True if inside screen, False otherwise
     """
-    return int(v[0]), int(v[1])
+    return (0 <= pos).all() and (pos < SCREEN_SIZE).all()
 
 
 def scale(v: ndarray, length: float) -> ndarray:
