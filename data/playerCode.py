@@ -8,8 +8,7 @@ from pygame.surface import Surface
 
 from data.playerData import Player
 from data.utils.constants import GRAVITY, PLAYER_MAX_V
-from data.utils.grid import get_grid_index, get_neighbor_tiles
-from data.utils.utils import scale
+from data.utils.utils import scale, get_grid_index, get_neighbor_tiles
 
 
 def display_player(player: Player, screen: Surface) -> None:

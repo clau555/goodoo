@@ -9,8 +9,7 @@ from pygame.surface import Surface
 from data.beamData import Beam
 from data.playerData import Player
 from data.utils.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
-from data.utils.grid import get_grid_index
-from data.utils.utils import scale, is_inside_screen
+from data.utils.utils import scale, is_inside_screen, get_grid_index
 
 
 def display_beam(beam: Beam, screen: Surface) -> None:

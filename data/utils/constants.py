@@ -28,7 +28,7 @@ GRID_HEIGHT: int = GRID_SIZE[1]
 # tile
 TILE_EDGE: int = SCREEN_SIZE[0] // GRID_WIDTH
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
-TILE_IMG: Surface = pygame.image.load("resources/sprites/test.png")
+TILE_IMG: Surface = pygame.image.load("resources/sprites/tile.png")
 TILE_SPRITE: Surface = pygame.transform.scale(TILE_IMG, tupint(TILE_SIZE))
 
 # goal tile

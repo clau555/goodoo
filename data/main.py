@@ -10,7 +10,7 @@ from data.beamData import Beam
 from data.goalCode import update_goal, display_goal
 from data.playerCode import update_velocity, move_and_collide, display_player
 from data.utils.constants import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE
-from data.utils.grid import init_world
+from data.utils.utils import init_world
 
 
 def main() -> None:
