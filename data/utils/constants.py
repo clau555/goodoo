@@ -8,6 +8,7 @@ from pygame import Surface
 def tupint(v: ndarray) -> Tuple[int, int]:
     """
     Converts a numpy vector to a tuple of ints.
+    It's needed because some pygame functions require tuples of ints.
 
     :param v: 2D numpy array
     :return: tuple of ints
@@ -64,9 +65,8 @@ BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)
 BEAM_VECTOR_STEP: float = TILE_EDGE / 3
 
 # colors
-color = Tuple[int, int, int]
-WHITE: color = (255, 255, 255)
-BLACK: color = (0, 0, 0)
-GREY: color = (128, 128, 128)
-BLUE: color = (0, 0, 255)
-RED: color = (250, 0, 0)
+WHITE: ndarray = array((255, 255, 255))
+BLACK: ndarray = array((0, 0, 0))
+GREY: ndarray = array((128, 128, 128))
+BLUE: ndarray = array((0, 0, 255))
+RED: ndarray = array((250, 0, 0))

@@ -1,7 +1,7 @@
 import time
 
 import pygame
-from numpy import ndarray, array, ndenumerate
+from numpy import ndarray, array
 from pygame.surface import Surface
 from pygame.time import Clock
 
@@ -9,8 +9,8 @@ from data.beamCode import update_beam, fire_beam, get_beam_velocity, display_bea
 from data.beamData import Beam
 from data.goalCode import update_goal, display_goal
 from data.playerCode import update_velocity, move_and_collide, display_player
-from data.utils.constants import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE, TILE_SPRITE
-from data.utils.grid import init_world, get_position
+from data.utils.constants import FPS, BLACK, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE
+from data.utils.grid import init_world
 
 
 def main() -> None:
@@ -19,7 +19,7 @@ def main() -> None:
     pygame.display.set_caption("Data Oriented Goodoo")
     pygame.mouse.set_visible(False)
 
-    tile_grid, player, goal = init_world("resources/maps/map1.jpg")
+    tile_grid, non_empty_tiles, player, goal = init_world("resources/maps/map1.jpg")
     beam: Beam = Beam()
 
     clock: Clock = pygame.time.Clock()
@@ -95,10 +95,8 @@ def main() -> None:
         display_beam(beam, screen)
         display_player(player, screen)
 
-        # TODO: optimize this
-        for (i, j), tile in ndenumerate(tile_grid):
-            if tile:
-                screen.blit(TILE_SPRITE, get_position(array((i, j))))
+        for tile in non_empty_tiles:
+            screen.blit(tile.sprite, tile.rect.topleft)
 
         cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
         screen.blit(CURSOR_SPRITE, cursor_pos)

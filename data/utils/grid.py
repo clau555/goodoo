@@ -1,18 +1,20 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import pygame.image
-from numpy import ndarray, array, zeros
+from numpy import ndarray, zeros, ndenumerate
 from pygame.pixelarray import PixelArray
 from pygame.rect import Rect
 from pygame.surface import Surface
 
 from data.goalData import Goal
 from data.playerData import Player
-from data.utils.constants import BLUE, TILE_SIZE, PLAYER_SIZE, RED, GOAL_SIZE, GREY, color, \
-    GRID_WIDTH, GRID_HEIGHT, GRID_SIZE
+from data.tileData import Tile
+from data.utils.constants import BLUE, TILE_SIZE, PLAYER_SIZE, RED, GOAL_SIZE, GREY, GRID_WIDTH, GRID_HEIGHT, \
+    GRID_SIZE, TILE_SPRITE
+from data.utils.utils import is_inside_grid
 
 
-def color_comparison(color1: color, color2: color, margin: int = 10) -> bool:
+def color_comparison(color1: ndarray, color2: ndarray, margin: int = 10) -> bool:
     """
     Compares two colors and returns True if they are close enough.
 
@@ -21,13 +23,10 @@ def color_comparison(color1: color, color2: color, margin: int = 10) -> bool:
     :param margin: maximum difference between colors
     :return: comparison result
     """
-    return \
-        color2[0] - margin <= color1[0] <= color2[0] + margin and \
-        color2[1] - margin <= color1[1] <= color2[1] + margin and \
-        color2[2] - margin <= color1[2] <= color2[2] + margin
+    return (color2 - margin <= color1).all() and (color1 <= color2 + margin).all()
 
 
-def init_world(file_path: str) -> Tuple[ndarray, Player, Goal]:
+def init_world(file_path: str) -> Tuple[List, List, Player, Goal]:
     """
     Loads a level from an image file.
     The image must be of `WORLD_WIDTH` by `WORLD_HEIGHT` size.
@@ -43,33 +42,34 @@ def init_world(file_path: str) -> Tuple[ndarray, Player, Goal]:
     if im.get_width() != GRID_WIDTH or im.get_height() != GRID_HEIGHT:
         raise ValueError("Level map has wrong size.")
 
-    tile_grid: ndarray = zeros(shape=GRID_SIZE, dtype=bool)
+    tile_grid: List = [[None for _ in range(GRID_HEIGHT)] for _ in range(GRID_WIDTH)]
+    non_empty_tiles: List = []
     player: Optional[Player] = None
     goal: Optional[Goal] = None
 
-    for i in range(GRID_WIDTH):
-        for j in range(GRID_HEIGHT):
+    for idx, _ in ndenumerate(zeros(shape=GRID_SIZE)):
 
-            idx: ndarray = array((i, j))
-            rgb: color = im.unmap_rgb(pixel_array[i, j])[0:3]
+        rgb: ndarray = im.unmap_rgb(pixel_array[idx])[0:3]
 
-            if color_comparison(rgb, GREY):
-                tile_grid[i, j] = True
+        if color_comparison(rgb, GREY):
+            tile: Tile = Tile(get_tile_rect(idx), TILE_SPRITE)
+            tile_grid[idx[0]][idx[1]] = tile
+            non_empty_tiles.append(tile)
 
-            elif color_comparison(rgb, BLUE) and not player:
-                pos = idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
-                player = Player(Rect(tuple(pos), tuple(PLAYER_SIZE)))
+        elif color_comparison(rgb, BLUE) and not player:
+            pos = idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
+            player = Player(Rect(tuple(pos), tuple(PLAYER_SIZE)))
 
-            elif color_comparison(rgb, RED) and not goal:
-                pos = idx * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
-                goal = Goal(Rect(pos, TILE_SIZE))
+        elif color_comparison(rgb, RED) and not goal:
+            pos = idx * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
+            goal = Goal(Rect(pos, TILE_SIZE))
 
     if not player:
         raise ValueError("No player spawn point detected inside the map.")
     if not goal:
         raise ValueError("No goal detected inside the map.")
 
-    return tile_grid, player, goal
+    return tile_grid, non_empty_tiles, player, goal
 
 
 def get_grid_index(pos: ndarray) -> ndarray:
@@ -81,19 +81,9 @@ def get_grid_index(pos: ndarray) -> ndarray:
     :return: grid index
     """
     idx: ndarray = pos // TILE_SIZE
-    if not (0 <= idx[0] < GRID_WIDTH and 0 <= idx[1] < GRID_HEIGHT):
+    if not is_inside_grid(idx):
         raise ValueError("Index out of bound.")
-    return idx
-
-
-def get_position(idx: ndarray) -> ndarray:
-    """
-    Returns the world position of the given grid index.
-
-    :param idx: grid index
-    :return: world position
-    """
-    return idx * TILE_SIZE
+    return idx.astype(int)
 
 
 def get_tile_rect(idx: ndarray) -> Rect:
@@ -106,22 +96,21 @@ def get_tile_rect(idx: ndarray) -> Rect:
     return Rect(idx * TILE_SIZE, TILE_SIZE)
 
 
-def get_neighbor_idxes(idx: ndarray) -> ndarray:
+def get_neighbor_tiles(tile_grid: List, idx: ndarray) -> List:
     """
-    Returns the grid indices of the neighbors of the given grid index.
-
-    :param idx: grid index
-    :return: neighbor grid indices
-    """
-    return array([[idx + array((i, j)) for j in range(-1, 2)] for i in range(-1, 2)])
-
-
-def is_empty(tile_grid: ndarray, idx: ndarray) -> bool:
-    """
-    Returns whether the given tile is empty.
+    Returns the list of all the neighbor tiles of the given tile position.
+    Does not contain empty tiles.
 
     :param tile_grid: world grid
-    :param idx: grid index
-    :return: true if empty, false otherwise
+    :param idx: world tile position
+    :return: neighbor tiles
     """
-    return not tile_grid[int(idx[0]), int(idx[1])]
+    tiles: List = []
+
+    for i, _ in ndenumerate(zeros(shape=(3, 3))):
+
+        offset_idx: ndarray = idx + i - 1
+        if is_inside_grid(offset_idx) and tile_grid[offset_idx[0]][offset_idx[1]]:
+            tiles.append(tile_grid[offset_idx[0]][offset_idx[1]])
+
+    return tiles

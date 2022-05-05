@@ -1,4 +1,5 @@
 from dataclasses import replace
+from typing import List
 
 import pygame
 from numpy import ndarray, array
@@ -8,7 +9,7 @@ from pygame.surface import Surface
 from data.beamData import Beam
 from data.playerData import Player
 from data.utils.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
-from data.utils.grid import get_grid_index, is_empty
+from data.utils.grid import get_grid_index
 from data.utils.utils import scale, is_inside_screen
 
 
@@ -28,13 +29,13 @@ def display_beam(beam: Beam, screen: Surface) -> None:
     )
 
 
-def update_beam(beam: Beam, player: Player, tiles: ndarray, delta: float) -> Beam:
+def update_beam(beam: Beam, player: Player, tile_grid: List, delta: float) -> Beam:
     """
     Updates the beam, decreasing its power and setting its start and end points.
 
     :param beam: beam data
     :param player: player data
-    :param tiles: list of tile data
+    :param tile_grid: world grid
     :param delta: delta time
     :return: updated beam data
     """
@@ -51,9 +52,9 @@ def update_beam(beam: Beam, player: Player, tiles: ndarray, delta: float) -> Bea
         # increasing vector until it collides with a tile or goes out of screen
         while not collide and is_inside_screen(end):
 
-            if not is_empty(tiles, get_grid_index(end)):
+            idx: ndarray = get_grid_index(end)
+            if tile_grid[idx[0]][idx[1]]:
                 collide = True
-
             end += step
 
     power: float = beam.power - BEAM_DECREASE * delta
