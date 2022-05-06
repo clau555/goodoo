@@ -22,11 +22,11 @@ SCREEN_SIZE: ndarray = RESOLUTIONS[0]  # select resolution
 SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 
 # world grid
-GRID_SIZE: ndarray = array((32, 256))  # world size in tiles
+GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
 GRID_WIDTH: int = GRID_SIZE[0]
 GRID_HEIGHT: int = GRID_SIZE[1]
 AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
-AUTOMATON_DENSITY: float = 0.6  # wall density during noise generation
+AUTOMATON_DENSITY: float = 0.46  # wall density during noise generation
 
 # tile
 TILE_EDGE: int = 60  # tile edge size in pixels
@@ -48,6 +48,7 @@ GOAL_SPRITES: List[Surface] = list(map(
     lambda img: pygame.transform.scale(img, tupint(GOAL_SIZE)),
     GOAL_IMAGES
 ))
+
 # player
 PLAYER_SIZE: ndarray = TILE_SIZE * 3/4
 PLAYER_IMG: Surface = pygame.image.load("resources/sprites/player.png")

@@ -7,7 +7,7 @@ from pygame.surface import Surface
 
 from data.playerData import Player
 from data.utils.constants import GRAVITY, PLAYER_MAX_V
-from data.utils.utils import scale, get_grid_index, get_moore_neighbors, idx_inside_grid
+from data.utils.utils import scale, get_grid_index, get_neighbor_grid, idx_inside_grid
 
 
 def display_player(player: Player, screen: Surface, camera_offset: ndarray) -> None:
@@ -59,7 +59,7 @@ def move_and_collide(player: Player, tile_grid: ndarray, delta: float) -> Player
     player_idx: ndarray = get_grid_index(array(player.rect.center))
     if not idx_inside_grid(player_idx):
         raise ValueError("Player out of bounds")
-    neighbor_tiles: ndarray = get_moore_neighbors(tile_grid, player_idx)
+    neighbor_tiles: ndarray = get_neighbor_grid(tile_grid, player_idx)
 
     # x movement executes first
     rect.x += v[0] * delta

@@ -22,8 +22,8 @@ def display_beam(beam: Beam, screen: Surface, camera_offset: ndarray) -> None:
     pygame.draw.line(
         screen,
         (255, 0, 0),
-        tuple(beam.start) + camera_offset,
-        tuple(beam.end) + camera_offset,
+        beam.start + camera_offset,
+        beam.end + camera_offset,
         int(beam.power * TILE_EDGE / 2)
     )
 

@@ -96,7 +96,7 @@ def main() -> None:
 
         # only displays tiles visible on screen
         visible_tiles: ndarray = get_screen_grid(tile_grid, camera_pos)
-        display_tiles(visible_tiles, screen, camera_offset[0], camera_offset[1])
+        display_tiles(visible_tiles, screen, camera_offset=camera_offset)
 
         cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
         screen.blit(CURSOR_SPRITE, cursor_pos)

@@ -1,32 +1,41 @@
-from copy import deepcopy
-from typing import List, Tuple
+from typing import Tuple, Optional, Callable
 
-from numpy import ndarray, sqrt, sum, zeros, random, array
+from numpy import ndarray, sqrt, sum, zeros, random, array, argwhere, vectorize, mgrid
 from pygame import Rect
 
 from data.goalData import Goal
 from data.playerData import Player
 from data.tileData import Tile
-from data.utils.constants import SCREEN_SIZE, GRID_SIZE, GRID_WIDTH, GRID_HEIGHT, TILE_SPRITE, PLAYER_SIZE, \
-    TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, AUTOMATON_DENSITY, SCREEN_GRID_SIZE
+from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SPRITE, PLAYER_SIZE, \
+    TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, AUTOMATON_DENSITY, SCREEN_GRID_SIZE, GRID_HEIGHT, GRID_WIDTH
 
+
+# ----
+# Math
+# ----
 
 def scale(v: ndarray, length: float) -> ndarray:
     """
     Scales a vector to a given length.
 
-    :param v: 2D numpy array
+    https://stackoverflow.com/a/21031303/17987233
+
+    :param v: grid index
     :param length: length to scale to
     :return: scaled vector
     """
     return v / sqrt(sum(v**2)) * length
 
 
+# ------
+# Screen
+# ------
+
 def pos_inside_screen(pos: ndarray, camera_offset: ndarray = zeros(2)) -> bool:
     """
     Checks if a position is inside the screen.
 
-    :param pos: screen position to check
+    :param pos: position in world space
     :param camera_offset: camera offset
     :return: True if inside screen, False otherwise
     """
@@ -37,20 +46,24 @@ def rect_inside_screen(rect: Rect, camera_offset) -> bool:
     """
     Checks if a rectangle is visible in the screen.
 
-    @param rect: rectangle to check
-    @param camera_offset: camera offset
-    @return: True if visible, False otherwise
+    :param rect: rectangle in world space
+    :param camera_offset: camera offset
+    :return: True if visible, False otherwise
     """
     offset_rect: Rect = Rect(rect)
     offset_rect.topleft = offset_rect.topleft + camera_offset
     return SCREEN_RECT.colliderect(offset_rect)
 
 
+# ----
+# Grid
+# ----
+
 def idx_inside_grid(idx: ndarray) -> bool:
     """
     Checks if an index is inside the grid.
 
-    :param idx: 2D numpy array
+    :param idx: grid index
     :return: True if inside grid, False otherwise
     """
     return (0 <= idx).all() and (idx < GRID_SIZE).all()
@@ -60,7 +73,7 @@ def pos_inside_grid(pos: ndarray) -> bool:
     """
     Checks if a world position is inside the grid.
 
-    :param pos: world position to check
+    :param pos: position in world space
     :return: True if inside grid, False otherwise
     """
     idx: ndarray = get_grid_index(pos)
@@ -69,30 +82,19 @@ def pos_inside_grid(pos: ndarray) -> bool:
 
 def get_grid_index(pos: ndarray) -> ndarray:
     """
-    Returns the grid index of the given position.
-    The values will be negative or greater than the grid size if the position is outside the grid.
+    Returns the grid index of the given world position.
 
-    :param pos: screen position
+    Warning : the values will be negative or greater than the grid size if the position is outside the grid.
+
+    :param pos: position in world space
     :return: grid index
     """
     return (pos // TILE_SIZE).astype(int)
 
 
-def get_moore_neighbors(tile_grid: ndarray, idx: ndarray) -> ndarray:
-    """
-    Returns neighborhood grid of the given tile position.
-
-    :param tile_grid: world grid
-    :param idx: world tile position
-    :return: index neighborhood
-    """
-    clamped_idx: ndarray = idx.clip(1, GRID_SIZE - 2)
-    return tile_grid[clamped_idx[0]-1:clamped_idx[0]+2, clamped_idx[1]-1:clamped_idx[1]+2]
-
-
 def get_screen_grid(tile_grid: ndarray, camera_pos: ndarray) -> ndarray:
     """
-    Returns the current tile grid visible on screen which is a sub grid of `tile_grid`.
+    Returns a sub grid of `tile_grid` which is the current tile grid visible on screen.
 
     :param tile_grid: world grid
     :param camera_pos: top left corner of the camera in world space
@@ -102,9 +104,52 @@ def get_screen_grid(tile_grid: ndarray, camera_pos: ndarray) -> ndarray:
     return tile_grid[idx[0]:idx[0]+SCREEN_GRID_SIZE[0]+1, idx[1]:idx[1]+SCREEN_GRID_SIZE[1]+1]
 
 
+def get_neighbor_grid(tile_grid: ndarray, idx: ndarray) -> ndarray:
+    """
+    Returns neighborhood grid of the given tile position.
+    :param tile_grid: world grid
+    :param idx: world tile position
+    :return: index neighborhood
+    """
+    clamped_idx: ndarray = idx.clip(1, GRID_SIZE - 2)
+    return tile_grid[clamped_idx[0]-1:clamped_idx[0]+2, clamped_idx[1]-1:clamped_idx[1]+2]
+
+
 # ----------------
 # World generation
 # ----------------
+
+def get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
+    """
+    Returns a grid with the number of neighbors for each cell.
+    A neighbor is counted if it's true.
+
+    :param bool_grid: grid of booleans
+    :return: grid with the number of neighbors for each cell
+    """
+    neighbors_mat: ndarray = zeros(bool_grid.shape, dtype=int)
+    int_grid: ndarray = bool_grid.astype(int)
+    neighbors_mat[1:-1, 1:-1] = (int_grid[:-2, :-2] + int_grid[:-2, 1:-1] + int_grid[:-2, 2:]
+                                 + int_grid[1:-1, :-2] + int_grid[1:-1, 2:] + int_grid[2:, :-2]
+                                 + int_grid[2:, 1:-1] + int_grid[2:, 2:])
+    return neighbors_mat
+
+
+def cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes) -> Optional[Tile]:
+    """
+    Returns the tile corresponding to the given cell.
+
+    :param cell: boolean cell
+    :param x_idxes: x indices of the cell
+    :param y_idxes: y indices of the cell
+    :return: tile if cell is true, None otherwise
+    """
+    if cell:
+        return Tile(Rect(array((x_idxes, y_idxes)) * TILE_SIZE, tuple(TILE_SIZE)), TILE_SPRITE)
+    return None
+
+
+cells_to_tiles: Callable = vectorize(cell_to_tile)
 
 
 def generate_world() -> Tuple[ndarray, Player, Goal]:
@@ -112,26 +157,46 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     Returns a world grid containing the wall tiles, and none for the empty tiles.
     Returns also a one-dimensional list of the wall tiles and the player and goal.
 
-    :return: world grid, wall tiles, player, goal
+    Algorithm is based on vectorized cellular automaton implementation described here :
+    https://lhoupert.fr/test-jbook/04-code-vectorization.html#uniform-vectorization
+
+    :return: world grid, player, goal
     """
 
     # initial noise grid
-    # TODO: use ndarray and vectorize `update_state` and `bool_grid_to_tile_grid`
-    bool_grid: List = (random.choice(
-        a=[False, True],
+    bool_grid: ndarray = random.choice(
+        a=[True, False],
         size=GRID_SIZE,
-        p=[1 - AUTOMATON_DENSITY, AUTOMATON_DENSITY])
-    ).tolist()
+        p=[AUTOMATON_DENSITY, 1 - AUTOMATON_DENSITY]
+    )
 
     # cellular automaton execution
     for _ in range(AUTOMATON_ITERATION):
-        bool_grid = update_state(bool_grid)
+
+        # getting each cell neighbors count
+        n_count_grid: ndarray = get_neighbors_count_grid(bool_grid)
+
+        # flatten grids
+        bool_grid_flat: ndarray = bool_grid.ravel()
+        n_count_grid_flat: ndarray = n_count_grid.ravel()
+
+        # cellular automaton rules
+        wall = argwhere(n_count_grid_flat > 4)
+        empty_ = argwhere(n_count_grid_flat <= 3)
+
+        # rules application
+        bool_grid_flat[wall] = True
+        bool_grid_flat[empty_] = False
+
+        # border tiles are walls
+        bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
 
     # TODO: localize regions and build paths between them
     # TODO: add player and goal spawn points
 
     # conversion to tile grid
-    tile_grid: List = bool_grid_to_tile_grid(bool_grid)
+    x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
+    tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
 
     # hard coded player and goal
     player_pos = array((10, 10)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
@@ -139,54 +204,4 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     goal_pos = array((40, 40)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
     goal = Goal(Rect(goal_pos, tuple(TILE_SIZE)))
 
-    return array(tile_grid), player, goal
-
-
-def update_state(bool_grid: List) -> List:
-    """
-    Updates the state of each cell of the grid according to Moore's neighborhood.
-
-    :param bool_grid: ndarray of boolean values
-    :return: updated grid
-    """
-    new_grid: List = deepcopy(bool_grid)
-
-    for i in range(GRID_WIDTH):
-        for j in range(GRID_HEIGHT):
-
-            neighbor_wall_count: int = 0
-            border: bool = False
-
-            # checking every neighbor
-            for x in range(i - 1, i + 2):
-                for y in range(j - 1, j + 2):
-
-                    if idx_inside_grid(array((x, y))):
-                        if bool_grid[x][y] and (y != j or x != i):
-                            neighbor_wall_count += 1
-                    else:
-                        # tiles on grid edge are automatically walls
-                        border = True
-
-            new_grid[i][j] = neighbor_wall_count > 4 or border
-
-    return new_grid
-
-
-def bool_grid_to_tile_grid(bool_grid: List) -> List:
-    """
-    Converts a grid of boolean values to a grid of tiles.
-
-    :param bool_grid: ndarray of boolean values
-    :return: grid of tiles and list of wall tiles
-    """
-    tile_grid: List = [[None for _ in range(GRID_HEIGHT)] for _ in range(GRID_WIDTH)]
-
-    for i in range(GRID_WIDTH):
-        for j in range(GRID_HEIGHT):
-
-            if bool_grid[i][j]:
-                tile: Tile = Tile(Rect(array((i, j)) * TILE_SIZE, tuple(TILE_SIZE)), TILE_SPRITE)
-                tile_grid[i][j] = tile
-
-    return tile_grid
+    return tile_grid, player, goal
