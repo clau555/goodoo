@@ -26,7 +26,7 @@ GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
 GRID_WIDTH: int = GRID_SIZE[0]
 GRID_HEIGHT: int = GRID_SIZE[1]
 AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
-AUTOMATON_DENSITY: float = 0.46  # wall density during noise generation
+NOISE_DENSITY: float = 0.48  # wall density during noise generation
 
 # tile
 TILE_EDGE: int = 60  # tile edge size in pixels
@@ -63,6 +63,7 @@ CURSOR_SPRITE: Surface = pygame.transform.scale(CURSOR_IMG, tupint(CURSOR_SIZE))
 # physics
 FPS: int = 60
 GRAVITY: ndarray = array((0, PLAYER_MAX_V / 75))
+CAMERA_SPEED: float = 0.2
 
 # beam physics
 BEAM_STRENGTH: float = PLAYER_MAX_V / 4  # beam impulse velocity length

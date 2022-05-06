@@ -7,7 +7,7 @@ from data.goalData import Goal
 from data.playerData import Player
 from data.tileData import Tile
 from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SPRITE, PLAYER_SIZE, \
-    TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, AUTOMATON_DENSITY, SCREEN_GRID_SIZE, GRID_HEIGHT, GRID_WIDTH
+    TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, NOISE_DENSITY, SCREEN_GRID_SIZE, GRID_HEIGHT, GRID_WIDTH
 
 
 # ----
@@ -92,15 +92,15 @@ def get_grid_index(pos: ndarray) -> ndarray:
     return (pos // TILE_SIZE).astype(int)
 
 
-def get_screen_grid(tile_grid: ndarray, camera_pos: ndarray) -> ndarray:
+def get_screen_grid(tile_grid: ndarray, camera_topleft: ndarray) -> ndarray:
     """
     Returns a sub grid of `tile_grid` which is the current tile grid visible on screen.
 
     :param tile_grid: world grid
-    :param camera_pos: top left corner of the camera in world space
+    :param camera_topleft: top left corner of the camera in world space
     :return: tile grid visible on screen
     """
-    idx: ndarray = (get_grid_index(camera_pos)).clip(0, GRID_SIZE - 1)  # top left corner of the camera in grid space
+    idx: ndarray = (get_grid_index(camera_topleft)).clip(0, GRID_SIZE - 1)  # conversion in grid space
     return tile_grid[idx[0]:idx[0]+SCREEN_GRID_SIZE[0]+1, idx[1]:idx[1]+SCREEN_GRID_SIZE[1]+1]
 
 
@@ -135,7 +135,7 @@ def get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
     return neighbors_mat
 
 
-def cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes) -> Optional[Tile]:
+def cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes: ndarray) -> Optional[Tile]:
     """
     Returns the tile corresponding to the given cell.
 
@@ -162,12 +162,11 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
 
     :return: world grid, player, goal
     """
-
     # initial noise grid
     bool_grid: ndarray = random.choice(
         a=[True, False],
         size=GRID_SIZE,
-        p=[AUTOMATON_DENSITY, 1 - AUTOMATON_DENSITY]
+        p=[NOISE_DENSITY, 1 - NOISE_DENSITY]
     )
 
     # cellular automaton execution

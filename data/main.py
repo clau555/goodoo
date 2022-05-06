@@ -10,7 +10,7 @@ from data.beamData import Beam
 from data.goalCode import update_goal, display_goal
 from data.playerCode import update_velocity, move_and_collide, display_player
 from data.tileCode import display_tiles
-from data.utils.constants import FPS, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE
+from data.utils.constants import FPS, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE, CAMERA_SPEED
 from data.utils.utils import generate_world, get_screen_grid
 
 
@@ -26,6 +26,7 @@ def main() -> None:
     clock: Clock = pygame.time.Clock()
     last_time: float = time.time()
 
+    camera_center: ndarray = array(player.rect.center) - SCREEN_SIZE / 2
     on_ground: bool = False
 
     while True:
@@ -63,8 +64,10 @@ def main() -> None:
             on_ground = True
 
         # camera
-        camera_offset: ndarray = SCREEN_SIZE / 2 - array(player.rect.center)
-        camera_pos: ndarray = array(player.rect.center) - SCREEN_SIZE / 2  # camera top left corner in world space
+        heading_pos: ndarray = array(player.rect.center) - camera_center
+        camera_center += heading_pos * delta * CAMERA_SPEED
+        camera_topleft = camera_center - SCREEN_SIZE / 2
+        camera_offset: ndarray = SCREEN_SIZE / 2 - camera_center
 
         beam = update_beam(beam, player, tile_grid, camera_offset, delta)
         if click and on_ground:
@@ -95,7 +98,7 @@ def main() -> None:
         display_player(player, screen, camera_offset)
 
         # only displays tiles visible on screen
-        visible_tiles: ndarray = get_screen_grid(tile_grid, camera_pos)
+        visible_tiles: ndarray = get_screen_grid(tile_grid, camera_topleft)
         display_tiles(visible_tiles, screen, camera_offset=camera_offset)
 
         cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
