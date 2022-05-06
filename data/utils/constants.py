@@ -29,7 +29,7 @@ AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
 NOISE_DENSITY: float = 0.48  # wall density during noise generation
 
 # tile
-TILE_EDGE: int = 60  # tile edge size in pixels
+TILE_EDGE: int = SCREEN_SIZE[0] // 32  # tile edge size in pixels
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
 TILE_IMG: Surface = pygame.image.load("resources/sprites/tile.png")
 TILE_SPRITE: Surface = pygame.transform.scale(TILE_IMG, tupint(TILE_SIZE))
