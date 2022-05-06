@@ -1,14 +1,14 @@
-from typing import Tuple, List, Optional
+from copy import deepcopy
+from typing import List, Tuple
 
-import pygame
-from numpy import ndarray, sqrt, sum, ndenumerate, zeros
-from pygame import Surface, Rect
+from numpy import ndarray, sqrt, sum, zeros, random, array
+from pygame import Rect
 
 from data.goalData import Goal
 from data.playerData import Player
 from data.tileData import Tile
-from data.utils.constants import SCREEN_SIZE, GRID_SIZE, GRID_WIDTH, GRID_HEIGHT, GREY, TILE_SPRITE, PLAYER_SIZE, \
-    TILE_SIZE, BLUE, RED, GOAL_SIZE, SCREEN_RECT
+from data.utils.constants import SCREEN_SIZE, GRID_SIZE, GRID_WIDTH, GRID_HEIGHT, TILE_SPRITE, PLAYER_SIZE, \
+    TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, AUTOMATON_DENSITY, SCREEN_GRID_SIZE
 
 
 def scale(v: ndarray, length: float) -> ndarray:
@@ -34,6 +34,13 @@ def pos_inside_screen(pos: ndarray, camera_offset: ndarray = zeros(2)) -> bool:
 
 
 def rect_inside_screen(rect: Rect, camera_offset) -> bool:
+    """
+    Checks if a rectangle is visible in the screen.
+
+    @param rect: rectangle to check
+    @param camera_offset: camera offset
+    @return: True if visible, False otherwise
+    """
     offset_rect: Rect = Rect(rect)
     offset_rect.topleft = offset_rect.topleft + camera_offset
     return SCREEN_RECT.colliderect(offset_rect)
@@ -71,77 +78,115 @@ def get_grid_index(pos: ndarray) -> ndarray:
     return (pos // TILE_SIZE).astype(int)
 
 
-def get_neighbor_tiles(tile_grid: List, idx: ndarray) -> List:
+def get_moore_neighbors(tile_grid: ndarray, idx: ndarray) -> ndarray:
     """
-    Returns the list of all the neighbor tiles of the given tile position.
-    Does not contain empty tiles.
+    Returns neighborhood grid of the given tile position.
 
     :param tile_grid: world grid
     :param idx: world tile position
-    :return: neighbor tiles
+    :return: index neighborhood
     """
-    tiles: List = []
-
-    for i, _ in ndenumerate(zeros(shape=(3, 3))):
-
-        offset_idx: ndarray = idx + i - 1
-        if idx_inside_grid(offset_idx) and tile_grid[offset_idx[0]][offset_idx[1]]:
-            tiles.append(tile_grid[offset_idx[0]][offset_idx[1]])
-
-    return tiles
+    clamped_idx: ndarray = idx.clip(1, GRID_SIZE - 2)
+    return tile_grid[clamped_idx[0]-1:clamped_idx[0]+2, clamped_idx[1]-1:clamped_idx[1]+2]
 
 
-def color_comparison(color1: ndarray, color2: ndarray, margin: int = 10) -> bool:
+def get_screen_grid(tile_grid: ndarray, camera_pos: ndarray) -> ndarray:
     """
-    Compares two colors and returns True if they are close enough.
+    Returns the current tile grid visible on screen which is a sub grid of `tile_grid`.
 
-    :param color1: rgb color
-    :param color2: rgb color
-    :param margin: maximum difference between colors
-    :return: comparison result
+    :param tile_grid: world grid
+    :param camera_pos: top left corner of the camera in world space
+    :return: tile grid visible on screen
     """
-    return (color2 - margin <= color1).all() and (color1 <= color2 + margin).all()
+    idx: ndarray = (get_grid_index(camera_pos)).clip(0, GRID_SIZE - 1)  # top left corner of the camera in grid space
+    return tile_grid[idx[0]:idx[0]+SCREEN_GRID_SIZE[0]+1, idx[1]:idx[1]+SCREEN_GRID_SIZE[1]+1]
 
 
-def init_world(file_path: str) -> Tuple[List, List, Player, Goal]:
+# ----------------
+# World generation
+# ----------------
+
+
+def generate_world() -> Tuple[ndarray, Player, Goal]:
     """
-    Loads a level from an image file.
-    The image must be of `WORLD_WIDTH` by `WORLD_HEIGHT` size.
-    It must contain white pixels representing the tiles, and a blue pixel representing the player spawn position.
+    Returns a world grid containing the wall tiles, and none for the empty tiles.
+    Returns also a one-dimensional list of the wall tiles and the player and goal.
 
-    :param file_path: path to the image file
-    :return: player data and the 2D array of tile data
+    :return: world grid, wall tiles, player, goal
     """
-    im: Surface = pygame.image.load(file_path)
 
-    if im.get_width() != GRID_WIDTH or im.get_height() != GRID_HEIGHT:
-        raise ValueError("Level map has wrong size.")
+    # initial noise grid
+    # TODO: use ndarray and vectorize `update_state` and `bool_grid_to_tile_grid`
+    bool_grid: List = (random.choice(
+        a=[False, True],
+        size=GRID_SIZE,
+        p=[1 - AUTOMATON_DENSITY, AUTOMATON_DENSITY])
+    ).tolist()
 
+    # cellular automaton execution
+    for _ in range(AUTOMATON_ITERATION):
+        bool_grid = update_state(bool_grid)
+
+    # TODO: localize regions and build paths between them
+    # TODO: add player and goal spawn points
+
+    # conversion to tile grid
+    tile_grid: List = bool_grid_to_tile_grid(bool_grid)
+
+    # hard coded player and goal
+    player_pos = array((10, 10)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
+    player = Player(Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+    goal_pos = array((40, 40)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
+    goal = Goal(Rect(goal_pos, tuple(TILE_SIZE)))
+
+    return array(tile_grid), player, goal
+
+
+def update_state(bool_grid: List) -> List:
+    """
+    Updates the state of each cell of the grid according to Moore's neighborhood.
+
+    :param bool_grid: ndarray of boolean values
+    :return: updated grid
+    """
+    new_grid: List = deepcopy(bool_grid)
+
+    for i in range(GRID_WIDTH):
+        for j in range(GRID_HEIGHT):
+
+            neighbor_wall_count: int = 0
+            border: bool = False
+
+            # checking every neighbor
+            for x in range(i - 1, i + 2):
+                for y in range(j - 1, j + 2):
+
+                    if idx_inside_grid(array((x, y))):
+                        if bool_grid[x][y] and (y != j or x != i):
+                            neighbor_wall_count += 1
+                    else:
+                        # tiles on grid edge are automatically walls
+                        border = True
+
+            new_grid[i][j] = neighbor_wall_count > 4 or border
+
+    return new_grid
+
+
+def bool_grid_to_tile_grid(bool_grid: List) -> List:
+    """
+    Converts a grid of boolean values to a grid of tiles.
+
+    :param bool_grid: ndarray of boolean values
+    :return: grid of tiles and list of wall tiles
+    """
     tile_grid: List = [[None for _ in range(GRID_HEIGHT)] for _ in range(GRID_WIDTH)]
-    non_empty_tiles: List = []
-    player: Optional[Player] = None
-    goal: Optional[Goal] = None
 
-    for idx, _ in ndenumerate(zeros(shape=GRID_SIZE)):
+    for i in range(GRID_WIDTH):
+        for j in range(GRID_HEIGHT):
 
-        rgb: ndarray = im.get_at(idx)[0:3]
+            if bool_grid[i][j]:
+                tile: Tile = Tile(Rect(array((i, j)) * TILE_SIZE, tuple(TILE_SIZE)), TILE_SPRITE)
+                tile_grid[i][j] = tile
 
-        if color_comparison(rgb, GREY):
-            tile: Tile = Tile(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), TILE_SPRITE)
-            tile_grid[idx[0]][idx[1]] = tile
-            non_empty_tiles.append(tile)
-
-        elif color_comparison(rgb, BLUE) and not player:
-            pos = idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
-            player = Player(Rect(tuple(pos), tuple(PLAYER_SIZE)))
-
-        elif color_comparison(rgb, RED) and not goal:
-            pos = idx * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
-            goal = Goal(Rect(pos, tuple(TILE_SIZE)))
-
-    if not player:
-        raise ValueError("No player spawn point detected inside the map.")
-    if not goal:
-        raise ValueError("No goal detected inside the map.")
-
-    return tile_grid, non_empty_tiles, player, goal
+    return tile_grid

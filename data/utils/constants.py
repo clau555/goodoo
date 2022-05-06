@@ -22,15 +22,20 @@ SCREEN_SIZE: ndarray = RESOLUTIONS[0]  # select resolution
 SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 
 # world grid
-GRID_SIZE: ndarray = array((32, 18))  # world size in tiles
+GRID_SIZE: ndarray = array((32, 256))  # world size in tiles
 GRID_WIDTH: int = GRID_SIZE[0]
 GRID_HEIGHT: int = GRID_SIZE[1]
+AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
+AUTOMATON_DENSITY: float = 0.6  # wall density during noise generation
 
 # tile
-TILE_EDGE: int = SCREEN_SIZE[0] // GRID_WIDTH
+TILE_EDGE: int = 60  # tile edge size in pixels
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
 TILE_IMG: Surface = pygame.image.load("resources/sprites/tile.png")
 TILE_SPRITE: Surface = pygame.transform.scale(TILE_IMG, tupint(TILE_SIZE))
+
+# screen dimension in terms of tiles
+SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] // TILE_EDGE))
 
 # goal tile
 GOAL_SIZE: ndarray = TILE_SIZE
@@ -43,7 +48,6 @@ GOAL_SPRITES: List[Surface] = list(map(
     lambda img: pygame.transform.scale(img, tupint(GOAL_SIZE)),
     GOAL_IMAGES
 ))
-
 # player
 PLAYER_SIZE: ndarray = TILE_SIZE * 3/4
 PLAYER_IMG: Surface = pygame.image.load("resources/sprites/player.png")
@@ -64,10 +68,3 @@ BEAM_STRENGTH: float = PLAYER_MAX_V / 4  # beam impulse velocity length
 BEAM_DURATION: float = 0.3  # beam duration in seconds
 BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)
 BEAM_VECTOR_STEP: float = TILE_EDGE / 3
-
-# colors
-WHITE: ndarray = array((255, 255, 255))
-BLACK: ndarray = array((0, 0, 0))
-GREY: ndarray = array((128, 128, 128))
-BLUE: ndarray = array((0, 0, 255))
-RED: ndarray = array((250, 0, 0))

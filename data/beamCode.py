@@ -1,5 +1,4 @@
 from dataclasses import replace
-from typing import List
 
 import pygame
 from numpy import ndarray, array
@@ -8,7 +7,7 @@ from pygame.surface import Surface
 
 from data.beamData import Beam
 from data.playerData import Player
-from data.utils.constants import BEAM_STRENGTH, RED, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
+from data.utils.constants import BEAM_STRENGTH, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
 from data.utils.utils import scale, pos_inside_screen, get_grid_index, pos_inside_grid
 
 
@@ -22,14 +21,14 @@ def display_beam(beam: Beam, screen: Surface, camera_offset: ndarray) -> None:
     """
     pygame.draw.line(
         screen,
-        RED,
+        (255, 0, 0),
         tuple(beam.start) + camera_offset,
         tuple(beam.end) + camera_offset,
         int(beam.power * TILE_EDGE / 2)
     )
 
 
-def update_beam(beam: Beam, player: Player, tile_grid: List, camera_offset: ndarray, delta: float) -> Beam:
+def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera_offset: ndarray, delta: float) -> Beam:
     """
     Updates the beam, decreasing its power and setting its start and end points.
 
@@ -54,7 +53,7 @@ def update_beam(beam: Beam, player: Player, tile_grid: List, camera_offset: ndar
         while not collide and pos_inside_screen(end, camera_offset) and pos_inside_grid(end):
 
             idx: ndarray = get_grid_index(end)
-            if tile_grid[idx[0]][idx[1]]:
+            if tile_grid[idx[0], idx[1]]:
                 collide = True
             end += step
 

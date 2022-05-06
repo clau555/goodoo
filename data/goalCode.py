@@ -20,6 +20,5 @@ def display_goal(goal: Goal, screen: Surface, camera_offset: ndarray) -> None:
     :param goal: goal data
     :param screen: screen surface
     :param camera_offset: camera offset
-    :return:
     """
     screen.blit(goal.sprites[int(goal.current_sprite)], goal.rect.topleft + camera_offset)
