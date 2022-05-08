@@ -63,7 +63,7 @@ CURSOR_SPRITE: Surface = pygame.transform.scale(CURSOR_IMG, tupint(CURSOR_SIZE))
 # physics
 FPS: int = 60
 GRAVITY: ndarray = array((0, PLAYER_MAX_V / 75))
-CAMERA_SPEED: float = 0.2
+CAMERA_SPEED: float = 0.3
 
 # beam physics
 BEAM_STRENGTH: float = PLAYER_MAX_V / 4  # beam impulse velocity length

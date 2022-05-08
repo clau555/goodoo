@@ -5,13 +5,15 @@ from numpy import ndarray, array
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.beamCode import update_beam, fire_beam, get_beam_velocity, display_beam
-from data.beamData import Beam
-from data.goalCode import update_goal, display_goal
-from data.playerCode import update_velocity, move_and_collide, display_player
-from data.tileCode import display_tiles
-from data.utils.constants import FPS, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE, CAMERA_SPEED
-from data.utils.utils import generate_world, get_screen_grid
+from data.objects.beam_code import update_beam, fire_beam, get_beam_velocity, display_beam
+from data.objects.beam_data import Beam
+from data.objects.camera_code import update_camera
+from data.objects.camera_data import Camera
+from data.objects.goal_code import update_goal, display_goal
+from data.objects.player_code import update_player, display_player
+from data.objects.tile_code import display_tiles
+from data.utils.constants import FPS, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE
+from data.utils.functions import generate_world, get_screen_grid
 
 
 def main() -> None:
@@ -22,11 +24,11 @@ def main() -> None:
 
     tile_grid, player, goal = generate_world()
     beam: Beam = Beam()
+    camera: Camera = Camera()
 
     clock: Clock = pygame.time.Clock()
     last_time: float = time.time()
 
-    camera_center: ndarray = array(player.rect.center) - SCREEN_SIZE / 2
     on_ground: bool = False
 
     while True:
@@ -58,32 +60,25 @@ def main() -> None:
         delta: float = (time.time() - last_time) * FPS
         last_time = time.time()
 
-        # using an alternate variable rather than player.on_ground because
-        # it keeps looping to true/false when on ground due to rect collision
+        # using an alternate variable rather than player.on_ground
+        # because it keeps looping to true/false when on ground due to rect collision
         if player.on_ground:
             on_ground = True
 
-        # camera
-        heading_pos: ndarray = array(player.rect.center) - camera_center
-        camera_center += heading_pos * delta * CAMERA_SPEED
-        camera_topleft = camera_center - SCREEN_SIZE / 2
-        camera_offset: ndarray = SCREEN_SIZE / 2 - camera_center
+        camera = update_camera(camera, array(player.rect.center), delta)
 
-        beam = update_beam(beam, player, tile_grid, camera_offset, delta)
+        beam = update_beam(beam, player, tile_grid, camera.offset, delta)
         if click and on_ground:
             beam = fire_beam(beam)
             on_ground = False
 
-        input_v: ndarray = get_beam_velocity(beam)
-
-        # player movement and collisions
-        player = update_velocity(player, input_v)
-        player = move_and_collide(player, tile_grid, delta)
+        player = update_player(player, get_beam_velocity(beam), tile_grid, delta)
 
         # game ends if goal is reached
         if player.rect.colliderect(goal.rect):
             pygame.quit()
             quit()
+
         goal = update_goal(goal)
 
         # -------
@@ -91,16 +86,17 @@ def main() -> None:
         # -------
 
         screen: Surface = pygame.display.get_surface()
-        screen.fill((0, 0, 0))
+        screen.fill((0, 0, 0))  # refresh screen
 
-        display_goal(goal, screen, camera_offset)
-        display_beam(beam, screen, camera_offset)
-        display_player(player, screen, camera_offset)
+        display_goal(goal, screen, camera.offset)
+        display_beam(beam, screen, camera.offset)
+        display_player(player, screen, camera.offset)
 
         # only displays tiles visible on screen
-        visible_tiles: ndarray = get_screen_grid(tile_grid, camera_topleft)
-        display_tiles(visible_tiles, screen, camera_offset=camera_offset)
+        visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
+        display_tiles(visible_tiles, screen, camera_offset=camera.offset)
 
+        # display cursor
         cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
         screen.blit(CURSOR_SPRITE, cursor_pos)
 

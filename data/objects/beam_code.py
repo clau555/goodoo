@@ -5,10 +5,10 @@ from numpy import ndarray, array
 from numpy.linalg import linalg
 from pygame.surface import Surface
 
-from data.beamData import Beam
-from data.playerData import Player
+from data.objects.beam_data import Beam
+from data.objects.player_data import Player
 from data.utils.constants import BEAM_STRENGTH, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
-from data.utils.utils import scale, pos_inside_screen, get_grid_index, pos_inside_grid
+from data.utils.functions import scale, pos_inside_screen, get_grid_index, pos_inside_grid
 
 
 def display_beam(beam: Beam, screen: Surface, camera_offset: ndarray) -> None:

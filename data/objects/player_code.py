@@ -5,9 +5,9 @@ from numpy.linalg import linalg
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.playerData import Player
+from data.objects.player_data import Player
 from data.utils.constants import GRAVITY, PLAYER_MAX_V
-from data.utils.utils import scale, get_grid_index, get_neighbor_grid, idx_inside_grid
+from data.utils.functions import scale, get_grid_index, get_neighbor_grid, idx_inside_grid
 
 
 def display_player(player: Player, screen: Surface, camera_offset: ndarray) -> None:
@@ -21,45 +21,33 @@ def display_player(player: Player, screen: Surface, camera_offset: ndarray) -> N
     screen.blit(player.sprite, player.rect.topleft + camera_offset)
 
 
-def update_velocity(player: Player, beam_velocity: ndarray) -> Player:
+def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, delta: float) -> Player:
     """
-    Updates the player's velocity based on the beam's velocity.
-    Normal gravity is applied if beam's velocity is zero.
+    Moves the player with according to the input velocity then collide with the tiles.
+    If any collision occurs, the player is moved to the appropriate position, and its velocity is updated accordingly.
 
     :param player: player data
-    :param beam_velocity: beam's velocity
+    :param input_velocity: velocity inputted by user
+    :param tile_grid: world tile grid
+    :param delta: time elapsed since last frame
     :return: updated player data
     """
+    # velocity update
     v: ndarray = player.velocity + GRAVITY
-    v = beam_velocity if linalg.norm(beam_velocity) != 0 else v
+    v = input_velocity if linalg.norm(input_velocity) != 0 else v
 
     # clamp velocity
     if linalg.norm(v) > PLAYER_MAX_V:
         v = scale(v, PLAYER_MAX_V)
-
-    return replace(player, velocity=v)
-
-
-def move_and_collide(player: Player, tile_grid: ndarray, delta: float) -> Player:
-    """
-    Moves the player with its current velocity then collide with the tiles.
-    If any collision occurs, the player is moved to the appropriate position.
-    Updates also player's velocity.
-
-    :param player: player data
-    :param tile_grid: world grid
-    :param delta: time elapsed since last frame
-    :return: updated player data
-    """
-    rect: Rect = Rect(player.rect.topleft, player.rect.size)
-    v: ndarray = player.velocity
-    on_ground: bool = False
 
     # getting neighbor tiles to check collision
     player_idx: ndarray = get_grid_index(array(player.rect.center))
     if not idx_inside_grid(player_idx):
         raise ValueError("Player out of bounds")
     neighbor_tiles: ndarray = get_neighbor_grid(tile_grid, player_idx)
+
+    rect: Rect = Rect(player.rect.topleft, player.rect.size)
+    on_ground: bool = False
 
     # x movement executes first
     rect.x += v[0] * delta

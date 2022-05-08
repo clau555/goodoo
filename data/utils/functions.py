@@ -3,9 +3,10 @@ from typing import Tuple, Optional, Callable
 from numpy import ndarray, sqrt, sum, zeros, random, array, argwhere, vectorize, mgrid
 from pygame import Rect
 
-from data.goalData import Goal
-from data.playerData import Player
-from data.tileData import Tile
+from data.objects.camera_data import Camera
+from data.objects.goal_data import Goal
+from data.objects.player_data import Player
+from data.objects.tile_data import Tile
 from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SPRITE, PLAYER_SIZE, \
     TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, NOISE_DENSITY, SCREEN_GRID_SIZE, GRID_HEIGHT, GRID_WIDTH
 
@@ -39,7 +40,7 @@ def pos_inside_screen(pos: ndarray, camera_offset: ndarray = zeros(2)) -> bool:
     :param camera_offset: camera offset
     :return: True if inside screen, False otherwise
     """
-    return (0 <= pos + camera_offset).all() and (pos + camera_offset < SCREEN_SIZE).all()
+    return (pos + camera_offset >= 0).all() and (pos + camera_offset < SCREEN_SIZE).all()
 
 
 def rect_inside_screen(rect: Rect, camera_offset) -> bool:
@@ -92,16 +93,19 @@ def get_grid_index(pos: ndarray) -> ndarray:
     return (pos // TILE_SIZE).astype(int)
 
 
-def get_screen_grid(tile_grid: ndarray, camera_topleft: ndarray) -> ndarray:
+def get_screen_grid(tile_grid: ndarray, camera: Camera) -> ndarray:
     """
     Returns a sub grid of `tile_grid` which is the current tile grid visible on screen.
 
     :param tile_grid: world grid
-    :param camera_topleft: top left corner of the camera in world space
+    :param camera: camera data
     :return: tile grid visible on screen
     """
-    idx: ndarray = (get_grid_index(camera_topleft)).clip(0, GRID_SIZE - 1)  # conversion in grid space
-    return tile_grid[idx[0]:idx[0]+SCREEN_GRID_SIZE[0]+1, idx[1]:idx[1]+SCREEN_GRID_SIZE[1]+1]
+    idx: ndarray = (get_grid_index(camera.top_left)).clip(0, GRID_SIZE - 1)  # conversion in grid space
+    return tile_grid[
+           idx[0]: idx[0] + SCREEN_GRID_SIZE[0] + 1,
+           idx[1]: idx[1] + SCREEN_GRID_SIZE[1] + 1
+           ]
 
 
 def get_neighbor_grid(tile_grid: ndarray, idx: ndarray) -> ndarray:
@@ -112,7 +116,10 @@ def get_neighbor_grid(tile_grid: ndarray, idx: ndarray) -> ndarray:
     :return: index neighborhood
     """
     clamped_idx: ndarray = idx.clip(1, GRID_SIZE - 2)
-    return tile_grid[clamped_idx[0]-1:clamped_idx[0]+2, clamped_idx[1]-1:clamped_idx[1]+2]
+    return tile_grid[
+           clamped_idx[0] - 1: clamped_idx[0] + 2,
+           clamped_idx[1] - 1: clamped_idx[1] + 2
+           ]
 
 
 # ----------------
@@ -155,9 +162,11 @@ cells_to_tiles: Callable = vectorize(cell_to_tile)
 def generate_world() -> Tuple[ndarray, Player, Goal]:
     """
     Returns a world grid containing the wall tiles, and none for the empty tiles.
-    Returns also a one-dimensional list of the wall tiles and the player and goal.
+    Returns also the spawned player and goal.
 
-    Algorithm is based on vectorized cellular automaton implementation described here :
+    Algorithm uses cellular automaton cave generation described here : https://youtu.be/slTEz6555Ts
+
+    Implementation is based on vectorized cellular automaton implementation described here :
     https://lhoupert.fr/test-jbook/04-code-vectorization.html#uniform-vectorization
 
     :return: world grid, player, goal
@@ -180,12 +189,12 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
         n_count_grid_flat: ndarray = n_count_grid.ravel()
 
         # cellular automaton rules
-        wall = argwhere(n_count_grid_flat > 4)
-        empty_ = argwhere(n_count_grid_flat <= 3)
+        wall_tiles = argwhere(n_count_grid_flat > 4)
+        empty_tiles = argwhere(n_count_grid_flat <= 3)
 
         # rules application
-        bool_grid_flat[wall] = True
-        bool_grid_flat[empty_] = False
+        bool_grid_flat[wall_tiles] = True
+        bool_grid_flat[empty_tiles] = False
 
         # border tiles are walls
         bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True

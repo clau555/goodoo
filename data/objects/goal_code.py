@@ -4,7 +4,7 @@ from numpy import ndarray
 
 from pygame.surface import Surface
 
-from data.goalData import Goal
+from data.objects.goal_data import Goal
 
 
 def update_goal(goal: Goal) -> Goal:

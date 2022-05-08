@@ -3,7 +3,7 @@ from typing import Callable
 from numpy import vectorize, ndarray
 from pygame import Surface
 
-from data.tileData import Tile
+from data.objects.tile_data import Tile
 
 
 def display_tile(tile: Tile, screen: Surface, camera_offset: ndarray) -> None:
