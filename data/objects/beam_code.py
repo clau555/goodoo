@@ -51,7 +51,7 @@ def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera: Camera, 
         end += step
 
         # increasing vector until it collides with a tile or goes out of screen
-        while not collide and pos_inside_screen(end, camera.offset) and pos_inside_grid(end):
+        while not collide and pos_inside_screen(end, camera) and pos_inside_grid(end):
 
             idx: ndarray = get_grid_index(end)
             if tile_grid[idx[0], idx[1]]:
