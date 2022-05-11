@@ -67,7 +67,7 @@ def main() -> None:
 
         camera = update_camera(camera, array(player.rect.center), delta)
 
-        beam = update_beam(beam, player, tile_grid, camera.offset, delta)
+        beam = update_beam(beam, player, tile_grid, camera, delta)
         if click and on_ground:
             beam = fire_beam(beam)
             on_ground = False
@@ -88,9 +88,9 @@ def main() -> None:
         screen: Surface = pygame.display.get_surface()
         screen.fill((0, 0, 0))  # refresh screen
 
-        display_goal(goal, screen, camera.offset)
-        display_beam(beam, screen, camera.offset)
-        display_player(player, screen, camera.offset)
+        display_goal(goal, screen, camera)
+        display_beam(beam, screen, camera)
+        display_player(player, screen, camera)
 
         # only displays tiles visible on screen
         visible_tiles: ndarray = get_screen_grid(tile_grid, camera)

@@ -1,9 +1,8 @@
 from dataclasses import replace
 
-from numpy import ndarray
-
 from pygame.surface import Surface
 
+from data.objects.camera_data import Camera
 from data.objects.goal_data import Goal
 
 
@@ -13,12 +12,12 @@ def update_goal(goal: Goal) -> Goal:
     return replace(goal, current_sprite=idx)
 
 
-def display_goal(goal: Goal, screen: Surface, camera_offset: ndarray) -> None:
+def display_goal(goal: Goal, screen: Surface, camera: Camera) -> None:
     """
     Displays the goal on the screen and animates it.
 
     :param goal: goal data
     :param screen: screen surface
-    :param camera_offset: camera offset
+    :param camera: camera data
     """
-    screen.blit(goal.sprites[int(goal.current_sprite)], goal.rect.topleft + camera_offset)
+    screen.blit(goal.sprites[int(goal.current_sprite)], goal.rect.topleft + camera.offset)

@@ -1,7 +1,9 @@
-from typing import Tuple, Optional, Callable
+from typing import Tuple, Optional, Callable, List
 
-from numpy import ndarray, sqrt, sum, zeros, random, array, argwhere, vectorize, mgrid
+from numpy import ndarray, sqrt, sum, zeros, random, array, argwhere, vectorize, mgrid, invert, full, amin, sign
 from pygame import Rect
+from scipy.ndimage.measurements import label
+from scipy.spatial.distance import cdist
 
 from data.objects.camera_data import Camera
 from data.objects.goal_data import Goal
@@ -25,34 +27,34 @@ def scale(v: ndarray, length: float) -> ndarray:
     :param length: length to scale to
     :return: scaled vector
     """
-    return v / sqrt(sum(v**2)) * length
+    return v / sqrt(sum(v ** 2)) * length
 
 
 # ------
 # Screen
 # ------
 
-def pos_inside_screen(pos: ndarray, camera_offset: ndarray = zeros(2)) -> bool:
+def pos_inside_screen(pos: ndarray, camera: Camera) -> bool:
     """
     Checks if a position is inside the screen.
 
     :param pos: position in world space
-    :param camera_offset: camera offset
+    :param camera: camera data
     :return: True if inside screen, False otherwise
     """
-    return (pos + camera_offset >= 0).all() and (pos + camera_offset < SCREEN_SIZE).all()
+    return (pos + camera.offset >= 0).all() and (pos + camera.offset < SCREEN_SIZE).all()
 
 
-def rect_inside_screen(rect: Rect, camera_offset) -> bool:
+def rect_inside_screen(rect: Rect, camera: Camera) -> bool:
     """
     Checks if a rectangle is visible in the screen.
 
     :param rect: rectangle in world space
-    :param camera_offset: camera offset
+    :param camera: camera data
     :return: True if visible, False otherwise
     """
     offset_rect: Rect = Rect(rect)
-    offset_rect.topleft = offset_rect.topleft + camera_offset
+    offset_rect.topleft = offset_rect.topleft + camera.offset
     return SCREEN_RECT.colliderect(offset_rect)
 
 
@@ -111,6 +113,7 @@ def get_screen_grid(tile_grid: ndarray, camera: Camera) -> ndarray:
 def get_neighbor_grid(tile_grid: ndarray, idx: ndarray) -> ndarray:
     """
     Returns neighborhood grid of the given tile position.
+
     :param tile_grid: world grid
     :param idx: world tile position
     :return: index neighborhood
@@ -207,9 +210,9 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
 
     # hard coded player and goal
-    player_pos = array((10, 10)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
+    player_pos = array((GRID_WIDTH / 2, 40)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
     player = Player(Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
-    goal_pos = array((40, 40)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
+    goal_pos = array((GRID_WIDTH, GRID_HEIGHT)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
     goal = Goal(Rect(goal_pos, tuple(TILE_SIZE)))
 
     return tile_grid, player, goal

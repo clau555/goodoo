@@ -6,42 +6,43 @@ from numpy.linalg import linalg
 from pygame.surface import Surface
 
 from data.objects.beam_data import Beam
+from data.objects.camera_data import Camera
 from data.objects.player_data import Player
 from data.utils.constants import BEAM_STRENGTH, BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE
 from data.utils.functions import scale, pos_inside_screen, get_grid_index, pos_inside_grid
 
 
-def display_beam(beam: Beam, screen: Surface, camera_offset: ndarray) -> None:
+def display_beam(beam: Beam, screen: Surface, camera: Camera) -> None:
     """
     Displays the beam on the screen.
 
     :param beam: beam data
     :param screen: screen surface
-    :param camera_offset: camera offset
+    :param camera: camera data
     """
     pygame.draw.line(
         screen,
         (255, 0, 0),
-        beam.start + camera_offset,
-        beam.end + camera_offset,
+        beam.start + camera.offset,
+        beam.end + camera.offset,
         int(beam.power * TILE_EDGE / 2)
     )
 
 
-def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera_offset: ndarray, delta: float) -> Beam:
+def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera: Camera, delta: float) -> Beam:
     """
     Updates the beam, decreasing its power and setting its start and end points.
 
     :param beam: beam data
     :param player: player data
     :param tile_grid: world grid
-    :param camera_offset: camera offset, used to calculate mouse position in world
+    :param camera: camera data, used to calculate mouse position in world
     :param delta: delta time
     :return: updated beam data
     """
     start: ndarray = array(player.rect.center).astype(float)
     end: ndarray = array(start)
-    step: ndarray = array(pygame.mouse.get_pos()) - camera_offset - start
+    step: ndarray = array(pygame.mouse.get_pos()) - camera.offset - start
 
     if linalg.norm(step) != 0:
 
@@ -50,7 +51,7 @@ def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera_offset: n
         end += step
 
         # increasing vector until it collides with a tile or goes out of screen
-        while not collide and pos_inside_screen(end, camera_offset) and pos_inside_grid(end):
+        while not collide and pos_inside_screen(end, camera.offset) and pos_inside_grid(end):
 
             idx: ndarray = get_grid_index(end)
             if tile_grid[idx[0], idx[1]]:
