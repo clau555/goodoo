@@ -86,5 +86,5 @@ def get_beam_velocity(beam: Beam) -> ndarray:
         v: ndarray = beam.start - beam.end
         if linalg.norm(v) != 0:
             v = scale(v, BEAM_STRENGTH)
-            return array(v)
+            return v
     return array((0, 0))

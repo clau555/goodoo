@@ -167,13 +167,19 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     Returns a world grid containing the wall tiles, and none for the empty tiles.
     Returns also the spawned player and goal.
 
-    Algorithm uses cellular automaton cave generation described here : https://youtu.be/slTEz6555Ts
+    Algorithm uses procedural cave generation with cellular automaton and generation of connections between rooms.
+    https://www.youtube.com/playlist?list=PLFt_AvWsXl0eZgMK_DT5_biRkWXftAOf9
 
-    Implementation is based on vectorized cellular automaton implementation described here :
-    https://lhoupert.fr/test-jbook/04-code-vectorization.html#uniform-vectorization
+    Implementation uses uniform vectorization.
+    https://lhoupert.fr/test-jbook/04-code-vectorization.html
 
     :return: world grid, player, goal
     """
+
+    # ------------------
+    # Cellular automaton
+    # ------------------
+
     # initial noise grid
     bool_grid: ndarray = random.choice(
         a=[True, False],
@@ -181,38 +187,144 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
         p=[NOISE_DENSITY, 1 - NOISE_DENSITY]
     )
 
+    # number of wall tiles neighbors for each cell
+    n_count_grid: ndarray = get_neighbors_count_grid(bool_grid)
+
     # cellular automaton execution
     for _ in range(AUTOMATON_ITERATION):
 
-        # getting each cell neighbors count
-        n_count_grid: ndarray = get_neighbors_count_grid(bool_grid)
+        # resetting neighbors count
+        n_count_grid = get_neighbors_count_grid(bool_grid)
 
         # flatten grids
         bool_grid_flat: ndarray = bool_grid.ravel()
         n_count_grid_flat: ndarray = n_count_grid.ravel()
 
-        # cellular automaton rules
-        wall_tiles = argwhere(n_count_grid_flat > 4)
-        empty_tiles = argwhere(n_count_grid_flat <= 3)
-
         # rules application
-        bool_grid_flat[wall_tiles] = True
-        bool_grid_flat[empty_tiles] = False
+        bool_grid_flat[argwhere(n_count_grid_flat > 4)] = True
+        bool_grid_flat[argwhere(n_count_grid_flat <= 3)] = False
 
         # border tiles are walls
         bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
 
-    # TODO: localize regions and build paths between them
-    # TODO: add player and goal spawn points
+    # -----------------------------------------------------
+    # Getting rooms connections lines start and stop points
+    # -----------------------------------------------------
 
-    # conversion to tile grid
+    # localizing rooms of empty tiles
+    room_grid, n_rooms = label(invert(bool_grid))
+
+    # matrix indicating if two rooms are connected between each other
+    connections: ndarray = full((n_rooms, n_rooms), False)
+
+    connections_idxes: List = []  # TODO find size of this thing in advance
+
+    # starting from room 1 because room 0 contains all the wall tiles
+    for a in range(1, n_rooms):
+        for b in range(1, n_rooms):
+
+            # skipping to next room if the two rooms are the same
+            # or if they are already connected
+            if a == b or connections[a, b] or connections[b, a]:
+                continue
+
+            # indexes of rooms contours
+            contours_a_idxes: ndarray = argwhere((room_grid == a) & (n_count_grid > 0))
+            contours_b_idxes: ndarray = argwhere((room_grid == b) & (n_count_grid > 0))
+
+            # matrix of distances between each contours
+            distances: ndarray = cdist(contours_a_idxes, contours_b_idxes)
+
+            # finding the smallest distance index
+            min_dist_idx: ndarray = argwhere(distances == amin(distances))[0]
+
+            # getting the two closest tiles, ie the two connection line ends
+            tile_a_idx: ndarray = contours_a_idxes[min_dist_idx[0]]
+            tile_b_idx: ndarray = contours_b_idxes[min_dist_idx[1]]
+
+            # marking the two rooms as connected
+            connections[a, b] = connections[b, a] = True
+
+            # adding the two points to our list of connections
+            connections_idxes.append((tile_a_idx, tile_b_idx))
+
+    connections_idxes: ndarray = array(connections_idxes, dtype=int)
+
+    # ---------------------------------------------------------
+    # Creating connections between rooms by removing wall tiles
+    # ---------------------------------------------------------
+
+    for connection in connections_idxes:
+
+        x: int = connection[0, 0]
+        y: int = connection[0, 1]
+
+        dx: int = connection[1, 0] - x
+        dy: int = connection[1, 1] - y
+
+        inverted: bool = False
+        step: int = sign(dx)
+        step_grad: int = sign(dy)
+        longest: int = abs(dx)
+        shortest: int = abs(dy)
+
+        if longest < shortest:
+            inverted = True
+            step: int = sign(dy)
+            step_grad: int = sign(dx)
+            longest = abs(dy)
+            shortest = abs(dx)
+
+        # line gradient
+        grad: float = longest / 2
+
+        # will store tile coordinates which are on the current line
+        line: ndarray = zeros((longest, 2), dtype=int)
+
+        for i in range(longest):
+            line[i] = array((x, y))
+
+            if inverted:
+                y += step
+            else:
+                x += step
+
+            grad += shortest
+
+            if grad >= longest:
+                if inverted:
+                    x += step_grad
+                else:
+                    y += step_grad
+                grad -= longest
+
+        # making sure the path doesn't cross another room
+        if False not in bool_grid[line[1:-1, 0], line[1:-1, 1]]:
+
+            # digging in a cross pattern to ensure space for player
+            bool_grid[line[:, 0], line[:, 1]] = \
+                bool_grid[line[:, 0] + 1, line[:, 1]] = \
+                bool_grid[line[:, 0] - 1, line[:, 1]] = \
+                bool_grid[line[:, 0], line[:, 1] + 1] = \
+                bool_grid[line[:, 0], line[:, 1] - 1] = False
+
+    # ensuring wall grid borders one last time
+    bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
+
+    # ---------------------------------
+    # TODO player and goal spawn points
+    # ---------------------------------
+
+    player_pos = array((GRID_WIDTH / 2, GRID_HEIGHT - 1)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
+    player = Player(Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+    goal_pos = array((GRID_WIDTH / 2, 1)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
+    goal = Goal(Rect(goal_pos, tuple(TILE_SIZE)))
+
+    # --------------------------------------------
+    # converting grid of booleans to grid of tiles
+    # --------------------------------------------
+
     x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
     tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
-
-    # hard coded player and goal
-    player_pos = array((GRID_WIDTH / 2, 40)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
-    player = Player(Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
-    goal_pos = array((GRID_WIDTH, GRID_HEIGHT)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
-    goal = Goal(Rect(goal_pos, tuple(TILE_SIZE)))
 
     return tile_grid, player, goal

@@ -66,7 +66,7 @@ GRAVITY: ndarray = array((0, PLAYER_MAX_V / 75))
 CAMERA_SPEED: float = 0.3
 
 # beam physics
-BEAM_STRENGTH: float = PLAYER_MAX_V / 4  # beam impulse velocity length
+BEAM_STRENGTH: float = TILE_EDGE / 6  # beam impulse velocity length
 BEAM_DURATION: float = 0.3  # beam duration in seconds
 BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)
 BEAM_VECTOR_STEP: float = TILE_EDGE / 3

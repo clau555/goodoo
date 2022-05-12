@@ -29,8 +29,6 @@ def main() -> None:
     clock: Clock = pygame.time.Clock()
     last_time: float = time.time()
 
-    on_ground: bool = False
-
     while True:
 
         # ------
@@ -60,17 +58,11 @@ def main() -> None:
         delta: float = (time.time() - last_time) * FPS
         last_time = time.time()
 
-        # using an alternate variable rather than player.on_ground
-        # because it keeps looping to true/false when on ground due to rect collision
-        if player.on_ground:
-            on_ground = True
-
         camera = update_camera(camera, array(player.rect.center), delta)
 
         beam = update_beam(beam, player, tile_grid, camera, delta)
-        if click and on_ground:
+        if click and beam.power == 0:
             beam = fire_beam(beam)
-            on_ground = False
 
         player = update_player(player, get_beam_velocity(beam), tile_grid, delta)
 
@@ -88,15 +80,15 @@ def main() -> None:
         screen: Surface = pygame.display.get_surface()
         screen.fill((0, 0, 0))  # refresh screen
 
-        display_goal(goal, screen, camera)
         display_beam(beam, screen, camera)
-        display_player(player, screen, camera)
 
         # only displays tiles visible on screen
         visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
-        display_tiles(visible_tiles, screen, camera_offset=camera.offset)
+        display_tiles(visible_tiles, screen, camera)
 
-        # display cursor
+        display_goal(goal, screen, camera)
+        display_player(player, screen, camera)
+
         cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
         screen.blit(CURSOR_SPRITE, cursor_pos)
 
