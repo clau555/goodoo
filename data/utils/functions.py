@@ -1,16 +1,19 @@
 from typing import Tuple, Optional, Callable, List
 
-from numpy import ndarray, sqrt, sum, zeros, random, array, argwhere, vectorize, mgrid, invert, full, amin, sign
+from numpy import ndarray, sqrt, sum, zeros, random, array, argwhere, vectorize, mgrid, invert, amin, sign
+from numpy.random import randint
 from pygame import Rect
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
+from data.objects.bonus_data import Bonus
 from data.objects.camera_data import Camera
 from data.objects.goal_data import Goal
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
 from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SPRITE, PLAYER_SIZE, \
-    TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, NOISE_DENSITY, SCREEN_GRID_SIZE, GRID_HEIGHT, GRID_WIDTH
+    TILE_SIZE, GOAL_SIZE, SCREEN_RECT, AUTOMATON_ITERATION, NOISE_DENSITY, SCREEN_GRID_SIZE, GRID_HEIGHT, GRID_WIDTH, \
+    BONUS_SIZE, BONUS_REPARTITION
 
 
 # ----
@@ -95,16 +98,16 @@ def get_grid_index(pos: ndarray) -> ndarray:
     return (pos // TILE_SIZE).astype(int)
 
 
-def get_screen_grid(tile_grid: ndarray, camera: Camera) -> ndarray:
+def get_screen_grid(grid: ndarray, camera: Camera) -> ndarray:
     """
     Returns a sub grid of `tile_grid` which is the current tile grid visible on screen.
 
-    :param tile_grid: world grid
+    :param grid: world grid
     :param camera: camera data
     :return: tile grid visible on screen
     """
     idx: ndarray = (get_grid_index(camera.top_left)).clip(0, GRID_SIZE - 1)  # conversion in grid space
-    return tile_grid[
+    return grid[
            idx[0]: idx[0] + SCREEN_GRID_SIZE[0] + 1,
            idx[1]: idx[1] + SCREEN_GRID_SIZE[1] + 1
            ]
@@ -162,7 +165,7 @@ def cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes: ndarray) -> Optional[Til
 cells_to_tiles: Callable = vectorize(cell_to_tile)
 
 
-def generate_world() -> Tuple[ndarray, Player, Goal]:
+def generate_world() -> Tuple[ndarray, Player, Goal, ndarray]:
     """
     Returns a world grid containing the wall tiles, and none for the empty tiles.
     Returns also the spawned player and goal.
@@ -173,7 +176,7 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     Implementation uses uniform vectorization.
     https://lhoupert.fr/test-jbook/04-code-vectorization.html
 
-    :return: world grid, player, goal
+    :return: world grid, player, goal, bonuses
     """
 
     # ------------------
@@ -192,7 +195,6 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
 
     # cellular automaton execution
     for _ in range(AUTOMATON_ITERATION):
-
         # resetting neighbors count
         n_count_grid = get_neighbors_count_grid(bool_grid)
 
@@ -215,7 +217,7 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     room_grid, n_rooms = label(invert(bool_grid))
 
     # matrix indicating if two rooms are connected between each other
-    connections: ndarray = full((n_rooms, n_rooms), False)
+    connections: ndarray = zeros((n_rooms, n_rooms), dtype=bool)
 
     connections_idxes: List = []  # TODO find size of this thing in advance
 
@@ -270,8 +272,8 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
 
         if longest < shortest:
             inverted = True
-            step: int = sign(dy)
-            step_grad: int = sign(dx)
+            step = sign(dy)
+            step_grad = sign(dx)
             longest = abs(dy)
             shortest = abs(dx)
 
@@ -300,7 +302,6 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
 
         # making sure the path doesn't cross another room
         if False not in bool_grid[line[1:-1, 0], line[1:-1, 1]]:
-
             # digging in a cross pattern to ensure space for player
             bool_grid[line[:, 0], line[:, 1]] = \
                 bool_grid[line[:, 0] + 1, line[:, 1]] = \
@@ -311,6 +312,13 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     # ensuring wall grid borders one last time
     bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
 
+    # --------------------------------------------
+    # converting grid of booleans to grid of tiles
+    # --------------------------------------------
+
+    x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
+    tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
+
     # ---------------------------------
     # TODO player and goal spawn points
     # ---------------------------------
@@ -320,11 +328,18 @@ def generate_world() -> Tuple[ndarray, Player, Goal]:
     goal_pos = array((GRID_WIDTH / 2, 1)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
     goal = Goal(Rect(goal_pos, tuple(TILE_SIZE)))
 
-    # --------------------------------------------
-    # converting grid of booleans to grid of tiles
-    # --------------------------------------------
+    # ---------------
+    # placing bonuses
+    # ---------------
 
-    x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
-    tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
+    bonuses: List = []
+    for y in range(GRID_HEIGHT - BONUS_REPARTITION, 0, -BONUS_REPARTITION):
 
-    return tile_grid, player, goal
+        empty_xs: ndarray = argwhere(bool_grid[:, y] == False)  # `== False` instead of `not`/`is' to avoid numpy error
+        if empty_xs.size > 0:
+            x = empty_xs[randint(0, empty_xs.size - 1)]
+
+            bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
+            bonuses.append(Bonus(Rect(tuple(bonus_pos), tuple(BONUS_SIZE))))
+
+    return tile_grid, player, goal, array(bonuses)

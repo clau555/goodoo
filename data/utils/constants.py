@@ -53,7 +53,7 @@ GOAL_SPRITES: List[Surface] = list(map(
 PLAYER_SIZE: ndarray = TILE_SIZE * 3/4
 PLAYER_IMG: Surface = pygame.image.load("resources/sprites/player.png")
 PLAYER_SPRITE: Surface = pygame.transform.scale(PLAYER_IMG, tupint(PLAYER_SIZE))
-PLAYER_MAX_V: int = TILE_SIZE[0] - 1
+PLAYER_MAX_V: int = TILE_EDGE - TILE_EDGE // 6
 
 # cursor
 CURSOR_SIZE: ndarray = TILE_SIZE * 3/4
@@ -65,8 +65,16 @@ FPS: int = 60
 GRAVITY: ndarray = array((0, PLAYER_MAX_V / 75))
 CAMERA_SPEED: float = 0.3
 
-# beam physics
-BEAM_STRENGTH: float = TILE_EDGE / 6  # beam impulse velocity length
+# beam
 BEAM_DURATION: float = 0.3  # beam duration in seconds
 BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)
 BEAM_VECTOR_STEP: float = TILE_EDGE / 3
+BEAM_INIT_STRENGTH: float = TILE_EDGE / 10  # beam impulse velocity length
+BEAM_MAX_STRENGTH: float = TILE_EDGE / 4
+
+# bonus
+BONUS_SIZE: ndarray = TILE_SIZE / 2
+BONUS_IMG: Surface = pygame.image.load("resources/sprites/bonus.png")
+BONUS_SPRITE: Surface = pygame.transform.scale(BONUS_IMG, tupint(BONUS_SIZE))
+BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
+BONUS_STRENGTH: float = TILE_EDGE / 20  # bonus in beam strength given by bonus
