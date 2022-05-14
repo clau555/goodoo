@@ -1,12 +1,12 @@
 from dataclasses import replace
 from typing import Callable
 
-from numpy import vectorize
-from pygame import Surface
+from numpy import vectorize, cos
+from pygame import Surface, Rect
 
 from data.objects.bonus_data import Bonus
 from data.objects.camera_data import Camera
-from data.utils.constants import BONUS_SPRITE
+from data.utils.constants import BONUS_SPRITE, TILE_EDGE
 
 
 def display_bonus(bonus: Bonus, screen: Surface, camera: Camera) -> None:
@@ -22,6 +22,12 @@ def display_bonus(bonus: Bonus, screen: Surface, camera: Camera) -> None:
 
 
 display_bonuses: Callable = vectorize(display_bonus)
+
+
+def update_bonus(bonus: Bonus, counter: int) -> Bonus:
+    rect: Rect = bonus.rect
+    rect.y = bonus.origin[1] + cos(counter) * TILE_EDGE / 3
+    return replace(bonus, rect=rect)
 
 
 def destroy_bonus(bonus: Bonus) -> Bonus:

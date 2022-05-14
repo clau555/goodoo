@@ -340,6 +340,7 @@ def generate_world() -> Tuple[ndarray, Player, Goal, ndarray]:
             x = empty_xs[randint(0, empty_xs.size - 1)]
 
             bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
-            bonuses.append(Bonus(Rect(tuple(bonus_pos), tuple(BONUS_SIZE))))
+            bonus_rect: Rect = Rect(tuple(bonus_pos), tuple(BONUS_SIZE))
+            bonuses.append(Bonus(bonus_rect, array(bonus_rect.topleft)))
 
     return tile_grid, player, goal, array(bonuses)

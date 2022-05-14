@@ -58,6 +58,7 @@ def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera: Camera, 
                 collide = True
             end += step
 
+    # decreasing beam power slowly over time
     power: float = beam.power - BEAM_DECREASE * delta
     power = 0 if power < 0 else power  # clamp power to 0
 

@@ -1,19 +1,20 @@
 import time
 
 import pygame
-from numpy import ndarray, array, where
+from numpy import ndarray, array, ndenumerate
 from pygame.surface import Surface
 from pygame.time import Clock
 
 from data.objects.beam_code import update_beam, fire_beam, get_beam_velocity, display_beam, add_strength
 from data.objects.beam_data import Beam
-from data.objects.bonus_code import display_bonuses, destroy_bonus
+from data.objects.bonus_code import display_bonuses, destroy_bonus, update_bonus
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
 from data.objects.goal_code import update_goal, display_goal
 from data.objects.player_code import update_player, display_player
 from data.objects.tile_code import display_tiles
-from data.utils.constants import FPS, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE, BONUS_STRENGTH
+from data.utils.constants import FPS, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE, BONUS_STRENGTH, BACKGROUND_SPRITE, \
+    ANIMATION_SPEED
 from data.utils.functions import generate_world, get_screen_grid, rect_inside_screen
 
 
@@ -26,6 +27,7 @@ def main() -> None:
     tile_grid, player, goal, bonuses = generate_world()
     beam: Beam = Beam()
     camera: Camera = Camera()
+    animation_counter: int = 0
 
     clock: Clock = pygame.time.Clock()
     last_time: float = time.time()
@@ -68,10 +70,12 @@ def main() -> None:
         player = update_player(player, get_beam_velocity(beam), tile_grid, delta)
 
         strength: float = 0
-        for bonus in bonuses:
+        for i, bonus in ndenumerate(bonuses):
+            bonuses[i] = update_bonus(bonus, animation_counter)
+
+            # player grabbing
             if player.rect.colliderect(bonus.rect) and bonus.alive:
-                # player grabs bonus
-                bonuses[where(bonuses == bonus)] = destroy_bonus(bonus)
+                bonuses[i] = destroy_bonus(bonus)
                 strength += BONUS_STRENGTH
 
         beam = add_strength(beam, strength)
@@ -88,7 +92,8 @@ def main() -> None:
         # -------
 
         screen: Surface = pygame.display.get_surface()
-        screen.fill((0, 0, 0))  # refresh screen
+
+        screen.blit(BACKGROUND_SPRITE, (0, 0))
 
         display_beam(beam, screen, camera)
 
@@ -105,6 +110,8 @@ def main() -> None:
 
         cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
         screen.blit(CURSOR_SPRITE, cursor_pos)
+
+        animation_counter += ANIMATION_SPEED
 
         pygame.display.flip()
         clock.tick(FPS)
