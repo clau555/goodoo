@@ -336,7 +336,7 @@ def generate_world() -> Tuple[ndarray, Player, Goal, ndarray]:
     for y in range(GRID_HEIGHT - BONUS_REPARTITION, 0, -BONUS_REPARTITION):
 
         empty_xs: ndarray = argwhere(bool_grid[:, y] == False)  # `== False` instead of `not`/`is' to avoid numpy error
-        if empty_xs.size > 0:
+        if empty_xs.size > 1:
             x = empty_xs[randint(0, empty_xs.size - 1)]
 
             bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
