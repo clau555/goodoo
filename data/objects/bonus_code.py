@@ -1,30 +1,20 @@
 from dataclasses import replace
-from typing import Callable
 
-from numpy import vectorize, cos
-from pygame import Surface, Rect
+from numpy import cos
+from pygame import Rect
 
 from data.objects.bonus_data import Bonus
-from data.objects.camera_data import Camera
-from data.utils.constants import BONUS_SPRITE, TILE_EDGE
+from data.utils.constants import TILE_EDGE
 
 
-def display_bonus(bonus: Bonus, screen: Surface, camera: Camera) -> None:
+def update_bonus(bonus: Bonus, counter: float) -> Bonus:
     """
-    Displays the bonus on the screen.
+    Makes the bonus cycle in a movement from top to bottom.
 
     :param bonus: bonus data
-    :param screen: screen surface
-    :param camera: camera data
+    :param counter: game counter
+    :return: updated bonus data
     """
-    if bonus.alive:
-        screen.blit(BONUS_SPRITE, bonus.rect.topleft + camera.offset)
-
-
-display_bonuses: Callable = vectorize(display_bonus)
-
-
-def update_bonus(bonus: Bonus, counter: int) -> Bonus:
     rect: Rect = bonus.rect
     rect.y = bonus.origin[1] + cos(counter) * TILE_EDGE / 3
     return replace(bonus, rect=rect)

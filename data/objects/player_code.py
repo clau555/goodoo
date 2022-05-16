@@ -3,23 +3,10 @@ from dataclasses import replace
 from numpy import ndarray, array, ndenumerate
 from numpy.linalg import linalg
 from pygame.rect import Rect
-from pygame.surface import Surface
 
-from data.objects.camera_data import Camera
 from data.objects.player_data import Player
 from data.utils.constants import GRAVITY, PLAYER_MAX_V
 from data.utils.functions import scale, get_grid_index, get_neighbor_grid, idx_inside_grid
-
-
-def display_player(player: Player, screen: Surface, camera: Camera) -> None:
-    """
-    Displays the player's sprite on the screen.
-
-    :param player: player data
-    :param screen: screen surface
-    :param camera: camera data
-    """
-    screen.blit(player.sprite, player.rect.topleft + camera.offset)
 
 
 def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, delta: float) -> Player:
@@ -47,7 +34,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
         raise ValueError("Player out of bounds")
     neighbor_tiles: ndarray = get_neighbor_grid(tile_grid, player_idx)
 
-    rect: Rect = Rect(player.rect.topleft, player.rect.size)
+    rect: Rect = Rect(player.rect)
     on_ground: bool = False
 
     # x movement executes first
