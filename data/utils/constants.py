@@ -1,8 +1,9 @@
 from typing import List
 
-import pygame.image
 from numpy import array, ndarray
 from pygame import Surface, Rect
+from pygame.image import load
+from pygame.transform import scale
 
 # screen
 # TODO render on 384x216 only
@@ -13,8 +14,8 @@ SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 # tile
 TILE_EDGE: int = SCREEN_SIZE[0] // 32  # tile edge size in pixels
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
-TILE_IMG: Surface = pygame.image.load("resources/sprites/tile.png")
-TILE_SPRITE: Surface = pygame.transform.scale(TILE_IMG, TILE_SIZE)
+TILE_IMG: Surface = load("resources/sprites/tile.png")
+TILE_SPRITE: Surface = scale(TILE_IMG, TILE_SIZE)
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
@@ -33,24 +34,24 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 # goal tile
 GOAL_SIZE: ndarray = TILE_SIZE
 GOAL_IMAGES: List[Surface] = [
-    pygame.image.load("resources/sprites/goal_1.png"),
-    pygame.image.load("resources/sprites/goal_2.png"),
-    pygame.image.load("resources/sprites/goal_3.png"),
+    load("resources/sprites/goal_1.png"),
+    load("resources/sprites/goal_2.png"),
+    load("resources/sprites/goal_3.png"),
 ]
 GOAL_SPRITES: List[Surface] = list(
-    map(lambda img: pygame.transform.scale(img, GOAL_SIZE), GOAL_IMAGES)
+    map(lambda img: scale(img, GOAL_SIZE), GOAL_IMAGES)
 )
 
 # player
 PLAYER_SIZE: ndarray = TILE_SIZE * 3/4
-PLAYER_IMG: Surface = pygame.image.load("resources/sprites/player.png")
-PLAYER_SPRITE: Surface = pygame.transform.scale(PLAYER_IMG, PLAYER_SIZE)
+PLAYER_IMG: Surface = load("resources/sprites/player.png")
+PLAYER_SPRITE: Surface = scale(PLAYER_IMG, PLAYER_SIZE)
 PLAYER_MAX_V: int = TILE_EDGE - TILE_EDGE // 6
 
 # cursor
 CURSOR_SIZE: ndarray = TILE_SIZE * 3/4
-CURSOR_IMG: Surface = pygame.image.load("resources/sprites/cursor.png")
-CURSOR_SPRITE: Surface = pygame.transform.scale(CURSOR_IMG, CURSOR_SIZE)
+CURSOR_IMG: Surface = load("resources/sprites/cursor.png")
+CURSOR_SPRITE: Surface = scale(CURSOR_IMG, CURSOR_SIZE)
 
 # physics
 FPS: int = 60
@@ -67,21 +68,21 @@ BEAM_MAX_STRENGTH: float = TILE_EDGE / 4
 
 # bonus
 BONUS_SIZE: ndarray = TILE_SIZE / 2
-BONUS_IMG: Surface = pygame.image.load("resources/sprites/bonus.png")
-BONUS_SPRITE: Surface = pygame.transform.scale(BONUS_IMG, BONUS_SIZE)
+BONUS_IMG: Surface = load("resources/sprites/bonus.png")
+BONUS_SPRITE: Surface = scale(BONUS_IMG, BONUS_SIZE)
 BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
 BONUS_STRENGTH: float = TILE_EDGE / 20  # bonus in beam strength given by bonus
 
 # lava
-LAVA_IMAGES: List[Surface] = [pygame.image.load("resources/sprites/lava.png")]
+LAVA_IMAGES: List[Surface] = [load("resources/sprites/lava.png")]
 LAVA_SPRITES: List[Surface] = list(
-    map(lambda img: pygame.transform.scale(img, TILE_SIZE), LAVA_IMAGES)
+    map(lambda img: scale(img, TILE_SIZE), LAVA_IMAGES)
 )
 LAVA_INIT_SPEED: float = TILE_EDGE / 50
 
 # background
-BACKGROUND_IMG: Surface = pygame.image.load("resources/sprites/background.png")
-BACKGROUND_SPRITE: Surface = pygame.transform.scale(BACKGROUND_IMG, SCREEN_SIZE)
-BACKGROUND_LAVA_IMG: Surface = pygame.image.load("resources/sprites/background_lava.png")
-BACKGROUND_LAVA_SPRITE: Surface = pygame.transform.scale(BACKGROUND_LAVA_IMG, SCREEN_SIZE)
+BACKGROUND_IMG: Surface = load("resources/sprites/background.png")
+BACKGROUND_SPRITE: Surface = scale(BACKGROUND_IMG, SCREEN_SIZE)
+BACKGROUND_LAVA_IMG: Surface = load("resources/sprites/background_lava.png")
+BACKGROUND_LAVA_SPRITE: Surface = scale(BACKGROUND_LAVA_IMG, SCREEN_SIZE)
 BACKGROUND_LAVA_DISTANCE: float = SCREEN_SIZE[1] * 1.5

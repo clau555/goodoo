@@ -1,8 +1,9 @@
 from dataclasses import replace
 
-import pygame
 from numpy import ndarray, array
 from numpy.linalg import linalg
+from pygame.draw import line
+from pygame.mouse import get_pos
 from pygame.surface import Surface
 
 from data.objects.beam_data import Beam
@@ -20,7 +21,7 @@ def display_beam(beam: Beam, screen: Surface, camera: Camera) -> None:
     :param screen: screen surface
     :param camera: camera data
     """
-    pygame.draw.line(
+    line(
         screen,
         (78, 152, 183),
         beam.start + camera.offset,
@@ -42,7 +43,7 @@ def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera: Camera, 
     """
     start: ndarray = array(player.rect.center).astype(float)
     end: ndarray = array(start)
-    step: ndarray = array(pygame.mouse.get_pos()) - camera.offset - start
+    step: ndarray = array(get_pos()) - camera.offset - start
 
     if linalg.norm(step) != 0:
 

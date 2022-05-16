@@ -2,6 +2,10 @@ import time
 
 import pygame
 from numpy import ndarray, array, ndenumerate
+from pygame import FULLSCREEN, SCALED, QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN
+from pygame.display import set_mode, set_caption, flip, get_surface
+from pygame.event import get
+from pygame.mouse import set_visible, get_pos
 from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
@@ -22,21 +26,21 @@ from data.utils.generation import generate_world
 
 def main() -> None:
     pygame.init()
-    pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN | pygame.SCALED)
-    pygame.display.set_caption("Goodoo")
-    pygame.mouse.set_visible(False)
+    set_mode(SCREEN_SIZE, FULLSCREEN | SCALED)
+    set_caption("Goodoo")
+    set_visible(False)
 
     tile_grid, player, goal, bonuses = generate_world()
 
     beam: Beam = Beam()
-    lava: Rect = Rect(0,  WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE)
+    lava: Rect = Rect(0, WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE)
     camera: Camera = Camera()
 
     counter: float = 0  # incremented every frame
 
-    screen: Surface = pygame.display.get_surface()
+    screen: Surface = get_surface()
 
-    clock: Clock = pygame.time.Clock()
+    clock: Clock = Clock()
     last_time: float = time.time()
 
     while True:
@@ -45,18 +49,18 @@ def main() -> None:
 
         click: bool = False
 
-        for event in pygame.event.get():
+        for event in get():
 
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 pygame.quit()
                 quit()
 
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
                     pygame.quit()
                     quit()
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == MOUSEBUTTONDOWN:
                 click = True
 
         # Model update --------------------------------------------------------
@@ -128,11 +132,10 @@ def main() -> None:
             display_lava(lava, screen, camera, counter)
 
         # cursor
-        cursor_pos: ndarray = array(pygame.mouse.get_pos()) - CURSOR_SIZE * 0.5
-        screen.blit(CURSOR_SPRITE, cursor_pos)
+        screen.blit(CURSOR_SPRITE, array(get_pos()) - CURSOR_SIZE * 0.5)
 
         counter += ANIMATION_SPEED * delta
 
-        pygame.display.flip()
+        flip()
         clock.tick(FPS)
         # print(int(clock.get_fps()))
