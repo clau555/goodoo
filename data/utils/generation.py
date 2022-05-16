@@ -187,16 +187,11 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
     # ensuring borders are walls
     bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
 
-    # Grid of tiles -----------------------------------------------------------
-
-    # TODO add different connected tile texture
-    x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
-    tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
-
     # TODO player / goal ------------------------------------------------------
 
-    player_pos = array((GRID_WIDTH / 2, GRID_HEIGHT - 1)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
-    player = Player(Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+    player_pos = array((GRID_WIDTH / 2, GRID_HEIGHT - 20)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
+    player = Player(player_pos, Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+
     goal_pos = array((GRID_WIDTH / 2, 1)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
     goal = Rect(goal_pos, tuple(TILE_SIZE))
 
@@ -212,5 +207,11 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
             bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
             bonus_rect: Rect = Rect(tuple(bonus_pos), tuple(BONUS_SIZE))
             bonuses.append(Bonus(bonus_rect, array(bonus_rect.topleft)))
+
+    # Grid of tiles -----------------------------------------------------------
+
+    # TODO add different connected tile texture
+    x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
+    tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
 
     return tile_grid, player, goal, array(bonuses)

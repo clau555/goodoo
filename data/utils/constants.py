@@ -6,13 +6,12 @@ from pygame.image import load
 from pygame.transform import scale
 
 # screen
-# TODO render on 384x216 only
-RESOLUTIONS: ndarray = array(((1920, 1080), (1280, 720), (960, 540), (384, 216)))
-SCREEN_SIZE: ndarray = RESOLUTIONS[0]  # select resolution
+ICON: Surface = load("resources/icon.png")
+SCREEN_SIZE: ndarray = array((384, 216))
 SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 
 # tile
-TILE_EDGE: int = SCREEN_SIZE[0] // 32  # tile edge size in pixels
+TILE_EDGE: int = 12  # tile edge size in pixels
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
 TILE_IMG: Surface = load("resources/sprites/tile.png")
 TILE_SPRITE: Surface = scale(TILE_IMG, TILE_SIZE)
@@ -25,14 +24,14 @@ WORLD_RIGHT: int = GRID_WIDTH * TILE_EDGE
 WORLD_BOTTOM: int = GRID_HEIGHT * TILE_EDGE
 
 # grid generation
-AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
 NOISE_DENSITY: float = 0.48  # wall density during noise generation
+AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
 
 # screen dimension in terms of tiles
 SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] // TILE_EDGE))
 
 # goal tile
-GOAL_SIZE: ndarray = TILE_SIZE
+GOAL_SIZE: ndarray = array((10, 10))
 GOAL_IMAGES: List[Surface] = [
     load("resources/sprites/goal_1.png"),
     load("resources/sprites/goal_2.png"),
@@ -43,20 +42,20 @@ GOAL_SPRITES: List[Surface] = list(
 )
 
 # player
-PLAYER_SIZE: ndarray = TILE_SIZE * 3/4
-PLAYER_IMG: Surface = load("resources/sprites/player.png")
+PLAYER_SIZE: ndarray = array((8, 8))
+PLAYER_IMG: Surface = load("resources/sprites/player_1.png")
 PLAYER_SPRITE: Surface = scale(PLAYER_IMG, PLAYER_SIZE)
 PLAYER_MAX_V: int = TILE_EDGE - TILE_EDGE // 6
 
 # cursor
-CURSOR_SIZE: ndarray = TILE_SIZE * 3/4
+CURSOR_SIZE: ndarray = array((6, 6))
 CURSOR_IMG: Surface = load("resources/sprites/cursor.png")
 CURSOR_SPRITE: Surface = scale(CURSOR_IMG, CURSOR_SIZE)
 
 # physics
 FPS: int = 60
 GRAVITY: ndarray = array((0, PLAYER_MAX_V / 75))
-CAMERA_SPEED: float = 0.3
+CAMERA_SPEED: float = 0.08
 ANIMATION_SPEED: float = 0.1
 
 # beam
@@ -67,7 +66,7 @@ BEAM_INIT_STRENGTH: float = TILE_EDGE / 10  # beam impulse velocity length
 BEAM_MAX_STRENGTH: float = TILE_EDGE / 4
 
 # bonus
-BONUS_SIZE: ndarray = TILE_SIZE / 2
+BONUS_SIZE: ndarray = array((4, 4))
 BONUS_IMG: Surface = load("resources/sprites/bonus.png")
 BONUS_SPRITE: Surface = scale(BONUS_IMG, BONUS_SIZE)
 BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses

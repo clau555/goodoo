@@ -25,7 +25,7 @@ def animation_frame(sprites: List[Surface], counter: float):
     Returns current frame of an animation based on the given counter.
 
     :param sprites: list of sprites
-    :param counter: game counter
+    :param counter: animation counter
     :return: current frame
     """
     return sprites[int(counter % len(sprites))]

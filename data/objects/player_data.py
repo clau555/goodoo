@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from numpy import ndarray, array
+from numpy import ndarray, zeros
 from pygame import Rect
 
 
 @dataclass(frozen=True)
 class Player:
+    pos: ndarray
     rect: Rect
-    velocity: ndarray = array((0, 0))
-    on_ground: bool = False
+    velocity: ndarray = zeros(2, dtype=float)

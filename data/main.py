@@ -3,7 +3,7 @@ import time
 import pygame
 from numpy import ndarray, array, ndenumerate
 from pygame import FULLSCREEN, SCALED, QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN
-from pygame.display import set_mode, set_caption, flip, get_surface
+from pygame.display import set_mode, set_caption, flip, get_surface, set_icon
 from pygame.event import get
 from pygame.mouse import set_visible, get_pos
 from pygame.rect import Rect
@@ -16,24 +16,27 @@ from data.objects.bonus_code import destroy_bonus, update_bonus
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
 from data.objects.lava_code import display_lava, update_lava
+from data.objects.lava_data import Lava
 from data.objects.player_code import update_player
-from data.utils.constants import FPS, CURSOR_SPRITE, CURSOR_SIZE, SCREEN_SIZE, BONUS_STRENGTH, BACKGROUND_SPRITE, \
+from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BONUS_STRENGTH, BACKGROUND_SPRITE, \
     ANIMATION_SPEED, TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
-    PLAYER_SPRITE
+    PLAYER_SPRITE, BACKGROUND_LAVA_DISTANCE, CURSOR_SIZE, ICON
 from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
 from data.utils.generation import generate_world
 
 
 def main() -> None:
     pygame.init()
+    # set_mode(SCREEN_SIZE)
     set_mode(SCREEN_SIZE, FULLSCREEN | SCALED)
+    set_icon(ICON)
     set_caption("Goodoo")
     set_visible(False)
 
     tile_grid, player, goal, bonuses = generate_world()
 
     beam: Beam = Beam()
-    lava: Rect = Rect(0, WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE)
+    lava: Lava = Lava(WORLD_BOTTOM, Rect(0, WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE))
     camera: Camera = Camera()
 
     counter: float = 0  # incremented every frame
@@ -98,10 +101,9 @@ def main() -> None:
         # Display -------------------------------------------------------------
 
         # background
-        if abs(player.rect.y - lava.y) > SCREEN_SIZE[1] * 1.5:
-            screen.blit(BACKGROUND_SPRITE, (0, 0))
-        else:
-            # TODO add fading
+        screen.blit(BACKGROUND_SPRITE, (0, 0))
+        if abs(player.pos[1] - lava.y) < BACKGROUND_LAVA_DISTANCE:
+            BACKGROUND_LAVA_SPRITE.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
             screen.blit(BACKGROUND_LAVA_SPRITE, (0, 0))
 
         # TODO add full walls on left and right sides of the tile grid
@@ -128,11 +130,11 @@ def main() -> None:
                 screen.blit(BONUS_SPRITE, bonus.rect.topleft + camera.offset)
 
         # lava
-        if rect_inside_screen(lava, camera):
+        if rect_inside_screen(lava.rect, camera):
             display_lava(lava, screen, camera, counter)
 
         # cursor
-        screen.blit(CURSOR_SPRITE, array(get_pos()) - CURSOR_SIZE * 0.5)
+        screen.blit(CURSOR_SPRITE, array(get_pos()) - CURSOR_SIZE / 2)
 
         counter += ANIMATION_SPEED * delta
 

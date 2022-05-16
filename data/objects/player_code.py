@@ -35,10 +35,11 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
     neighbor_tiles: ndarray = get_neighbor_grid(tile_grid, player_idx)
 
     rect: Rect = Rect(player.rect)
-    on_ground: bool = False
+    pos: ndarray = array(player.pos)
 
     # x movement executes first
-    rect.x += v[0] * delta
+    pos[0] += v[0] * delta
+    rect.x = pos[0]
 
     # x collision and correction
     for _, tile in ndenumerate(neighbor_tiles):
@@ -48,16 +49,19 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
 
                 if v[0] > 0:
                     rect.right = tile.rect.left
+                    pos[0] = rect.x
                     v[0] = 0
                     break
 
                 elif v[0] < 0:
                     rect.left = tile.rect.right
+                    pos[0] = rect.x
                     v[0] = 0
                     break
 
     # y movement executes second
-    rect.y += v[1] * delta
+    pos[1] += v[1] * delta
+    rect.y = pos[1]
 
     # y collisions and correction
     for _, tile in ndenumerate(neighbor_tiles):
@@ -67,13 +71,14 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
 
                 if v[1] > 0:
                     rect.bottom = tile.rect.top
-                    on_ground = True
+                    pos[1] = rect.y
                     v = array((0, 0))
                     break
 
                 elif v[1] < 0:
                     rect.top = tile.rect.bottom
+                    pos[1] = rect.y
                     v[1] = 0
                     break
 
-    return replace(player, rect=rect, velocity=v, on_ground=on_ground)
+    return replace(player, pos=pos, rect=rect, velocity=v)

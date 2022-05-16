@@ -12,7 +12,7 @@ def update_bonus(bonus: Bonus, counter: float) -> Bonus:
     Makes the bonus cycle in a movement from top to bottom.
 
     :param bonus: bonus data
-    :param counter: game counter
+    :param counter: animation counter
     :return: updated bonus data
     """
     rect: Rect = bonus.rect
