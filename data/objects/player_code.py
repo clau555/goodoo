@@ -6,7 +6,7 @@ from pygame.rect import Rect
 
 from data.objects.player_data import Player
 from data.utils.constants import GRAVITY, PLAYER_MAX_V
-from data.utils.functions import scale, get_grid_index, get_neighbor_grid, idx_inside_grid
+from data.utils.functions import scale_vec, world_to_grid, get_neighbor_grid, idx_inside_grid
 
 
 def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, delta: float) -> Player:
@@ -26,10 +26,10 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
 
     # clamp velocity
     if linalg.norm(v) > PLAYER_MAX_V:
-        v = scale(v, PLAYER_MAX_V)
+        v = scale_vec(v, PLAYER_MAX_V)
 
     # getting neighbor tiles to check collision
-    player_idx: ndarray = get_grid_index(array(player.rect.center))
+    player_idx: ndarray = world_to_grid(array(player.rect.center))
     if not idx_inside_grid(player_idx):
         raise ValueError("Player out of bounds")
     neighbor_tiles: ndarray = get_neighbor_grid(tile_grid, player_idx)

@@ -2,7 +2,8 @@ import time
 
 import pygame
 from numpy import ndarray, array, ndenumerate
-from pygame import FULLSCREEN, SCALED, QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN
+from numpy.random import choice
+from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, FULLSCREEN, SCALED
 from pygame.display import set_mode, set_caption, flip, get_surface, set_icon
 from pygame.event import get
 from pygame.mouse import set_visible, get_pos
@@ -20,7 +21,7 @@ from data.objects.lava_data import Lava
 from data.objects.player_code import update_player
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BONUS_STRENGTH, BACKGROUND_SPRITE, \
     ANIMATION_SPEED, TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
-    PLAYER_SPRITE, BACKGROUND_LAVA_DISTANCE, CURSOR_SIZE, ICON
+    PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, BACKGROUND_LAVA_DISTANCE
 from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
 from data.utils.generation import generate_world
 
@@ -37,7 +38,10 @@ def main() -> None:
 
     beam: Beam = Beam()
     lava: Lava = Lava(WORLD_BOTTOM, Rect(0, WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE))
-    camera: Camera = Camera()
+    camera: Camera = Camera(array(player.rect.center))
+
+    lava_trigger: bool = False
+    shake_counter: int = 150
 
     counter: float = 0  # incremented every frame
 
@@ -73,7 +77,15 @@ def main() -> None:
 
         camera = update_camera(camera, array(player.rect.center), delta)
 
-        lava = update_lava(lava, delta)
+        if not lava_trigger and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
+            lava_trigger = True
+
+        if lava_trigger:
+            lava = update_lava(lava, delta)
+            if shake_counter > 0:
+                random_offset: ndarray = choice((-1, 1)) * choice(SHAKE_AMPLITUDE, 2)
+                camera = update_camera(camera, array(player.rect.center) + random_offset, delta)
+                shake_counter -= 1
 
         beam = update_beam(beam, player, tile_grid, camera, delta)
         if click and beam.power == 0:
@@ -102,7 +114,10 @@ def main() -> None:
 
         # background
         screen.blit(BACKGROUND_SPRITE, (0, 0))
+
         if abs(player.pos[1] - lava.y) < BACKGROUND_LAVA_DISTANCE:
+
+            # lava background fades out as player goes away from it and vice versa
             BACKGROUND_LAVA_SPRITE.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
             screen.blit(BACKGROUND_LAVA_SPRITE, (0, 0))
 

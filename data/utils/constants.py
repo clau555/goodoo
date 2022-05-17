@@ -26,6 +26,7 @@ WORLD_BOTTOM: int = GRID_HEIGHT * TILE_EDGE
 # grid generation
 NOISE_DENSITY: float = 0.48  # wall density during noise generation
 AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
+PLAYER_SPAWN_HEIGHT: int = GRID_HEIGHT - 3
 
 # screen dimension in terms of tiles
 SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] // TILE_EDGE))
@@ -55,8 +56,9 @@ CURSOR_SPRITE: Surface = scale(CURSOR_IMG, CURSOR_SIZE)
 # physics
 FPS: int = 60
 GRAVITY: ndarray = array((0, PLAYER_MAX_V / 75))
-CAMERA_SPEED: float = 0.08
 ANIMATION_SPEED: float = 0.1
+CAMERA_SPEED: float = 0.08
+SHAKE_AMPLITUDE: int = 50
 
 # beam
 BEAM_DURATION: float = 0.3  # beam duration in seconds
@@ -77,11 +79,13 @@ LAVA_IMAGES: List[Surface] = [load("resources/sprites/lava.png")]
 LAVA_SPRITES: List[Surface] = list(
     map(lambda img: scale(img, TILE_SIZE), LAVA_IMAGES)
 )
-LAVA_INIT_SPEED: float = TILE_EDGE / 50
+LAVA_INIT_SPEED: float = TILE_EDGE / 10
+LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 5
+LAVA_WARNING_DURATION: int = 150  # number of frames the screen must shake when triggering lava
 
 # background
 BACKGROUND_IMG: Surface = load("resources/sprites/background.png")
 BACKGROUND_SPRITE: Surface = scale(BACKGROUND_IMG, SCREEN_SIZE)
 BACKGROUND_LAVA_IMG: Surface = load("resources/sprites/background_lava.png")
 BACKGROUND_LAVA_SPRITE: Surface = scale(BACKGROUND_LAVA_IMG, SCREEN_SIZE)
-BACKGROUND_LAVA_DISTANCE: float = SCREEN_SIZE[1] * 1.5
+BACKGROUND_LAVA_DISTANCE: int = SCREEN_SIZE[1] * 2

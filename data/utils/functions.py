@@ -1,26 +1,25 @@
 from typing import List
 
-from numpy import ndarray, sqrt, sum
+from numpy import ndarray
+from numpy.linalg import norm
 from pygame import Rect, Surface
 
 from data.objects.camera_data import Camera
 from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SIZE, SCREEN_RECT, SCREEN_GRID_SIZE
 
 
-def scale(v: ndarray, length: float) -> ndarray:
+def scale_vec(v: ndarray, length: float) -> ndarray:
     """
     Scales a vector to a given length.
-
-    https://stackoverflow.com/a/21031303/17987233
 
     :param v: grid index
     :param length: length to scale to
     :return: scaled vector
     """
-    return v / sqrt(sum(v ** 2)) * length
+    return v / norm(v) * length
 
 
-def animation_frame(sprites: List[Surface], counter: float):
+def animation_frame(sprites: List[Surface], counter: float) -> Surface:
     """
     Returns current frame of an animation based on the given counter.
 
@@ -44,7 +43,7 @@ def pos_inside_screen(pos: ndarray, camera: Camera) -> bool:
 
 def rect_inside_screen(rect: Rect, camera: Camera) -> bool:
     """
-    Checks if a rectangle is visible in the screen.
+    Checks if a rectangle is visible on screen.
 
     :param rect: rectangle in world space
     :param camera: camera data
@@ -55,9 +54,9 @@ def rect_inside_screen(rect: Rect, camera: Camera) -> bool:
 
 def idx_inside_grid(idx: ndarray) -> bool:
     """
-    Checks if an index is inside the grid.
+    Checks if a grid space index is inside the grid.
 
-    :param idx: grid index
+    :param idx: index in grid space
     :return: True if inside grid, False otherwise
     """
     return (0 <= idx).all() and (idx < GRID_SIZE).all()
@@ -70,10 +69,10 @@ def pos_inside_grid(pos: ndarray) -> bool:
     :param pos: position in world space
     :return: True if inside grid, False otherwise
     """
-    return idx_inside_grid(get_grid_index(pos))
+    return idx_inside_grid(world_to_grid(pos))
 
 
-def get_grid_index(pos: ndarray) -> ndarray:
+def world_to_grid(pos: ndarray) -> ndarray:
     """
     Returns the grid index of the given world position.
 
@@ -93,7 +92,7 @@ def get_screen_grid(grid: ndarray, camera: Camera) -> ndarray:
     :param camera: camera data
     :return: tile grid visible on screen
     """
-    idx: ndarray = (get_grid_index(camera.top_left)).clip(0, GRID_SIZE - 1)  # conversion in grid space
+    idx: ndarray = (world_to_grid(camera.top_left)).clip(0, GRID_SIZE - 1)  # conversion in grid space
     return grid[
         idx[0]: idx[0] + SCREEN_GRID_SIZE[0] + 1,
         idx[1]: idx[1] + SCREEN_GRID_SIZE[1] + 1

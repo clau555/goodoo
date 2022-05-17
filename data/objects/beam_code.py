@@ -10,7 +10,7 @@ from data.objects.beam_data import Beam
 from data.objects.camera_data import Camera
 from data.objects.player_data import Player
 from data.utils.constants import BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE, BEAM_MAX_STRENGTH
-from data.utils.functions import scale, pos_inside_screen, get_grid_index, pos_inside_grid
+from data.utils.functions import scale_vec, pos_inside_screen, world_to_grid, pos_inside_grid
 
 
 def display_beam(beam: Beam, screen: Surface, camera: Camera) -> None:
@@ -48,13 +48,13 @@ def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera: Camera, 
     if linalg.norm(step) != 0:
 
         collide: bool = False
-        step = scale(step, BEAM_VECTOR_STEP)
+        step = scale_vec(step, BEAM_VECTOR_STEP)
         end += step
 
         # increasing vector until it collides with a tile or goes out of screen
         while not collide and pos_inside_screen(end, camera) and pos_inside_grid(end):
 
-            idx: ndarray = get_grid_index(end)
+            idx: ndarray = world_to_grid(end)
             if tile_grid[idx[0], idx[1]]:
                 collide = True
             end += step
@@ -104,6 +104,6 @@ def get_beam_velocity(beam: Beam) -> ndarray:
     if beam.power > 0:
         v: ndarray = beam.start - beam.end
         if linalg.norm(v) != 0:
-            v = scale(v, beam.strength)
+            v = scale_vec(v, beam.strength)
             return v
     return array((0, 0))

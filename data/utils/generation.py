@@ -10,7 +10,7 @@ from data.objects.bonus_data import Bonus
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
 from data.utils.constants import TILE_SIZE, TILE_SPRITE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_WIDTH, \
-    GRID_HEIGHT, PLAYER_SIZE, GOAL_SIZE, BONUS_REPARTITION, BONUS_SIZE
+    GRID_HEIGHT, PLAYER_SIZE, GOAL_SIZE, BONUS_REPARTITION, BONUS_SIZE, PLAYER_SPAWN_HEIGHT
 
 
 def get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
@@ -187,10 +187,17 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
     # ensuring borders are walls
     bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
 
-    # TODO player / goal ------------------------------------------------------
+    # Player ------------------------------------------------------------------
 
-    player_pos = array((GRID_WIDTH / 2, GRID_HEIGHT - 20)) * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2
+    # choosing free tile to spawn on
+    empty_xs: ndarray = argwhere(bool_grid[:, PLAYER_SPAWN_HEIGHT] == False)
+    x: int = int(empty_xs[randint(0, empty_xs.size - 1)])
+
+    player_idx: ndarray = array((x, PLAYER_SPAWN_HEIGHT))  # grid space
+    player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
     player = Player(player_pos, Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+
+    # TODO Goal --------------------------------------------------------------------
 
     goal_pos = array((GRID_WIDTH / 2, 1)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
     goal = Rect(goal_pos, tuple(TILE_SIZE))
@@ -200,9 +207,9 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
     bonuses: List = []
     for y in range(GRID_HEIGHT - BONUS_REPARTITION, 0, -BONUS_REPARTITION):
 
-        empty_xs: ndarray = argwhere(bool_grid[:, y] == False)  # `== False` instead of `not`/`is' to avoid numpy error
+        empty_xs: ndarray = argwhere(bool_grid[:, y] == False)
         if empty_xs.size > 1:
-            x = empty_xs[randint(0, empty_xs.size - 1)]
+            x: int = int(empty_xs[randint(0, empty_xs.size - 1)])
 
             bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
             bonus_rect: Rect = Rect(tuple(bonus_pos), tuple(BONUS_SIZE))
