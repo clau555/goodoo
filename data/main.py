@@ -22,7 +22,7 @@ from data.objects.player_code import update_player, decrease_goo, add_goo_from_b
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, \
     ANIMATION_SPEED, TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
     PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, BACKGROUND_LAVA_DISTANCE, \
-    LAVA_WARNING_DURATION, BONUS_SIZE
+    LAVA_WARNING_DURATION
 from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
 from data.utils.generation import generate_world
 
@@ -76,11 +76,14 @@ def main() -> None:
         delta: float = (time.time() - last_time) * FPS
         last_time = time.time()
 
+        # camera follows player
         camera = update_camera(camera, array(player.rect.center), delta)
 
+        # lava is triggered when player reached a certain height ...
         if not lava_trigger and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
             lava_trigger = True
 
+        # ... when it occurs, the lava starts moving up and the camera shakes
         if lava_trigger:
             lava = update_lava(lava, delta)
             if shake_counter > 0:
@@ -88,6 +91,8 @@ def main() -> None:
                 camera = update_camera(camera, player.rect.center + random_offset, delta)
                 shake_counter -= 1
 
+        # beam starts from the player and aims at mouse position,
+        # it's fired on user click and consume player's goo
         beam = update_beam(beam, player, tile_grid, camera, delta)
         if click and beam.power == 0:
             beam = fire_beam(beam)
@@ -98,7 +103,7 @@ def main() -> None:
         for i, bonus in ndenumerate(bonuses):
             bonuses[i] = update_bonus(bonus, counter)
 
-            # player grabbing bonus
+            # player grabbing bonus destroys it, and gives goo to player
             if player.rect.colliderect(bonus.rect) and bonus.alive:
                 bonuses[i] = destroy_bonus(bonus)
                 player = add_goo_from_bonus(player)
@@ -140,7 +145,7 @@ def main() -> None:
         # bonuses
         for bonus in bonuses:
             if rect_inside_screen(bonus.rect, camera) and bonus.alive:
-                display_light(screen, BONUS_SIZE[0] * 3, array(bonus.rect.center), camera, counter)
+                display_light(screen, array(bonus.rect.center), camera, counter)
                 screen.blit(BONUS_SPRITE, bonus.rect.topleft + camera.offset)
 
         # lava

@@ -5,7 +5,7 @@ from numpy.linalg import linalg
 from pygame.rect import Rect
 
 from data.objects.player_data import Player
-from data.utils.constants import GRAVITY, PLAYER_MAX_V, BONUS_VALUE
+from data.utils.constants import GRAVITY, PLAYER_MAX_V, BONUS_VALUE, PLAYER_MAX_GOO
 from data.utils.functions import scale_vec, world_to_grid, get_neighbor_grid, idx_inside_grid
 
 
@@ -34,8 +34,8 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
         raise ValueError("Player out of bounds")
     neighbor_tiles: ndarray = get_neighbor_grid(tile_grid, player_idx)
 
-    rect: Rect = Rect(player.rect)
     pos: ndarray = array(player.pos)
+    rect: Rect = Rect(player.rect)
 
     # x movement executes first
     pos[0] += v[0] * delta
@@ -85,9 +85,24 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
 
 
 def add_goo_from_bonus(player: Player) -> Player:
-    return replace(player, goo=player.goo + BONUS_VALUE)
+    """
+    Adds the `BONUS_VALUE` to player goo quantity.
+    Player's goo quantity is capped to `PLAYER_MAX_GOO`
+
+    :param player: player data
+    :return: updated player data
+    """
+    goo: int = player.goo + BONUS_VALUE
+    goo = goo if goo < PLAYER_MAX_GOO else PLAYER_MAX_GOO
+    return replace(player, goo=goo)
 
 
 def decrease_goo(player: Player) -> Player:
+    """
+    Decrease player's goo quantity by one, at a minimum of zero.
+
+    :param player: player data
+    :return: updated player data
+    """
     goo: int = player.goo - 1 if player.goo > 0 else 0
     return replace(player, goo=goo)

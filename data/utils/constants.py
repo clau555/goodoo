@@ -42,7 +42,8 @@ GOAL_SPRITES: List[Surface] = list(
 PLAYER_SIZE: ndarray = array((8, 8))
 PLAYER_IMG: Surface = load("resources/sprites/player_1.png")
 PLAYER_SPRITE: Surface = scale(PLAYER_IMG, PLAYER_SIZE)
-PLAYER_MAX_V: int = TILE_EDGE - TILE_EDGE // 6
+PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
+PLAYER_MAX_GOO: int = 40
 
 # cursor
 CURSOR_SIZE: ndarray = array((6, 6))
@@ -68,8 +69,9 @@ BONUS_SIZE: ndarray = array((4, 4))
 BONUS_IMG: Surface = load("resources/sprites/bonus.png")
 BONUS_SPRITE: Surface = scale(BONUS_IMG, BONUS_SIZE)
 BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
-BONUS_VALUE: int = 20
+BONUS_VALUE: int = 15
 LIGHT_COLOR: Tuple[int, int, int] = (32, 63, 95)
+LIGHT_RADIUS: int = BONUS_SIZE[0] * 3
 
 # lava
 LAVA_IMAGES: List[Surface] = [load("resources/sprites/lava.png")]

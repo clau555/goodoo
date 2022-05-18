@@ -13,7 +13,7 @@ from data.utils.constants import TILE_SIZE, TILE_SPRITE, GRID_SIZE, NOISE_DENSIT
     GRID_HEIGHT, PLAYER_SIZE, GOAL_SIZE, BONUS_REPARTITION, BONUS_SIZE, PLAYER_SPAWN_HEIGHT
 
 
-def get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
+def _get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
     """
     Returns a grid with the number of neighbors for each cell.
     A neighbor is counted if it's true.
@@ -29,7 +29,7 @@ def get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
     return neighbors_mat
 
 
-def cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes: ndarray) -> Optional[Tile]:
+def _cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes: ndarray) -> Optional[Tile]:
     """
     Returns the tile corresponding to the given cell.
 
@@ -43,7 +43,7 @@ def cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes: ndarray) -> Optional[Til
     return None
 
 
-cells_to_tiles: Callable = vectorize(cell_to_tile)
+_cells_to_tiles: Callable = vectorize(_cell_to_tile)
 
 
 def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
@@ -70,12 +70,12 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
     )
 
     # number of wall tiles neighbors for each cell
-    n_count_grid: ndarray = get_neighbors_count_grid(bool_grid)
+    n_count_grid: ndarray = _get_neighbors_count_grid(bool_grid)
 
     # cellular automaton execution
     for _ in range(AUTOMATON_ITERATION):
         # resetting neighbors count
-        n_count_grid = get_neighbors_count_grid(bool_grid)
+        n_count_grid = _get_neighbors_count_grid(bool_grid)
 
         # flatten grids
         bool_grid_flat: ndarray = bool_grid.ravel()
@@ -176,7 +176,6 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
 
         # making sure the path doesn't cross another room
         if False not in bool_grid[line[1:-1, 0], line[1:-1, 1]]:
-
             # digging in a cross pattern to ensure space for player
             bool_grid[line[:, 0], line[:, 1]] = \
                 bool_grid[line[:, 0] + 1, line[:, 1]] = \
@@ -184,7 +183,7 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
                 bool_grid[line[:, 0], line[:, 1] + 1] = \
                 bool_grid[line[:, 0], line[:, 1] - 1] = False
 
-    # ensuring borders are walls
+    # ensuring borders are walls, one last time
     bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
 
     # Player ------------------------------------------------------------------
@@ -197,7 +196,7 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
     player = Player(player_pos, Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
 
-    # TODO Goal --------------------------------------------------------------------
+    # TODO Goal (replace by exit at top) --------------------------------------
 
     goal_pos = array((GRID_WIDTH / 2, 1)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
     goal = Rect(goal_pos, tuple(TILE_SIZE))
@@ -219,6 +218,6 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
 
     # TODO add different connected tile texture
     x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
-    tile_grid: ndarray = cells_to_tiles(bool_grid, x_idxes, y_idxes)
+    tile_grid: ndarray = _cells_to_tiles(bool_grid, x_idxes, y_idxes)
 
     return tile_grid, player, goal, array(bonuses)
