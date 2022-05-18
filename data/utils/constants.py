@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from numpy import array, ndarray
 from pygame import Surface, Rect
@@ -33,11 +33,7 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 
 # goal tile
 GOAL_SIZE: ndarray = array((10, 10))
-GOAL_IMAGES: List[Surface] = [
-    load("resources/sprites/goal_1.png"),
-    load("resources/sprites/goal_2.png"),
-    load("resources/sprites/goal_3.png"),
-]
+GOAL_IMAGES: List[Surface] = [load(f"resources/sprites/goal_{i}.png") for i in range(1, 4)]
 GOAL_SPRITES: List[Surface] = list(
     map(lambda img: scale(img, GOAL_SIZE), GOAL_IMAGES)
 )
@@ -62,9 +58,9 @@ SHAKE_AMPLITUDE: int = 50
 
 # beam
 BEAM_DURATION: float = 0.3  # beam duration in seconds
-BEAM_DECREASE: float = 1 / (BEAM_DURATION * FPS)
+BEAM_POWER_DECREASE: float = 1 / (BEAM_DURATION * FPS)
 BEAM_VECTOR_STEP: float = TILE_EDGE / 3
-BEAM_INIT_STRENGTH: float = TILE_EDGE / 10  # beam impulse velocity length
+BEAM_MIN_STRENGTH: float = TILE_EDGE / 10  # beam impulse velocity length
 BEAM_MAX_STRENGTH: float = TILE_EDGE / 4
 
 # bonus
@@ -72,7 +68,8 @@ BONUS_SIZE: ndarray = array((4, 4))
 BONUS_IMG: Surface = load("resources/sprites/bonus.png")
 BONUS_SPRITE: Surface = scale(BONUS_IMG, BONUS_SIZE)
 BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
-BONUS_STRENGTH: float = TILE_EDGE / 20  # bonus in beam strength given by bonus
+BONUS_VALUE: int = 20
+LIGHT_COLOR: Tuple[int, int, int] = (32, 63, 95)
 
 # lava
 LAVA_IMAGES: List[Surface] = [load("resources/sprites/lava.png")]
@@ -80,7 +77,7 @@ LAVA_SPRITES: List[Surface] = list(
     map(lambda img: scale(img, TILE_SIZE), LAVA_IMAGES)
 )
 LAVA_INIT_SPEED: float = TILE_EDGE / 10
-LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 5
+LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 10
 LAVA_WARNING_DURATION: int = 150  # number of frames the screen must shake when triggering lava
 
 # background

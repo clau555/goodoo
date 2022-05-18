@@ -5,7 +5,7 @@ from numpy.linalg import linalg
 from pygame.rect import Rect
 
 from data.objects.player_data import Player
-from data.utils.constants import GRAVITY, PLAYER_MAX_V
+from data.utils.constants import GRAVITY, PLAYER_MAX_V, BONUS_VALUE
 from data.utils.functions import scale_vec, world_to_grid, get_neighbor_grid, idx_inside_grid
 
 
@@ -82,3 +82,12 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
                     break
 
     return replace(player, pos=pos, rect=rect, velocity=v)
+
+
+def add_goo_from_bonus(player: Player) -> Player:
+    return replace(player, goo=player.goo + BONUS_VALUE)
+
+
+def decrease_goo(player: Player) -> Player:
+    goo: int = player.goo - 1 if player.goo > 0 else 0
+    return replace(player, goo=goo)

@@ -9,7 +9,7 @@ from pygame.surface import Surface
 from data.objects.beam_data import Beam
 from data.objects.camera_data import Camera
 from data.objects.player_data import Player
-from data.utils.constants import BEAM_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE, BEAM_MAX_STRENGTH
+from data.utils.constants import BEAM_POWER_DECREASE, BEAM_VECTOR_STEP, TILE_EDGE, BEAM_MAX_STRENGTH, BEAM_MIN_STRENGTH
 from data.utils.functions import scale_vec, pos_inside_screen, world_to_grid, pos_inside_grid
 
 
@@ -60,7 +60,7 @@ def update_beam(beam: Beam, player: Player, tile_grid: ndarray, camera: Camera, 
             end += step
 
     # decreasing beam power slowly over time
-    power: float = beam.power - BEAM_DECREASE * delta
+    power: float = beam.power - BEAM_POWER_DECREASE * delta
     power = 0 if power < 0 else power  # clamp power to 0
 
     return replace(beam, start=start, end=end, power=power)
@@ -76,34 +76,20 @@ def fire_beam(beam: Beam) -> Beam:
     return replace(beam, power=1)
 
 
-def add_strength(beam: Beam, strength: float) -> Beam:
+def get_beam_velocity(beam: Beam, player: Player) -> ndarray:
     """
-    Adds strength to the beam.
-
-    :param beam: beam data
-    :param strength: strength to add
-    :return: updated beam data
-    """
-    strength_: float = beam.strength + strength
-
-    # clip from 0 to BEAM_MAX_STRENGTH
-    strength_ = 0 if strength_ < 0 else strength_
-    strength_ = BEAM_MAX_STRENGTH if strength_ > BEAM_MAX_STRENGTH else strength_
-
-    return replace(beam, strength=strength_)
-
-
-def get_beam_velocity(beam: Beam) -> ndarray:
-    """
-    Returns the velocity impulse the beam would give to the player, depending on current beam strength.
+    Returns the velocity impulse the beam would give to the player, depending on the player's goo quantity.
     Returns a zero vector if the beam has no power left.
 
     :param beam: beam data
+    :param player: player data
     :return: updated beam data
     """
     if beam.power > 0:
         v: ndarray = beam.start - beam.end
         if linalg.norm(v) != 0:
-            v = scale_vec(v, beam.strength)
-            return v
+            if player.goo > 0:
+                return scale_vec(v, BEAM_MAX_STRENGTH)
+            else:
+                return scale_vec(v, BEAM_MIN_STRENGTH)
     return array((0, 0))

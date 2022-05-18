@@ -11,17 +11,18 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.objects.beam_code import update_beam, fire_beam, get_beam_velocity, display_beam, add_strength
+from data.objects.beam_code import update_beam, fire_beam, get_beam_velocity, display_beam
 from data.objects.beam_data import Beam
-from data.objects.bonus_code import destroy_bonus, update_bonus
+from data.objects.bonus_code import destroy_bonus, update_bonus, display_light
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
 from data.objects.lava_code import display_lava, update_lava
 from data.objects.lava_data import Lava
-from data.objects.player_code import update_player
-from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BONUS_STRENGTH, BACKGROUND_SPRITE, \
+from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus
+from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, \
     ANIMATION_SPEED, TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
-    PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, BACKGROUND_LAVA_DISTANCE
+    PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, BACKGROUND_LAVA_DISTANCE, \
+    LAVA_WARNING_DURATION, BONUS_SIZE
 from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
 from data.utils.generation import generate_world
 
@@ -41,7 +42,7 @@ def main() -> None:
     camera: Camera = Camera(array(player.rect.center))
 
     lava_trigger: bool = False
-    shake_counter: int = 150
+    shake_counter: int = LAVA_WARNING_DURATION
 
     counter: float = 0  # incremented every frame
 
@@ -84,26 +85,23 @@ def main() -> None:
             lava = update_lava(lava, delta)
             if shake_counter > 0:
                 random_offset: ndarray = choice((-1, 1)) * choice(SHAKE_AMPLITUDE, 2)
-                camera = update_camera(camera, array(player.rect.center) + random_offset, delta)
+                camera = update_camera(camera, player.rect.center + random_offset, delta)
                 shake_counter -= 1
 
         beam = update_beam(beam, player, tile_grid, camera, delta)
         if click and beam.power == 0:
             beam = fire_beam(beam)
+            player = decrease_goo(player)
 
-        player = update_player(player, get_beam_velocity(beam), tile_grid, delta)
+        player = update_player(player, get_beam_velocity(beam, player), tile_grid, delta)
 
-        strength: float = 0
         for i, bonus in ndenumerate(bonuses):
             bonuses[i] = update_bonus(bonus, counter)
 
             # player grabbing bonus
             if player.rect.colliderect(bonus.rect) and bonus.alive:
                 bonuses[i] = destroy_bonus(bonus)
-                strength += BONUS_STRENGTH
-
-        # increasing beam impulse velocity
-        beam = add_strength(beam, strength)
+                player = add_goo_from_bonus(player)
 
         # game ends if goal is reached
         if player.rect.colliderect(goal):
@@ -142,6 +140,7 @@ def main() -> None:
         # bonuses
         for bonus in bonuses:
             if rect_inside_screen(bonus.rect, camera) and bonus.alive:
+                display_light(screen, BONUS_SIZE[0] * 3, array(bonus.rect.center), camera, counter)
                 screen.blit(BONUS_SPRITE, bonus.rect.topleft + camera.offset)
 
         # lava
