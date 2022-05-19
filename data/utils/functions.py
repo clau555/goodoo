@@ -5,7 +5,7 @@ from numpy.linalg import norm
 from pygame import Rect, Surface
 
 from data.objects.camera_data import Camera
-from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SIZE, SCREEN_RECT, SCREEN_GRID_SIZE
+from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SIZE, SCREEN_RECT, SCREEN_GRID_SIZE, ANIMATION_SPEED
 
 
 def scale_vec(v: ndarray, length: float) -> ndarray:
@@ -19,15 +19,15 @@ def scale_vec(v: ndarray, length: float) -> ndarray:
     return v / norm(v) * length
 
 
-def animation_frame(sprites: List[Surface], counter: float) -> Surface:
+def animation_frame(sprites: List[Surface], timer: float) -> Surface:
     """
-    Returns current frame of an animation based on the given counter.
+    Returns current frame of an animation based on the given timer.
 
     :param sprites: list of sprites
-    :param counter: animation counter
+    :param timer: game timer
     :return: current frame
     """
-    return sprites[int(counter % len(sprites))]
+    return sprites[int(((timer % ANIMATION_SPEED) / ANIMATION_SPEED) * len(sprites))]
 
 
 def pos_inside_screen(pos: ndarray, camera: Camera) -> bool:

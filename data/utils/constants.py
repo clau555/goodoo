@@ -34,9 +34,7 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 # goal tile
 GOAL_SIZE: ndarray = array((10, 10))
 GOAL_IMAGES: List[Surface] = [load(f"resources/sprites/goal_{i}.png") for i in range(1, 4)]
-GOAL_SPRITES: List[Surface] = list(
-    map(lambda img: scale(img, GOAL_SIZE), GOAL_IMAGES)
-)
+GOAL_SPRITES: List[Surface] = list(map(lambda img: scale(img, GOAL_SIZE), GOAL_IMAGES))
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
@@ -52,16 +50,16 @@ CURSOR_SPRITE: Surface = scale(CURSOR_IMG, CURSOR_SIZE)
 
 # physics
 FPS: int = 60
-GRAVITY: ndarray = array((0, PLAYER_MAX_V / 75))
-ANIMATION_SPEED: float = 0.1
+TARGET_FPS: float = 60.
+GRAVITY: ndarray = array((0, PLAYER_MAX_V / 100))
+ANIMATION_SPEED: float = 0.8  # duration of a sprite frame in seconds
 CAMERA_SPEED: float = 0.08
 SHAKE_AMPLITUDE: int = 50
 
 # beam
-BEAM_DURATION: float = 0.3  # beam duration in seconds
-BEAM_POWER_DECREASE: float = 1 / (BEAM_DURATION * FPS)
+BEAM_POWER_DECREASE: float = 1 / (0.3 * TARGET_FPS)
 BEAM_VECTOR_STEP: float = TILE_EDGE / 3
-BEAM_MIN_STRENGTH: float = TILE_EDGE / 10  # beam impulse velocity length
+BEAM_MIN_STRENGTH: float = TILE_EDGE / 10
 BEAM_MAX_STRENGTH: float = TILE_EDGE / 4
 
 # bonus
@@ -70,17 +68,16 @@ BONUS_IMG: Surface = load("resources/sprites/bonus.png")
 BONUS_SPRITE: Surface = scale(BONUS_IMG, BONUS_SIZE)
 BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
 BONUS_VALUE: int = 15
-LIGHT_COLOR: Tuple[int, int, int] = (32, 63, 95)
+LIGHT_COLOR: Tuple[int, int, int] = (27, 41, 83)
 LIGHT_RADIUS: int = BONUS_SIZE[0] * 3
+BONUS_ANIMATION_SPEED: float = 0.6  # duration of light pulse and bonus movement in seconds
 
 # lava
-LAVA_IMAGES: List[Surface] = [load("resources/sprites/lava.png")]
-LAVA_SPRITES: List[Surface] = list(
-    map(lambda img: scale(img, TILE_SIZE), LAVA_IMAGES)
-)
-LAVA_INIT_SPEED: float = TILE_EDGE / 10
+LAVA_IMAGES: List[Surface] = [load("resources/sprites/lava.png")]  # TODO lava animation
+LAVA_SPRITES: List[Surface] = list(map(lambda img: scale(img, TILE_SIZE), LAVA_IMAGES))
+LAVA_SPEED: float = TILE_EDGE / 10
 LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 10
-LAVA_WARNING_DURATION: int = 150  # number of frames the screen must shake when triggering lava
+LAVA_WARNING_DURATION: float = 1.5  # number of seconds the screen must shake when triggering lava
 
 # background
 BACKGROUND_IMG: Surface = load("resources/sprites/background.png")

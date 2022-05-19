@@ -194,7 +194,7 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
 
     player_idx: ndarray = array((x, PLAYER_SPAWN_HEIGHT))  # grid space
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
-    player = Player(player_pos, Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+    player = Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
 
     # TODO Goal (replace by exit at top) --------------------------------------
 
@@ -212,7 +212,7 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
 
             bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
             bonus_rect: Rect = Rect(tuple(bonus_pos), tuple(BONUS_SIZE))
-            bonuses.append(Bonus(bonus_rect, array(bonus_rect.topleft)))
+            bonuses.append(Bonus(bonus_rect, array(bonus_rect.topleft, dtype=float)))
 
     # Grid of tiles -----------------------------------------------------------
 

@@ -21,7 +21,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
     :return: updated player data
     """
     # velocity update
-    v: ndarray = player.velocity + GRAVITY
+    v: ndarray = player.velocity + GRAVITY * delta
     v = input_velocity if linalg.norm(input_velocity) != 0 else v
 
     # clamp velocity
@@ -39,7 +39,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
 
     # x movement executes first
     pos[0] += v[0] * delta
-    rect.x = pos[0]
+    rect.x = round(pos[0])
 
     # x collision and correction
     for _, tile in ndenumerate(neighbor_tiles):
@@ -61,7 +61,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
 
     # y movement executes second
     pos[1] += v[1] * delta
-    rect.y = pos[1]
+    rect.y = round(pos[1])
 
     # y collisions and correction
     for _, tile in ndenumerate(neighbor_tiles):

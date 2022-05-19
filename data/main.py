@@ -1,7 +1,7 @@
 import time
 
 import pygame
-from numpy import ndarray, array, ndenumerate
+from numpy import ndarray, array, ndenumerate, around
 from numpy.random import choice
 from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, FULLSCREEN, SCALED
 from pygame.display import set_mode, set_caption, flip, get_surface, set_icon
@@ -20,9 +20,9 @@ from data.objects.lava_code import display_lava, update_lava
 from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, \
-    ANIMATION_SPEED, TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
+    TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
     PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, BACKGROUND_LAVA_DISTANCE, \
-    LAVA_WARNING_DURATION
+    LAVA_WARNING_DURATION, TARGET_FPS
 from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
 from data.utils.generation import generate_world
 
@@ -39,12 +39,12 @@ def main() -> None:
 
     beam: Beam = Beam()
     lava: Lava = Lava(WORLD_BOTTOM, Rect(0, WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE))
-    camera: Camera = Camera(array(player.rect.center))
+    camera: Camera = Camera(array(player.rect.center, dtype=float))
 
     lava_trigger: bool = False
-    shake_counter: int = LAVA_WARNING_DURATION
+    shake_counter: float = LAVA_WARNING_DURATION
 
-    counter: float = 0  # incremented every frame
+    timer: float = 0  # incremented every frame by delta time
 
     screen: Surface = get_surface()
 
@@ -52,6 +52,13 @@ def main() -> None:
     last_time: float = time.time()
 
     while True:
+        clock.tick(FPS)
+
+        # delta update using time module because pygame is less precise
+        now: float = time.time()
+        delta_time = (now - last_time)
+        delta: float = delta_time * TARGET_FPS
+        last_time = now
 
         # Events --------------------------------------------------------------
 
@@ -73,9 +80,6 @@ def main() -> None:
 
         # Model update --------------------------------------------------------
 
-        delta: float = (time.time() - last_time) * FPS
-        last_time = time.time()
-
         # camera follows player
         camera = update_camera(camera, array(player.rect.center), delta)
 
@@ -89,7 +93,7 @@ def main() -> None:
             if shake_counter > 0:
                 random_offset: ndarray = choice((-1, 1)) * choice(SHAKE_AMPLITUDE, 2)
                 camera = update_camera(camera, player.rect.center + random_offset, delta)
-                shake_counter -= 1
+                shake_counter -= delta_time
 
         # beam starts from the player and aims at mouse position,
         # it's fired on user click and consume player's goo
@@ -101,7 +105,7 @@ def main() -> None:
         player = update_player(player, get_beam_velocity(beam, player), tile_grid, delta)
 
         for i, bonus in ndenumerate(bonuses):
-            bonuses[i] = update_bonus(bonus, counter)
+            bonuses[i] = update_bonus(bonus, timer)
 
             # player grabbing bonus destroys it, and gives goo to player
             if player.rect.colliderect(bonus.rect) and bonus.alive:
@@ -133,30 +137,29 @@ def main() -> None:
         visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
         for _, tile in ndenumerate(visible_tiles):
             if tile:
-                screen.blit(tile.sprite, tile.rect.topleft + camera.offset)
+                screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
 
         # goal
         if rect_inside_screen(goal, camera):
-            screen.blit(animation_frame(GOAL_SPRITES, counter), goal.topleft + camera.offset)
+            screen.blit(animation_frame(GOAL_SPRITES, timer), around(goal.topleft + camera.offset))
 
         # player
-        screen.blit(PLAYER_SPRITE, player.rect.topleft + camera.offset)
+        screen.blit(PLAYER_SPRITE, around(player.rect.topleft + camera.offset))
 
         # bonuses
         for bonus in bonuses:
             if rect_inside_screen(bonus.rect, camera) and bonus.alive:
-                display_light(screen, array(bonus.rect.center), camera, counter)
-                screen.blit(BONUS_SPRITE, bonus.rect.topleft + camera.offset)
+                display_light(screen, array(bonus.rect.center), camera, timer)
+                screen.blit(BONUS_SPRITE, around(bonus.rect.topleft + camera.offset))
 
         # lava
         if rect_inside_screen(lava.rect, camera):
-            display_lava(lava, screen, camera, counter)
+            display_lava(lava, screen, camera, timer)
 
         # cursor
         screen.blit(CURSOR_SPRITE, array(get_pos()) - CURSOR_SIZE / 2)
 
-        counter += ANIMATION_SPEED * delta
+        timer += delta_time
 
         flip()
-        clock.tick(FPS)
         # print(int(clock.get_fps()))

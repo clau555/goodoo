@@ -16,7 +16,7 @@ def update_camera(camera: Camera, focus_pos: ndarray, delta: float) -> Camera:
     :return: updated camera data
     """
     heading: ndarray = focus_pos - camera.center
-    center: ndarray = camera.center + heading * delta * CAMERA_SPEED
+    center: ndarray = camera.center + heading * CAMERA_SPEED * delta
     top_left: ndarray = center - SCREEN_SIZE / 2
     offset: ndarray = SCREEN_SIZE / 2 - center
 
