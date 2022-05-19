@@ -56,11 +56,11 @@ ANIMATION_SPEED: float = 0.8  # duration of a sprite frame in seconds
 CAMERA_SPEED: float = 0.08
 SHAKE_AMPLITUDE: int = 50
 
-# beam
-BEAM_POWER_DECREASE: float = 1 / (0.3 * TARGET_FPS)
-BEAM_VECTOR_STEP: float = TILE_EDGE / 3
-BEAM_MIN_STRENGTH: float = TILE_EDGE / 10
-BEAM_MAX_STRENGTH: float = TILE_EDGE / 4
+# ray
+RAY_POWER_DECREASE: float = 1 / (0.3 * TARGET_FPS)
+RAY_VECTOR_STEP: float = TILE_EDGE / 3
+RAY_MIN_STRENGTH: float = TILE_EDGE / 10
+RAY_MAX_STRENGTH: float = TILE_EDGE / 4
 
 # bonus
 BONUS_SIZE: ndarray = array((4, 4))

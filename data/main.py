@@ -11,14 +11,14 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.objects.beam_code import update_beam, fire_beam, get_beam_velocity, display_beam
-from data.objects.beam_data import Beam
 from data.objects.bonus_code import destroy_bonus, update_bonus, display_light
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
 from data.objects.lava_code import display_lava, update_lava
 from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus
+from data.objects.ray_code import update_ray, fire_ray, get_ray_velocity, display_ray
+from data.objects.ray_data import Ray
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, \
     TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
     PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, BACKGROUND_LAVA_DISTANCE, \
@@ -37,7 +37,7 @@ def main() -> None:
 
     tile_grid, player, goal, bonuses = generate_world()
 
-    beam: Beam = Beam()
+    ray: Ray = Ray()
     lava: Lava = Lava(WORLD_BOTTOM, Rect(0, WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE))
     camera: Camera = Camera(array(player.rect.center, dtype=float))
 
@@ -95,14 +95,14 @@ def main() -> None:
                 camera = update_camera(camera, player.rect.center + random_offset, delta)
                 shake_counter -= delta_time
 
-        # beam starts from the player and aims at mouse position,
+        # ray starts from the player and aims at mouse position,
         # it's fired on user click and consume player's goo
-        beam = update_beam(beam, player, tile_grid, camera, delta)
-        if click and beam.power == 0:
-            beam = fire_beam(beam)
+        ray = update_ray(ray, player, tile_grid, camera, delta)
+        if click and ray.power == 0:
+            ray = fire_ray(ray)
             player = decrease_goo(player)
 
-        player = update_player(player, get_beam_velocity(beam, player), tile_grid, delta)
+        player = update_player(player, get_ray_velocity(ray, player), tile_grid, delta)
 
         for i, bonus in ndenumerate(bonuses):
             bonuses[i] = update_bonus(bonus, timer)
@@ -130,8 +130,8 @@ def main() -> None:
 
         # TODO add full walls on left and right sides of the tile grid
 
-        # beam
-        display_beam(beam, screen, camera)
+        # ray
+        display_ray(ray, screen, camera)
 
         # tiles
         visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
