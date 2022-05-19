@@ -34,9 +34,9 @@ You're a lively ball of goo who can only move by projecting its own substance to
 You inadvertently fell into a volcano pit, and your goal is to reach the exit at the top before the lava reaches you.
 
 Every time you do a jump impulse, you loose goo. Without enough goo you're not able to go fast enough.
-You'll have to catch small goo balls on your way to maintain you speed.
+You'll have to catch small goo balls on your way to maintain your speed.
 
-The main obstacle you'll encounter on your way is the cave generation.
+The main obstacle you'll encounter on your way will be the cave generation.
 
 ## Data-Oriented Programming
 
