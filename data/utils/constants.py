@@ -7,9 +7,9 @@ from pygame.image import load
 from pygame.mask import Mask, from_surface
 from pygame.transform import scale
 
-FILE_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
-RESOURCES_PATH: Path = FILE_PATH / "resources"
-SPRITES_PATH: Path = FILE_PATH / RESOURCES_PATH / "sprites"
+DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
+RESOURCES_PATH: Path = DIR_PATH / "resources"
+SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
 
 # screen
 ICON: Surface = load(RESOURCES_PATH / "icon.png")
