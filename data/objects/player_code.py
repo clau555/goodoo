@@ -11,7 +11,7 @@ from data.utils.functions import scale_vec, world_to_grid, get_neighbor_grid, id
 
 def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, delta: float) -> Player:
     """
-    Moves the player with according to the input velocity then collide with the tiles.
+    Moves the player according to the input velocity then collide with the tiles.
     If any collision occurs, the player is moved to the appropriate position, and its velocity is updated accordingly.
 
     :param player: player data
