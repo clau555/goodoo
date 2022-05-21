@@ -12,7 +12,7 @@ def update_camera(camera: Camera, focus_pos: ndarray, delta: float) -> Camera:
 
     :param camera: camera data
     :param focus_pos: position on which the camera should be centered
-    :param delta: delta time
+    :param delta: delta between two frames
     :return: updated camera data
     """
     heading: ndarray = focus_pos - camera.center

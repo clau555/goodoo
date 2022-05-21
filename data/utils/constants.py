@@ -4,7 +4,6 @@ from typing import List, Tuple
 from numpy import array, ndarray
 from pygame import Surface, Rect
 from pygame.image import load
-from pygame.mask import Mask, from_surface
 from pygame.transform import scale
 
 DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
@@ -26,8 +25,6 @@ TILE_SPRITE: Surface = scale(TILE_IMG, TILE_SIZE)
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
 GRID_WIDTH: int = GRID_SIZE[0]
 GRID_HEIGHT: int = GRID_SIZE[1]
-WORLD_RIGHT: int = GRID_WIDTH * TILE_EDGE
-WORLD_BOTTOM: int = GRID_HEIGHT * TILE_EDGE
 
 # grid generation
 NOISE_DENSITY: float = 0.48  # wall density during noise generation
@@ -40,7 +37,7 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 # goal tile
 GOAL_SIZE: ndarray = array((10, 10))
 GOAL_IMAGES: List[Surface] = [load(SPRITES_PATH / f"goal_{i}.png") for i in range(1, 4)]
-GOAL_SPRITES: List[Surface] = list(map(lambda img: scale(img, GOAL_SIZE), GOAL_IMAGES))
+GOAL_SPRITES: List[Surface] = [scale(img, GOAL_SIZE) for img in GOAL_IMAGES]
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
@@ -80,7 +77,7 @@ BONUS_ANIMATION_SPEED: float = 0.6  # duration of light pulse and bonus movement
 
 # lava
 LAVA_IMAGES: List[Surface] = [load(SPRITES_PATH / "lava.png")]  # TODO lava animation
-LAVA_SPRITES: List[Surface] = list(map(lambda img: scale(img, TILE_SIZE), LAVA_IMAGES))
+LAVA_SPRITES: List[Surface] = [scale(img, TILE_SIZE) for img in LAVA_IMAGES]
 LAVA_SPEED: float = TILE_EDGE / 10
 LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 10
 LAVA_WARNING_DURATION: float = 1.5  # number of seconds the screen must shake when triggering lava
@@ -92,8 +89,3 @@ BACKGROUND_SPRITE: Surface = scale(BACKGROUND_IMG, SCREEN_SIZE)
 BACKGROUND_LAVA_IMG: Surface = load(SPRITES_PATH / "background_lava.png")
 BACKGROUND_LAVA_SPRITE: Surface = scale(BACKGROUND_LAVA_IMG, SCREEN_SIZE)
 BACKGROUND_LAVA_DISTANCE: int = SCREEN_SIZE[1] * 2
-
-BACKGROUND_FULL: Surface = Surface(BACKGROUND_SIZE)
-BACKGROUND_FULL.fill((50, 37, 29))
-BACKGROUND_MASK: Mask = from_surface(BACKGROUND_SPRITE)
-GRID_MASK: Mask = from_surface(Surface(GRID_SIZE * TILE_EDGE))

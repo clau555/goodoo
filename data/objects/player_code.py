@@ -17,7 +17,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
     :param player: player data
     :param input_velocity: velocity inputted by user
     :param tile_grid: world tile grid
-    :param delta: time elapsed since last frame
+    :param delta: delta between two frames
     :return: updated player data
     """
     # velocity update

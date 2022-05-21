@@ -1,7 +1,7 @@
 import time
 
 import pygame
-from numpy import ndarray, array, ndenumerate, around
+from numpy import ndarray, array, ndenumerate, around, clip
 from numpy.random import choice
 from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, FULLSCREEN, SCALED
 from pygame.display import set_mode, set_caption, flip, get_surface, set_icon
@@ -20,9 +20,9 @@ from data.objects.player_code import update_player, decrease_goo, add_goo_from_b
 from data.objects.ray_code import update_ray, fire_ray, get_ray_velocity, display_ray
 from data.objects.ray_data import Ray
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, \
-    TILE_EDGE, WORLD_BOTTOM, WORLD_RIGHT, BACKGROUND_LAVA_SPRITE, GOAL_SPRITES, BONUS_SPRITE, \
-    PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, BACKGROUND_LAVA_DISTANCE, \
-    LAVA_WARNING_DURATION, TARGET_FPS
+    TILE_EDGE, GOAL_SPRITES, BONUS_SPRITE, \
+    PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
+    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT
 from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
 from data.utils.generation import generate_world
 
@@ -38,7 +38,7 @@ def main() -> None:
     tile_grid, player, goal, bonuses = generate_world()
 
     ray: Ray = Ray()
-    lava: Lava = Lava(WORLD_BOTTOM, Rect(0, WORLD_BOTTOM, WORLD_RIGHT, TILE_EDGE))
+    lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
     camera: Camera = Camera(array(player.rect.center, dtype=float))
 
     lava_trigger: bool = False
@@ -52,9 +52,9 @@ def main() -> None:
     last_time: float = time.time()
 
     while True:
-        clock.tick(FPS)
+        clock.tick(FPS)  # limit fps
 
-        # delta update using time module because pygame is less precise
+        # delta update using time module because pygame is less accurate
         now: float = time.time()
         delta_time = (now - last_time)
         delta: float = delta_time * TARGET_FPS
@@ -119,25 +119,37 @@ def main() -> None:
 
         # Display -------------------------------------------------------------
 
-        # background
-        screen.blit(BACKGROUND_SPRITE, (0, 0))
+        screen.fill((50, 37, 29))
 
+        visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
+
+        # background visible area
+        background_portion_rect: Rect = Rect(
+            clip(around(camera.offset[0]), 0, None), 0,
+            SCREEN_SIZE[0] - abs(around(camera.offset[0])), SCREEN_SIZE[1]
+        )
+
+        # background display
+        screen.blit(
+            BACKGROUND_SPRITE.subsurface(background_portion_rect),
+            (clip(around(camera.offset[0]), 0, None), 0)
+        )
         if abs(player.pos[1] - lava.y) < BACKGROUND_LAVA_DISTANCE:
-
+            background_portion = BACKGROUND_LAVA_SPRITE.subsurface(background_portion_rect)
             # lava background fades out as player goes away from it and vice versa
-            BACKGROUND_LAVA_SPRITE.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
-            screen.blit(BACKGROUND_LAVA_SPRITE, (0, 0))
-
-        # TODO add full walls on left and right sides of the tile grid
-
-        # ray
-        display_ray(ray, screen, camera)
+            background_portion.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
+            screen.blit(
+                background_portion,
+                (clip(around(camera.offset[0]), 0, None), 0)
+            )
 
         # tiles
-        visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
         for _, tile in ndenumerate(visible_tiles):
             if tile:
                 screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
+
+        # ray
+        display_ray(ray, screen, camera)
 
         # goal
         if rect_inside_screen(goal, camera):
@@ -153,8 +165,7 @@ def main() -> None:
                 screen.blit(BONUS_SPRITE, around(bonus.rect.topleft + camera.offset))
 
         # lava
-        if rect_inside_screen(lava.rect, camera):
-            display_lava(lava, screen, camera, timer)
+        display_lava(lava, screen, camera, timer)
 
         # cursor
         screen.blit(CURSOR_SPRITE, array(get_pos()) - CURSOR_SIZE / 2)
