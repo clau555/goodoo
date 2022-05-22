@@ -10,7 +10,7 @@ from data.objects.bonus_data import Bonus
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
 from data.utils.constants import TILE_SIZE, TILE_SPRITE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_WIDTH, \
-    GRID_HEIGHT, PLAYER_SIZE, GOAL_SIZE, BONUS_REPARTITION, BONUS_SIZE, PLAYER_SPAWN_HEIGHT
+    GRID_HEIGHT, PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, PLAYER_SPAWN_HEIGHT
 
 
 def _get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
@@ -46,10 +46,10 @@ def _cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes: ndarray) -> Optional[Ti
 _cells_to_tiles: Callable = vectorize(_cell_to_tile)
 
 
-def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
+def generate_world() -> Tuple[ndarray, Player, ndarray]:
     """
     Returns a world grid containing the wall tiles, and none for the empty tiles.
-    Returns also the spawned player and goal.
+    Returns also the player, and the list of spawned bonuses.
 
     Algorithm uses procedural cave generation with cellular automaton and generation of connections between rooms.
     https://www.youtube.com/playlist?list=PLFt_AvWsXl0eZgMK_DT5_biRkWXftAOf9
@@ -196,10 +196,7 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
     player = Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
 
-    # TODO Goal (replace by exit at top) --------------------------------------
-
-    goal_pos = array((GRID_WIDTH / 2, 1)) * TILE_SIZE + TILE_SIZE / 2 - GOAL_SIZE / 2
-    goal = Rect(goal_pos, tuple(TILE_SIZE))
+    # TODO top exit generation ------------------------------------------------
 
     # Bonuses -----------------------------------------------------------------
 
@@ -220,4 +217,4 @@ def generate_world() -> Tuple[ndarray, Player, Rect, ndarray]:
     x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
     tile_grid: ndarray = _cells_to_tiles(bool_grid, x_idxes, y_idxes)
 
-    return tile_grid, player, goal, array(bonuses)
+    return tile_grid, player, array(bonuses)

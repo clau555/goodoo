@@ -33,10 +33,6 @@ PLAYER_SPAWN_HEIGHT: int = GRID_HEIGHT - 3
 # screen dimension in terms of tiles
 SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] // TILE_EDGE))
 
-# goal tile
-GOAL_SIZE: ndarray = array((10, 10))
-GOAL_SPRITES: List[Surface] = [load(SPRITES_PATH / f"goal_{i}.png") for i in range(1, 4)]
-
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
 PLAYER_COLOR_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_color_{i}.png") for i in range(1, 5)]

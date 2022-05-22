@@ -19,11 +19,10 @@ from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus, display_player
 from data.objects.ray_code import update_ray, fire_ray, get_ray_velocity, display_ray
 from data.objects.ray_data import Ray
-from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, \
-    TILE_EDGE, GOAL_SPRITES, BONUS_SPRITE, \
+from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, BONUS_SPRITE, \
     CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
     BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR
-from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
+from data.utils.functions import get_screen_grid, rect_inside_screen
 from data.utils.generation import generate_world
 
 
@@ -35,7 +34,7 @@ def main() -> None:
     set_caption("Goodoo")
     set_visible(False)
 
-    tile_grid, player, goal, bonuses = generate_world()
+    tile_grid, player, bonuses = generate_world()
 
     ray: Ray = Ray()
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
@@ -112,11 +111,6 @@ def main() -> None:
                 bonuses[i] = destroy_bonus(bonus)
                 player = add_goo_from_bonus(player)
 
-        # game ends if goal is reached
-        if player.rect.colliderect(goal):
-            pygame.quit()
-            quit()
-
         # Display -------------------------------------------------------------
 
         screen.fill(WALL_COLOR)
@@ -150,10 +144,6 @@ def main() -> None:
 
         # ray
         display_ray(ray, screen, camera)
-
-        # goal
-        if rect_inside_screen(goal, camera):
-            screen.blit(animation_frame(GOAL_SPRITES, timer), around(goal.topleft + camera.offset))
 
         # player
         display_player(player, ray, screen, camera, timer)
