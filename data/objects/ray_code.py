@@ -9,7 +9,8 @@ from pygame.surface import Surface
 from data.objects.camera_data import Camera
 from data.objects.player_data import Player
 from data.objects.ray_data import Ray
-from data.utils.constants import RAY_POWER_DECREASE, RAY_VECTOR_STEP, TILE_EDGE, RAY_MAX_STRENGTH, RAY_MIN_STRENGTH
+from data.utils.constants import RAY_POWER_DECREASE, RAY_VECTOR_STEP, TILE_EDGE, RAY_MAX_STRENGTH, RAY_MIN_STRENGTH, \
+    RAY_COLOR
 from data.utils.functions import scale_vec, pos_inside_screen, world_to_grid, pos_inside_grid
 
 
@@ -23,7 +24,7 @@ def display_ray(ray: Ray, screen: Surface, camera: Camera) -> None:
     """
     line(
         screen,
-        (78, 152, 183),
+        RAY_COLOR,
         ray.start + camera.offset,
         ray.end + camera.offset,
         int(ray.power * TILE_EDGE / 2)

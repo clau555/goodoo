@@ -16,13 +16,13 @@ from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
 from data.objects.lava_code import display_lava, update_lava
 from data.objects.lava_data import Lava
-from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus
+from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus, display_player
 from data.objects.ray_code import update_ray, fire_ray, get_ray_velocity, display_ray
 from data.objects.ray_data import Ray
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, \
     TILE_EDGE, GOAL_SPRITES, BONUS_SPRITE, \
-    PLAYER_SPRITE, CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
-    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT
+    CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
+    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR
 from data.utils.functions import get_screen_grid, rect_inside_screen, animation_frame
 from data.utils.generation import generate_world
 
@@ -119,31 +119,31 @@ def main() -> None:
 
         # Display -------------------------------------------------------------
 
-        screen.fill((50, 37, 29))
-
-        visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
+        screen.fill(WALL_COLOR)
 
         # background visible area
-        background_portion_rect: Rect = Rect(
+        background_portion: Rect = Rect(
             clip(around(camera.offset[0]), 0, None), 0,
             SCREEN_SIZE[0] - abs(around(camera.offset[0])), SCREEN_SIZE[1]
         )
 
         # background display
         screen.blit(
-            BACKGROUND_SPRITE.subsurface(background_portion_rect),
+            BACKGROUND_SPRITE.subsurface(background_portion),
             (clip(around(camera.offset[0]), 0, None), 0)
         )
         if abs(player.pos[1] - lava.y) < BACKGROUND_LAVA_DISTANCE:
-            background_portion = BACKGROUND_LAVA_SPRITE.subsurface(background_portion_rect)
+            background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
+
             # lava background fades out as player goes away from it and vice versa
-            background_portion.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
+            background_portion_.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
             screen.blit(
-                background_portion,
+                background_portion_,
                 (clip(around(camera.offset[0]), 0, None), 0)
             )
 
         # tiles
+        visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
         for _, tile in ndenumerate(visible_tiles):
             if tile:
                 screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
@@ -156,7 +156,7 @@ def main() -> None:
             screen.blit(animation_frame(GOAL_SPRITES, timer), around(goal.topleft + camera.offset))
 
         # player
-        screen.blit(PLAYER_SPRITE, around(player.rect.topleft + camera.offset))
+        display_player(player, ray, screen, camera, timer)
 
         # bonuses
         for bonus in bonuses:

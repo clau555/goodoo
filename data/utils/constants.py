@@ -18,8 +18,7 @@ SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 # tile
 TILE_EDGE: int = 12  # tile edge size in pixels
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
-TILE_IMG: Surface = load(SPRITES_PATH / "tile.png")
-TILE_SPRITE: Surface = scale(TILE_IMG, TILE_SIZE)
+TILE_SPRITE: Surface = load(SPRITES_PATH / "tile.png")
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
@@ -36,20 +35,18 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 
 # goal tile
 GOAL_SIZE: ndarray = array((10, 10))
-GOAL_IMAGES: List[Surface] = [load(SPRITES_PATH / f"goal_{i}.png") for i in range(1, 4)]
-GOAL_SPRITES: List[Surface] = [scale(img, GOAL_SIZE) for img in GOAL_IMAGES]
+GOAL_SPRITES: List[Surface] = [load(SPRITES_PATH / f"goal_{i}.png") for i in range(1, 4)]
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
-PLAYER_IMG: Surface = load(SPRITES_PATH / "player_1.png")  # TODO player animation
-PLAYER_SPRITE: Surface = scale(PLAYER_IMG, PLAYER_SIZE)
+PLAYER_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_{i}.png") for i in range(1, 5)]
+PLAYER_PALE_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_pale_{i}.png") for i in range(1, 5)]
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
-PLAYER_MAX_GOO: int = 40
+PLAYER_MAX_GOO: int = 20
 
 # cursor
 CURSOR_SIZE: ndarray = array((6, 6))
-CURSOR_IMG: Surface = load(SPRITES_PATH / "cursor.png")
-CURSOR_SPRITE: Surface = scale(CURSOR_IMG, CURSOR_SIZE)
+CURSOR_SPRITE: Surface = load(SPRITES_PATH / "cursor.png")
 
 # physics
 FPS: int = 60
@@ -64,11 +61,11 @@ RAY_POWER_DECREASE: float = 1 / (0.3 * TARGET_FPS)
 RAY_VECTOR_STEP: float = TILE_EDGE / 3
 RAY_MIN_STRENGTH: float = TILE_EDGE / 10
 RAY_MAX_STRENGTH: float = TILE_EDGE / 4
+RAY_COLOR: Tuple[int, int, int] = (255, 255, 255)
 
 # bonus
 BONUS_SIZE: ndarray = array((4, 4))
-BONUS_IMG: Surface = load(SPRITES_PATH / "bonus.png")
-BONUS_SPRITE: Surface = scale(BONUS_IMG, BONUS_SIZE)
+BONUS_SPRITE: Surface = load(SPRITES_PATH / "bonus.png")
 BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
 BONUS_VALUE: int = 15
 LIGHT_COLOR: Tuple[int, int, int] = (27, 41, 83)
@@ -76,16 +73,14 @@ LIGHT_RADIUS: int = BONUS_SIZE[0] * 3
 BONUS_ANIMATION_SPEED: float = 0.6  # duration of light pulse and bonus movement in seconds
 
 # lava
-LAVA_IMAGES: List[Surface] = [load(SPRITES_PATH / "lava.png")]  # TODO lava animation
-LAVA_SPRITES: List[Surface] = [scale(img, TILE_SIZE) for img in LAVA_IMAGES]
+LAVA_SPRITES: List[Surface] = [load(SPRITES_PATH / "lava.png")]  # TODO lava animation
 LAVA_SPEED: float = TILE_EDGE / 10
 LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 10
 LAVA_WARNING_DURATION: float = 1.5  # number of seconds the screen must shake when triggering lava
 
 # background
-BACKGROUND_SIZE: ndarray = array((192, 108))
-BACKGROUND_IMG: Surface = load(SPRITES_PATH / "background.png")
-BACKGROUND_SPRITE: Surface = scale(BACKGROUND_IMG, SCREEN_SIZE)
-BACKGROUND_LAVA_IMG: Surface = load(SPRITES_PATH / "background_lava.png")
-BACKGROUND_LAVA_SPRITE: Surface = scale(BACKGROUND_LAVA_IMG, SCREEN_SIZE)
-BACKGROUND_LAVA_DISTANCE: int = SCREEN_SIZE[1] * 2
+BACKGROUND_SPRITE: Surface = scale(load(SPRITES_PATH / "background.png"), SCREEN_SIZE)
+BACKGROUND_LAVA_SPRITE: Surface = scale(load(SPRITES_PATH / "background_lava.png"), SCREEN_SIZE)
+BACKGROUND_LAVA_DISTANCE: int = SCREEN_SIZE[1] * 2  # distance between lava and player at which background starts to
+# change to lava background
+WALL_COLOR: Tuple[int, int, int] = (50, 37, 29)
