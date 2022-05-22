@@ -39,8 +39,10 @@ GOAL_SPRITES: List[Surface] = [load(SPRITES_PATH / f"goal_{i}.png") for i in ran
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
-PLAYER_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_{i}.png") for i in range(1, 5)]
+PLAYER_COLOR_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_color_{i}.png") for i in range(1, 5)]
 PLAYER_PALE_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_pale_{i}.png") for i in range(1, 5)]
+PLAYER_GROUND_COLOR_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_ground_color_{i}.png") for i in range(1, 5)]
+PLAYER_GROUND_PALE_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_ground_pale_{i}.png") for i in range(1, 5)]
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 PLAYER_MAX_GOO: int = 20
 

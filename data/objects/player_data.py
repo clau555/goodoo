@@ -9,4 +9,5 @@ class Player:
     pos: ndarray
     rect: Rect
     velocity: ndarray = zeros(2, dtype=float)
+    on_ground: bool = False
     goo: int = 0  # goo quantity
