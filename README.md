@@ -61,4 +61,4 @@ The program **doesn't use** :
 
 ---
 
-<img src="resources/animation.gif" alt="gif"/>
+<img src="resources/goodoo.gif" alt="gif"/>
