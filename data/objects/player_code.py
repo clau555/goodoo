@@ -1,5 +1,4 @@
 from dataclasses import replace
-from typing import List
 
 from numpy import ndarray, array, ndenumerate, around
 from numpy.linalg import linalg
@@ -10,8 +9,8 @@ from pygame.transform import flip
 from data.objects.camera_data import Camera
 from data.objects.player_data import Player
 from data.objects.ray_data import Ray
-from data.utils.constants import GRAVITY, PLAYER_MAX_V, BONUS_VALUE, PLAYER_MAX_GOO, PLAYER_COLOR_SPRITES, \
-    PLAYER_PALE_SPRITES, PLAYER_GROUND_COLOR_SPRITES, PLAYER_GROUND_PALE_SPRITES
+from data.utils.constants import GRAVITY, PLAYER_MAX_V, BONUS_VALUE, PLAYER_MAX_GOO, PLAYER_COLOR_SPRITE, \
+    PLAYER_PALE_SPRITE, PLAYER_GROUND_COLOR_SPRITES, PLAYER_GROUND_PALE_SPRITES
 from data.utils.functions import scale_vec, world_to_grid, get_neighbor_grid, idx_inside_grid, animation_frame
 
 
@@ -28,39 +27,35 @@ def display_player(player: Player, ray: Ray, screen: Surface, camera: Camera, ti
     :param timer: game timer
     """
     screen_pos: ndarray = around(player.rect.topleft + camera.offset)
-    color_sprites: List[Surface]
-    pale_sprites: List[Surface]
 
     # display ground sprites or flying sprites
     if player.on_ground:
-        color_sprites = PLAYER_GROUND_COLOR_SPRITES
-        pale_sprites = PLAYER_GROUND_PALE_SPRITES
+        pale_sprite: Surface = animation_frame(PLAYER_GROUND_PALE_SPRITES, timer)
+        color_sprite: Surface = animation_frame(PLAYER_GROUND_COLOR_SPRITES, timer)
     else:
-        color_sprites = PLAYER_COLOR_SPRITES
-        pale_sprites = PLAYER_PALE_SPRITES
+        color_sprite = PLAYER_COLOR_SPRITE
+        pale_sprite = PLAYER_PALE_SPRITE
 
-    # getting current frames
-    player_pale_sprite: Surface = animation_frame(pale_sprites, timer)
-    player_color_sprite: Surface = animation_frame(color_sprites, timer)
-    player_color_sprite.set_alpha(int(player.goo / PLAYER_MAX_GOO * 255))
+    # setting color alpha on top of pale sprite
+    color_sprite.set_alpha(int(player.goo / PLAYER_MAX_GOO * 255))
 
     # flipping sprites depending on orientation
     if ray.start[0] - ray.end[0] < 0:
-        screen.blit(player_pale_sprite, screen_pos)
-        screen.blit(player_color_sprite, screen_pos)
+        screen.blit(pale_sprite, screen_pos)
+        screen.blit(color_sprite, screen_pos)
     else:
-        screen.blit(flip(player_pale_sprite, True, False), screen_pos)
-        screen.blit(flip(player_color_sprite, True, False), screen_pos)
+        screen.blit(flip(pale_sprite, True, False), screen_pos)
+        screen.blit(flip(color_sprite, True, False), screen_pos)
 
 
-def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, delta: float) -> Player:
+def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta: float) -> Player:
     """
     Moves the player according to the input velocity then collide with the tiles.
     If any collision occurs, the player is moved to the appropriate position, and its velocity is updated accordingly.
 
     :param player: player data
     :param input_velocity: velocity inputted by user
-    :param tile_grid: world tile grid
+    :param grid: world tile grid
     :param delta: delta between two frames
     :return: updated player data
     """
@@ -76,7 +71,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_grid: ndarray, d
     player_idx: ndarray = world_to_grid(array(player.rect.center))
     if not idx_inside_grid(player_idx):
         raise ValueError("Player out of bounds")
-    neighbor_tiles: ndarray = get_neighbor_grid(tile_grid, player_idx)
+    neighbor_tiles: ndarray = get_neighbor_grid(grid, player_idx)
 
     player_pos: ndarray = array(player.pos)
     player_rect: Rect = Rect(player.rect)
