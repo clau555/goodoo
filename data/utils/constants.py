@@ -9,6 +9,7 @@ from pygame.transform import scale
 DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
 RESOURCES_PATH: Path = DIR_PATH / "resources"
 SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
+PLAYER_PATH: Path = SPRITES_PATH / "player"
 
 # screen
 ICON: Surface = load(RESOURCES_PATH / "icon.png")
@@ -51,10 +52,10 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
-PLAYER_COLOR_SPRITE: Surface = load(SPRITES_PATH / f"player_jump_color.png")
-PLAYER_PALE_SPRITE: Surface = load(SPRITES_PATH / f"player_jump_pale.png")
-PLAYER_GROUND_COLOR_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_ground_color_{i}.png") for i in range(1, 5)]
-PLAYER_GROUND_PALE_SPRITES: List[Surface] = [load(SPRITES_PATH / f"player_ground_pale_{i}.png") for i in range(1, 5)]
+PLAYER_COLOR_SPRITE: Surface = load(PLAYER_PATH / f"player_jump_color.png")
+PLAYER_PALE_SPRITE: Surface = load(PLAYER_PATH / f"player_jump_pale.png")
+PLAYER_GROUND_COLOR_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_color_{i}.png") for i in range(1, 5)]
+PLAYER_GROUND_PALE_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_pale_{i}.png") for i in range(1, 5)]
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 PLAYER_MAX_GOO: int = 20
 
