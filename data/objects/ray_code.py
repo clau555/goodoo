@@ -37,7 +37,7 @@ def update_ray(ray: Ray, player: Player, tile_grid: ndarray, camera: Camera, del
 
     :param ray: ray data
     :param player: player data
-    :param tile_grid: world grid
+    :param tile_grid: world tile grid
     :param camera: camera data, used to calculate mouse position in world
     :param delta: delta between two frames
     :return: updated ray data

@@ -86,9 +86,9 @@ def world_to_grid(pos: ndarray) -> ndarray:
 
 def get_screen_grid(grid: ndarray, camera: Camera) -> ndarray:
     """
-    Returns a sub grid of `tile_grid` which is the current tile grid visible on screen.
+    Returns a sub grid of `grid` which is the current grid visible on screen.
 
-    :param grid: world grid
+    :param grid: world tile grid
     :param camera: camera data
     :return: tile grid visible on screen
     """
@@ -99,16 +99,16 @@ def get_screen_grid(grid: ndarray, camera: Camera) -> ndarray:
     ]
 
 
-def get_neighbor_grid(tile_grid: ndarray, idx: ndarray) -> ndarray:
+def get_moore_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     """
-    Returns neighborhood grid of the given tile position.
+    Returns the Moore neighborhood grid of the given tile index.
 
-    :param tile_grid: world grid
-    :param idx: world tile position
+    :param grid: world tile grid
+    :param idx: tile index
     :return: index neighborhood
     """
-    clamped_idx: ndarray = idx.clip(1, GRID_SIZE - 2)
-    return tile_grid[
-        clamped_idx[0] - 1: clamped_idx[0] + 2,
-        clamped_idx[1] - 1: clamped_idx[1] + 2
+    idx_: ndarray = idx.clip(1, GRID_SIZE - 2)
+    return grid[
+       idx_[0] - 1: idx_[0] + 2,
+       idx_[1] - 1: idx_[1] + 2
     ]

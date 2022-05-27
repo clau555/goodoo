@@ -1,49 +1,96 @@
-from typing import Optional, Callable, Tuple, List
+from typing import Tuple, List
 
-from numpy import ndarray, zeros, array, vectorize, random, argwhere, invert, amin, sign, mgrid
+from numpy import ndarray, zeros, array, random, argwhere, invert, amin, sign, ndenumerate, empty
 from numpy.random import randint
-from pygame import Rect
+from pygame import Rect, Surface
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
 from data.objects.bonus_data import Bonus
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
-from data.utils.constants import TILE_SIZE, TILE_SPRITE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_WIDTH, \
-    GRID_HEIGHT, PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, PLAYER_SPAWN_HEIGHT
+from data.utils.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
+    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, PLAYER_SPAWN_HEIGHT, TILE_SPRITES
 
 
-def _get_neighbors_count_grid(bool_grid: ndarray) -> ndarray:
+def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
     """
     Returns a grid with the number of neighbors for each cell.
     A neighbor is counted if it's true.
 
-    :param bool_grid: grid of booleans
+    :param grid: boolean grid
     :return: grid with the number of neighbors for each cell
     """
-    neighbors_mat: ndarray = zeros(bool_grid.shape, dtype=int)
-    int_grid: ndarray = bool_grid.astype(int)
+    neighbors_mat: ndarray = zeros(grid.shape, dtype=int)
+    int_grid: ndarray = grid.astype(int)
     neighbors_mat[1:-1, 1:-1] = (int_grid[:-2, :-2] + int_grid[:-2, 1:-1] + int_grid[:-2, 2:]
                                  + int_grid[1:-1, :-2] + int_grid[1:-1, 2:] + int_grid[2:, :-2]
                                  + int_grid[2:, 1:-1] + int_grid[2:, 2:])
     return neighbors_mat
 
 
-def _cell_to_tile(cell: bool, x_idxes: ndarray, y_idxes: ndarray) -> Optional[Tile]:
+def _cartesian_list():
     """
-    Returns the tile corresponding to the given cell.
+    Returns a list of all possible combinations of 4 neighbors.
 
-    :param cell: boolean cell
-    :param x_idxes: x indices of the cell
-    :param y_idxes: y indices of the cell
-    :return: tile if cell is true, None otherwise
+    :return: all possible combinations of 4 neighbors
     """
-    if cell:
-        return Tile(Rect(array((x_idxes, y_idxes)) * TILE_SIZE, tuple(TILE_SIZE)), TILE_SPRITE)
-    return None
+    cartesian_product: List = []
+    for a in [False, True]:
+        for b in [False, True]:
+            for c in [False, True]:
+                for d in [False, True]:
+                    cartesian_product.append([a, b, c, d])
+    return cartesian_product
 
 
-_cells_to_tiles: Callable = vectorize(_cell_to_tile)
+def _get_von_neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
+    """
+    Returns respectively up, right, down and left neighbors of the given index.
+
+    :param grid: boolean grid
+    :param idx: index
+    :return: von neumann neighborhood of index
+    """
+    offsets: ndarray = array(((0, -1), (1, 0), (0, 1), (-1, 0)))
+
+    if idx[0] == 0:
+        offsets[3] = zeros(2)
+    elif idx[0] == grid.shape[0] - 1:
+        offsets[1] = zeros(2)
+    if idx[1] == 0:
+        offsets[0] = zeros(2)
+    elif idx[1] == grid.shape[1] - 1:
+        offsets[2] = zeros(2)
+
+    offset_idxes: ndarray = idx + offsets
+
+    return grid[offset_idxes[:, 0], offset_idxes[:, 1]]
+
+
+def _to_tiles(grid: ndarray) -> ndarray:
+    """
+    Returns a grid with the corresponding tile data for each cell.
+
+    :param grid: boolean grid
+    :return: tile grid
+    """
+    tile_grid: ndarray = empty(grid.shape).astype(Tile)
+    neighbor_patterns: List = _cartesian_list()
+
+    for (i, j), cell in ndenumerate(grid):
+        if cell:
+            idx: ndarray = array((i, j))
+            neighbors: ndarray = _get_von_neumann_neighborhood(grid, idx)
+            # print(idx, neighbors, neighbor_patterns.index(list(neighbors)))
+
+            # choosing tile sprite depending on neighborhood
+            sprite: Surface = TILE_SPRITES[neighbor_patterns.index(list(neighbors))]
+            tile_grid[i, j] = Tile(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite)
+        else:
+            tile_grid[i, j] = None
+
+    return tile_grid
 
 
 def generate_world() -> Tuple[ndarray, Player, ndarray]:
@@ -57,7 +104,7 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
     Implementation uses uniform vectorization.
     https://lhoupert.fr/test-jbook/04-code-vectorization.html
 
-    :return: world grid, player, goal, bonuses
+    :return: tile grid, player, bonuses
     """
 
     # Cellular automaton ------------------------------------------------------
@@ -211,10 +258,8 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
             bonus_rect: Rect = Rect(tuple(bonus_pos), tuple(BONUS_SIZE))
             bonuses.append(Bonus(bonus_rect, array(bonus_rect.topleft, dtype=float)))
 
-    # Grid of tiles -----------------------------------------------------------
+    # Convert to grid of tiles ------------------------------------------------
 
-    # TODO add different connected tile texture
-    x_idxes, y_idxes = mgrid[:GRID_WIDTH, :GRID_HEIGHT]
-    tile_grid: ndarray = _cells_to_tiles(bool_grid, x_idxes, y_idxes)
+    tile_grid: ndarray = _to_tiles(bool_grid)
 
     return tile_grid, player, array(bonuses)

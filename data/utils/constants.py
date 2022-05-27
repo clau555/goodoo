@@ -15,10 +15,26 @@ ICON: Surface = load(RESOURCES_PATH / "icon.png")
 SCREEN_SIZE: ndarray = array((384, 216))
 SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 
-# tile
+# tiles
 TILE_EDGE: int = 12  # tile edge size in pixels
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
-TILE_SPRITE: Surface = load(SPRITES_PATH / "tile.png")
+
+
+def load_tiles_from_sheet() -> List[Surface]:
+    """
+    Loads the different tile sprites from `tile_sheet.png`.
+
+    :return: list of tile sprites
+    """
+    tiles: List[Surface] = []
+    sheet: Surface = load(SPRITES_PATH / "tile_sheet.png")
+    for j in range(0, sheet.get_size()[1], TILE_EDGE):
+        for i in range(0, sheet.get_size()[0], TILE_EDGE):
+            tiles.append(sheet.subsurface(Rect((i, j), tuple(TILE_SIZE))))
+    return tiles
+
+
+TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
