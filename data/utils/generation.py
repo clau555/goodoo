@@ -82,7 +82,6 @@ def _to_tiles(grid: ndarray) -> ndarray:
         if cell:
             idx: ndarray = array((i, j))
             neighbors: ndarray = _get_von_neumann_neighborhood(grid, idx)
-            # print(idx, neighbors, neighbor_patterns.index(list(neighbors)))
 
             # choosing tile sprite depending on neighborhood
             sprite: Surface = TILE_SPRITES[neighbor_patterns.index(list(neighbors))]

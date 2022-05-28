@@ -1,14 +1,14 @@
 from dataclasses import replace
 
-from numpy import array
+from numpy import array, ndarray
 from pygame import draw
 from pygame.rect import Rect
 from pygame.surface import Surface
 
 from data.objects.camera_data import Camera
 from data.objects.lava_data import Lava
-from data.utils.constants import LAVA_SPEED, GRID_WIDTH, LAVA_SPRITES, TILE_EDGE, SCREEN_SIZE
-from data.utils.functions import animation_frame
+from data.utils.constants import LAVA_SPEED, GRID_WIDTH, LAVA_SPRITES, TILE_EDGE, SCREEN_SIZE, TILE_SIZE
+from data.utils.functions import animation_frame, world_to_grid
 
 
 def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> None:
@@ -20,14 +20,18 @@ def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> N
     :param camera: camera data
     :param timer: game timer
     """
-    rect = Rect(0, lava.y + camera.offset[1], SCREEN_SIZE[0], SCREEN_SIZE[1] - (lava.y + camera.offset[1]) + 1)
-    draw.rect(screen, (254, 56, 7), rect)
+    lava_rect = Rect(0, lava.y + camera.offset[1], SCREEN_SIZE[0], SCREEN_SIZE[1] - (lava.y + camera.offset[1]))
+    draw.rect(screen, (254, 56, 7), lava_rect)
 
-    for i in range(GRID_WIDTH):
-        # TODO clip x axis to grid ?
+    # clipping lava rect position on tile grid...
+    grid_pos: ndarray = world_to_grid(lava_rect.topleft + array((0, 1)) - camera.offset)  # converts grid space
+    screen_pos: ndarray = grid_pos * TILE_SIZE + camera.offset  # converts back to screen space
+
+    # ...to display lava sprites along the grid
+    for i in range(GRID_WIDTH + 1):
         screen.blit(
             animation_frame(LAVA_SPRITES, timer),
-            rect.topleft + array((TILE_EDGE, 0)) * i - array((0, 1))
+            screen_pos + array((TILE_EDGE, 0)) * i + array((0, -1))
         )
 
 
