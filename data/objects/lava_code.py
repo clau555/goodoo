@@ -24,14 +24,14 @@ def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> N
     draw.rect(screen, (254, 56, 7), lava_rect)
 
     # clipping lava rect position on tile grid...
-    grid_pos: ndarray = world_to_grid(lava_rect.topleft + array((0, 1)) - camera.offset)  # converts grid space
+    grid_pos: ndarray = world_to_grid(lava_rect.topleft + array((0, 1)) - camera.offset)  # converts to grid space
     screen_pos: ndarray = grid_pos * TILE_SIZE + camera.offset  # converts back to screen space
 
-    # ...to display lava sprites along the grid
+    # ...to display lava sprites along the grid on the x-axis
     for i in range(GRID_WIDTH + 1):
         screen.blit(
             animation_frame(LAVA_SPRITES, timer),
-            screen_pos + array((TILE_EDGE, 0)) * i + array((0, -1))
+            (screen_pos[0] + TILE_EDGE * i, lava_rect.y - 1)
         )
 
 
