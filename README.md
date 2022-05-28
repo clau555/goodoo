@@ -41,7 +41,7 @@ The main obstacle you'll encounter on your way will be the cave generation.
 ## Data-Oriented Programming
 
 This project tries to implement some (but not all) principles of the paradigm of *Data-Oriented Programming*
-[as described by Yehonathan Sharvit](https://blog.klipse.tech/).  
+[as described by Yehonathan Sharvit](https://blog.klipse.tech/databook/2020/09/29/do-principles.html).  
 This is done as an experiment for myself and to show to my fellow co-workers that you can actually do something with 
 this thing.
 
@@ -57,7 +57,7 @@ shape.
 
 The program **doesn't use** :
 - **Data comparability by value** - no need of data comparison.
-- **Literal representation of the data** - no need of data instanciation.
+- **Literal representation of the data** - no need of data instanciation by literal.
 
 ---
 
