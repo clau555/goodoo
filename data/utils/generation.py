@@ -235,8 +235,12 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
     # Player ------------------------------------------------------------------
 
     # choosing free tile to spawn on
-    empty_xs: ndarray = argwhere(bool_grid[:, PLAYER_SPAWN_HEIGHT] == False)
-    x: int = int(empty_xs[randint(0, empty_xs.size - 1)])  # FIXME sometimes crashes (full row ?)
+    j: int = 1
+    empty_xs: ndarray = argwhere(bool_grid[:, GRID_HEIGHT - j] == False)
+    while empty_xs.size == 0:
+        j += 1
+        empty_xs: ndarray = argwhere(bool_grid[:, GRID_HEIGHT - j] == False)
+    x: int = int(empty_xs[randint(0, empty_xs.size - 1)])
 
     player_idx: ndarray = array((x, PLAYER_SPAWN_HEIGHT))  # grid space
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
