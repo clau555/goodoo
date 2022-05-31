@@ -1,6 +1,6 @@
 from typing import List
 
-from numpy import ndarray
+from numpy import ndarray, clip, around, array
 from numpy.linalg import norm
 from pygame import Rect, Surface
 
@@ -28,6 +28,16 @@ def animation_frame(sprites: List[Surface], timer: float) -> Surface:
     :return: current frame
     """
     return sprites[int(((timer % ANIMATION_SPEED) / ANIMATION_SPEED) * len(sprites))]
+
+
+def background_position(camera: Camera) -> ndarray:
+    """
+    Returns current background top left position in screen space.
+
+    :param camera: camera data
+    :return: background screen position
+    """
+    return array((clip(around(camera.offset[0]), 0, None), 0))
 
 
 def pos_inside_screen(pos: ndarray, camera: Camera) -> bool:

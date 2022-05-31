@@ -22,7 +22,7 @@ from data.objects.ray_data import Ray
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, BONUS_SPRITE, \
     CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
     BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR
-from data.utils.functions import get_screen_grid, rect_inside_screen
+from data.utils.functions import get_screen_grid, rect_inside_screen, background_position
 from data.utils.generation import generate_world
 
 
@@ -40,7 +40,7 @@ def main() -> None:
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
     camera: Camera = Camera(array(player.rect.center, dtype=float))
 
-    lava_trigger: bool = False
+    lava_triggered: bool = False
     shake_counter: float = LAVA_WARNING_DURATION
 
     timer: float = 0  # incremented every frame by delta time
@@ -82,14 +82,14 @@ def main() -> None:
         # camera follows player
         camera = update_camera(camera, array(player.rect.center), delta)
 
-        # lava is triggered when player reached a certain height ...
-        if not lava_trigger and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
-            lava_trigger = True
+        # lava is triggered when player reached a certain height
+        if not lava_triggered and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
+            lava_triggered = True
 
-        # ... when it occurs, the lava starts moving up and the camera shakes
-        if lava_trigger:
-            lava = update_lava(lava, delta)
+        if lava_triggered:
+            lava = update_lava(lava, delta)  # lava is moving up
             if shake_counter > 0:
+                # camera shakes for a short period of time
                 random_offset: ndarray = choice((-1, 1)) * choice(SHAKE_AMPLITUDE, 2)
                 camera = update_camera(camera, player.rect.center + random_offset, delta)
                 shake_counter -= delta_time
@@ -122,19 +122,19 @@ def main() -> None:
         )
 
         # background display
-        screen.blit(
-            BACKGROUND_SPRITE.subsurface(background_portion),
-            (clip(around(camera.offset[0]), 0, None), 0)
-        )
-        if abs(player.pos[1] - lava.y) < BACKGROUND_LAVA_DISTANCE:
-            background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
+        screen.blit(BACKGROUND_SPRITE.subsurface(background_portion), background_position(camera))
 
+        if lava_triggered and shake_counter > 0:
+            # lava background is displayed when camera shakes
+            background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
+            background_portion_.set_alpha(shake_counter / LAVA_WARNING_DURATION * 255)
+            screen.blit(background_portion_, background_position(camera))
+
+        elif abs(player.pos[1] - lava.y) < BACKGROUND_LAVA_DISTANCE:
             # lava background fades out as player goes away from it and vice versa
+            background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
             background_portion_.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
-            screen.blit(
-                background_portion_,
-                (clip(around(camera.offset[0]), 0, None), 0)
-            )
+            screen.blit(background_portion_, background_position(camera))
 
         # tiles
         visible_tiles: ndarray = get_screen_grid(tile_grid, camera)

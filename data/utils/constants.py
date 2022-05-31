@@ -90,8 +90,8 @@ BONUS_ANIMATION_SPEED: float = 0.6  # duration of light pulse and bonus movement
 # lava
 LAVA_SPRITES: List[Surface] = [load(SPRITES_PATH / "lava.png")]  # TODO lava animation
 LAVA_SPEED: float = TILE_EDGE / 10
-LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 10
-LAVA_WARNING_DURATION: float = 1.5  # number of seconds the screen must shake when triggering lava
+LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 20
+LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake when triggering lava
 
 # background
 BACKGROUND_SPRITE: Surface = scale(load(SPRITES_PATH / "background.png"), SCREEN_SIZE)
