@@ -1,6 +1,6 @@
 from dataclasses import replace
 
-from numpy import array, ndarray
+from numpy import array, ndarray, around
 from pygame import draw
 from pygame.rect import Rect
 from pygame.surface import Surface
@@ -20,7 +20,12 @@ def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> N
     :param camera: camera data
     :param timer: game timer
     """
-    lava_rect = Rect(0, lava.y + camera.offset[1], SCREEN_SIZE[0], SCREEN_SIZE[1] - (lava.y + camera.offset[1]))
+    lava_rect = Rect(
+        0,
+        around(lava.y + camera.offset[1]),  # needs to be rounded to match display
+        SCREEN_SIZE[0],
+        SCREEN_SIZE[1] - (lava.y + camera.offset[1])
+    )
     draw.rect(screen, (254, 56, 7), lava_rect)
 
     # clipping lava rect position on tile grid...
@@ -31,7 +36,7 @@ def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> N
     for i in range(GRID_WIDTH + 1):
         screen.blit(
             animation_frame(LAVA_SPRITES, timer),
-            (screen_pos[0] + TILE_EDGE * i, lava_rect.y - 1)
+            around((screen_pos[0] + TILE_EDGE * i, lava_rect.y - 1))
         )
 
 
