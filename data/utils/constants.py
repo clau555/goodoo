@@ -45,7 +45,6 @@ GRID_HEIGHT: int = GRID_SIZE[1]
 # grid generation
 NOISE_DENSITY: float = 0.48  # wall density during noise generation
 AUTOMATON_ITERATION: int = 4  # number of automaton steps during generation
-PLAYER_SPAWN_HEIGHT: int = GRID_HEIGHT - 3
 
 # screen dimension in terms of tiles
 SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] // TILE_EDGE))

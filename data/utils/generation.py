@@ -10,7 +10,7 @@ from data.objects.bonus_data import Bonus
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
 from data.utils.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
-    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, PLAYER_SPAWN_HEIGHT, TILE_SPRITES
+    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, TILE_SPRITES
 
 
 def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
@@ -234,15 +234,23 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
 
     # Player ------------------------------------------------------------------
 
-    # choosing free tile to spawn on
-    j: int = 1
-    empty_xs: ndarray = argwhere(bool_grid[:, GRID_HEIGHT - j] == False)
-    while empty_xs.size == 0:
-        j += 1
-        empty_xs: ndarray = argwhere(bool_grid[:, GRID_HEIGHT - j] == False)
-    x: int = int(empty_xs[randint(0, empty_xs.size - 1)])
+    # getting the first row with empty tiles starting from bottom of the grid
+    spawn_height: int = GRID_HEIGHT - 1
+    empty_xs: ndarray = argwhere(bool_grid[:, spawn_height])
+    for j in range(GRID_HEIGHT - 1, 0, -1):
+        empty_xs = argwhere(bool_grid[:, j] == False)
+        if empty_xs.size > 0:
+            spawn_height = j
+            break
 
-    player_idx: ndarray = array((x, PLAYER_SPAWN_HEIGHT))  # grid space
+    if empty_xs.size == 0:
+        raise Exception("No player spawn point found")
+    elif empty_xs.size == 1:
+        x: int = int(empty_xs[0])  # choosing the only empty tile
+    else:
+        x: int = int(empty_xs[randint(0, empty_xs.size - 1)])  # choosing a random empty tile
+
+    player_idx: ndarray = array((x, spawn_height))  # grid space
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
     player = Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
 
