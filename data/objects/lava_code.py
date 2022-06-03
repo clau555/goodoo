@@ -20,11 +20,12 @@ def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> N
     :param camera: camera data
     :param timer: game timer
     """
+    height_offset: ndarray = around(lava.y + camera.offset[1])
     lava_rect = Rect(
         0,
-        around(lava.y + camera.offset[1]),  # needs to be rounded to match display
+        height_offset,  # needs to be rounded to match display
         SCREEN_SIZE[0],
-        SCREEN_SIZE[1] - (lava.y + camera.offset[1])
+        SCREEN_SIZE[1] - height_offset
     )
     draw.rect(screen, (254, 56, 7), lava_rect)
 
