@@ -3,4 +3,5 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Lava:
-    y: float
+    height: float
+    triggered: bool = False

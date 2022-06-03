@@ -20,10 +20,10 @@ def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> N
     :param camera: camera data
     :param timer: game timer
     """
-    height_offset: ndarray = around(lava.y + camera.offset[1])
+    height_offset: ndarray = around(lava.height + camera.offset[1])  # needs to be rounded to match display
     lava_rect = Rect(
         0,
-        height_offset,  # needs to be rounded to match display
+        height_offset,
         SCREEN_SIZE[0],
         SCREEN_SIZE[1] - height_offset
     )
@@ -49,5 +49,15 @@ def update_lava(lava: Lava, delta: float) -> Lava:
     :param delta: delta between two frames
     :return: updated lava rectangle
     """
-    y: float = lava.y - LAVA_SPEED * delta
-    return replace(lava, y=y)
+    height: float = lava.height - LAVA_SPEED * delta
+    return replace(lava, height=height)
+
+
+def set_lava_triggered(lava: Lava) -> Lava:
+    """
+    Sets lava's triggered state at True.
+
+    :param lava: lava data
+    :return: updated lava data
+    """
+    return replace(lava, triggered=True)

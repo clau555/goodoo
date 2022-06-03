@@ -14,7 +14,7 @@ from pygame.time import Clock
 from data.objects.bonus_code import destroy_bonus, update_bonus, display_light
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
-from data.objects.lava_code import display_lava, update_lava
+from data.objects.lava_code import display_lava, update_lava, set_lava_triggered
 from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus, display_player
 from data.objects.ray_code import update_ray, fire_ray, get_ray_velocity, display_ray
@@ -40,7 +40,6 @@ def main() -> None:
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
     camera: Camera = Camera(array(player.rect.center, dtype=float))
 
-    lava_triggered: bool = False
     shake_counter: float = LAVA_WARNING_DURATION
 
     timer: float = 0  # incremented every frame by delta time
@@ -83,10 +82,10 @@ def main() -> None:
         camera = update_camera(camera, array(player.rect.center), delta)
 
         # lava is triggered when player reached a certain height
-        if not lava_triggered and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
-            lava_triggered = True
+        if not lava.triggered and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
+            lava = set_lava_triggered(lava)
 
-        if lava_triggered:
+        if lava.triggered:
             lava = update_lava(lava, delta)  # lava is moving up
             if shake_counter > 0:
                 # camera shakes for a short period of time
@@ -124,16 +123,16 @@ def main() -> None:
         # background display
         screen.blit(BACKGROUND_SPRITE.subsurface(background_portion), background_position(camera))
 
-        if lava_triggered and shake_counter > 0:
+        if lava.triggered and shake_counter > 0:
             # lava background is displayed when camera shakes
             background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
             background_portion_.set_alpha(shake_counter / LAVA_WARNING_DURATION * 255)
             screen.blit(background_portion_, background_position(camera))
 
-        elif abs(player.pos[1] - lava.y) < BACKGROUND_LAVA_DISTANCE:
+        elif abs(player.pos[1] - lava.height) < BACKGROUND_LAVA_DISTANCE:
             # lava background fades out as player goes away from it and vice versa
             background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
-            background_portion_.set_alpha(255 - abs(player.pos[1] - lava.y) / BACKGROUND_LAVA_DISTANCE * 255)
+            background_portion_.set_alpha(255 - abs(player.pos[1] - lava.height) / BACKGROUND_LAVA_DISTANCE * 255)
             screen.blit(background_portion_, background_position(camera))
 
         # tiles
