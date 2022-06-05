@@ -10,6 +10,7 @@ DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
 RESOURCES_PATH: Path = DIR_PATH / "resources"
 SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
 PLAYER_PATH: Path = SPRITES_PATH / "player"
+LAVA_PATH: Path = SPRITES_PATH / "lava"
 
 # screen
 ICON: Surface = load(RESOURCES_PATH / "icon.png")
@@ -87,7 +88,7 @@ LIGHT_RADIUS: int = BONUS_SIZE[0] * 3
 BONUS_ANIMATION_SPEED: float = 0.6  # duration of light pulse and bonus movement in seconds
 
 # lava
-LAVA_SPRITES: List[Surface] = [load(SPRITES_PATH / "lava.png")]  # TODO lava animation
+LAVA_SPRITES: List[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]
 LAVA_SPEED: float = TILE_EDGE / 10
 LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 20
 LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake when triggering lava
