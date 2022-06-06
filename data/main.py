@@ -115,25 +115,27 @@ def main() -> None:
         screen.fill(WALL_COLOR)
 
         # background visible area
-        background_portion: Rect = Rect(
-            clip(around(camera.offset[0]), 0, None), 0,
-            SCREEN_SIZE[0] - abs(around(camera.offset[0])), SCREEN_SIZE[1]
+        portion_rect: Rect = Rect(
+            clip(around(camera.offset[0]), 0, None),
+            0,
+            SCREEN_SIZE[0] - abs(around(camera.offset[0])),
+            SCREEN_SIZE[1]
         )
 
         # background display
-        screen.blit(BACKGROUND_SPRITE.subsurface(background_portion), background_position(camera))
+        screen.blit(BACKGROUND_SPRITE.subsurface(portion_rect), background_position(camera))
 
         if lava.triggered and shake_counter > 0:
             # lava background is displayed when camera shakes
-            background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
-            background_portion_.set_alpha(shake_counter / LAVA_WARNING_DURATION * 255)
-            screen.blit(background_portion_, background_position(camera))
+            background_portion: Surface = BACKGROUND_LAVA_SPRITE.subsurface(portion_rect)
+            background_portion.set_alpha(shake_counter / LAVA_WARNING_DURATION * 255)
+            screen.blit(background_portion, background_position(camera))
 
         elif abs(player.pos[1] - lava.height) < BACKGROUND_LAVA_DISTANCE:
             # lava background fades out as player goes away from it and vice versa
-            background_portion_: Surface = BACKGROUND_LAVA_SPRITE.subsurface(background_portion)
-            background_portion_.set_alpha(255 - abs(player.pos[1] - lava.height) / BACKGROUND_LAVA_DISTANCE * 255)
-            screen.blit(background_portion_, background_position(camera))
+            background_portion: Surface = BACKGROUND_LAVA_SPRITE.subsurface(portion_rect)
+            background_portion.set_alpha(255 - abs(player.pos[1] - lava.height) / BACKGROUND_LAVA_DISTANCE * 255)
+            screen.blit(background_portion, background_position(camera))
 
         # tiles
         visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
