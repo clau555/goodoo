@@ -104,9 +104,9 @@ def get_screen_grid(grid: ndarray, camera: Camera) -> ndarray:
     """
     idx: ndarray = (world_to_grid(camera.top_left)).clip(0, GRID_SIZE - 1)  # conversion in grid space
     return grid[
-        idx[0]: idx[0] + SCREEN_GRID_SIZE[0] + 1,
-        idx[1]: idx[1] + SCREEN_GRID_SIZE[1] + 1
-    ]
+           idx[0]: idx[0] + SCREEN_GRID_SIZE[0] + 1,
+           idx[1]: idx[1] + SCREEN_GRID_SIZE[1] + 1
+           ]
 
 
 def get_moore_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
@@ -119,6 +119,6 @@ def get_moore_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     """
     idx_: ndarray = idx.clip(1, GRID_SIZE - 2)
     return grid[
-       idx_[0] - 1: idx_[0] + 2,
-       idx_[1] - 1: idx_[1] + 2
-    ]
+           idx_[0] - 1: idx_[0] + 2,
+           idx_[1] - 1: idx_[1] + 2
+           ]

@@ -10,7 +10,7 @@ from data.objects.bonus_data import Bonus
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
 from data.utils.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
-    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, TILE_SPRITES
+    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, TILE_SPRITES, GRID_WIDTH
 
 
 def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
@@ -27,6 +27,27 @@ def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
                                  + int_grid[1:-1, :-2] + int_grid[1:-1, 2:] + int_grid[2:, :-2]
                                  + int_grid[2:, 1:-1] + int_grid[2:, 2:])
     return neighbors_mat
+
+
+def _get_circle_coords(center: ndarray, radius: int) -> ndarray:
+    """
+    Returns the list of coordinates inside the circle.
+
+    https://stackoverflow.com/a/39862846/17987233
+
+    :param center: circle center
+    :param radius: circle radius
+    :return: list of coordinates inside the circle
+    """
+    coords: List = []
+
+    x = radius
+    for x_ in range(-x, x + 1):
+        y = int((radius ** 2 - x_ ** 2) ** 0.5)
+        for y_ in range(-y, y + 1):
+            coords.append(array((x_, y_)))
+
+    return array(coords) + center
 
 
 def _cartesian_list():
@@ -131,8 +152,14 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
         bool_grid_flat[argwhere(n_count_grid_flat > 4)] = True
         bool_grid_flat[argwhere(n_count_grid_flat <= 3)] = False
 
-        # border tiles are walls
+        # border tiles are walls during generation
         bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
+
+    # Exit generation ------------------------------------------------
+
+    exit_coords: ndarray = abs(_get_circle_coords(array((GRID_WIDTH // 2, 0)), GRID_WIDTH // 2 - 1))
+    bool_grid[exit_coords[:, 0], exit_coords[:, 1]] = False
+    bool_grid[:, 0] = False
 
     # Rooms connections -------------------------------------------------------
 
@@ -142,7 +169,7 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
     # matrix indicating if two rooms are connected between each other
     connections: ndarray = zeros((n_rooms, n_rooms), dtype=bool)
 
-    connections_idxes: List = []  # TODO find size of this thing in advance
+    connections_idxes: List = []
 
     # starting from room 1 because room 0 contains all the wall tiles
     for a in range(1, n_rooms):
@@ -229,8 +256,8 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
                 bool_grid[line[:, 0], line[:, 1] + 1] = \
                 bool_grid[line[:, 0], line[:, 1] - 1] = False
 
-    # ensuring borders are walls, one last time
-    bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
+    # ensuring borders are walls, except for the top which is the exit
+    bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, -1] = True
 
     # Player ------------------------------------------------------------------
 
@@ -253,8 +280,6 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
     player_idx: ndarray = array((x, spawn_height))  # grid space
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
     player = Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
-
-    # TODO top exit generation ------------------------------------------------
 
     # Bonuses -----------------------------------------------------------------
 
