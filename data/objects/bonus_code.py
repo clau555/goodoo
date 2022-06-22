@@ -1,17 +1,19 @@
 from dataclasses import replace
 from typing import List
 
-from numpy import cos, ndarray, array, around
-from pygame import Rect, Surface, SRCALPHA, draw, BLEND_RGB_ADD
+from numpy import cos, array, around
+from pygame import Rect, Surface, BLEND_RGB_ADD
 
 from data.objects.bonus_data import Bonus
 from data.objects.camera_data import Camera
-from data.utils.constants import TILE_EDGE, LIGHT_COLOR, LIGHT_RADIUS, BONUS_ANIMATION_SPEED
+from data.utils.constants import TILE_EDGE, LIGHT_RADIUS, BONUS_ANIMATION_SPEED, BONUS_SPRITE, LIGHT_RECT
+from data.utils.functions import bonus_light_surface, rect_inside_screen
 
 
 def update_bonus(bonus: Bonus, timer: float) -> Bonus:
     """
-    Makes the bonus cycle in a movement from top to bottom.
+    Makes the bonus cycle in a movement from top to bottom,
+    and updates its light effect.
 
     :param bonus: bonus data
     :param timer: game timer
@@ -19,7 +21,14 @@ def update_bonus(bonus: Bonus, timer: float) -> Bonus:
     """
     rect: Rect = bonus.rect
     rect.y = bonus.origin[1] + cos(timer / BONUS_ANIMATION_SPEED) * TILE_EDGE / 3
-    return replace(bonus, rect=rect)
+
+    radius: List[float] = [
+        LIGHT_RADIUS * ((timer % BONUS_ANIMATION_SPEED) / BONUS_ANIMATION_SPEED),
+        LIGHT_RADIUS * ((BONUS_ANIMATION_SPEED - timer % BONUS_ANIMATION_SPEED) / BONUS_ANIMATION_SPEED)
+    ]
+    lights: List[Surface] = [bonus_light_surface(r) for r in radius]
+
+    return replace(bonus, rect=rect, lights=lights)
 
 
 def destroy_bonus(bonus: Bonus) -> Bonus:
@@ -32,37 +41,35 @@ def destroy_bonus(bonus: Bonus) -> Bonus:
     return replace(bonus, alive=False)
 
 
-def _circle_surface(radius: float) -> Surface:
+def bonus_inside_screen(bonus: Bonus, camera: Camera) -> bool:
     """
-    Returns a surface containing a transparent blue circle of the given radius.
+    Checks if a bonus is visible on screen.
 
-    :param radius: radius
-    :return: surface
-    """
-    surface: Surface = Surface((radius * 2, radius * 2), SRCALPHA)
-    draw.circle(surface, LIGHT_COLOR, (radius, radius), radius)
-    surface.set_alpha(255)
-    return surface
-
-
-def display_light(screen: Surface, pos: ndarray, camera: Camera, timer: float) -> None:
-    """
-    Displays a light animation at a certain position.
-
-    :param screen: screen surface
-    :param pos: world position
+    :param bonus: bonus data
     :param camera: camera data
-    :param timer: game timer
+    :return: True if bonus is visible, False otherwise
     """
-    radius_: List[float] = [
-        LIGHT_RADIUS * ((timer % BONUS_ANIMATION_SPEED) / BONUS_ANIMATION_SPEED),
-        LIGHT_RADIUS * ((BONUS_ANIMATION_SPEED - timer % BONUS_ANIMATION_SPEED) / BONUS_ANIMATION_SPEED)
-    ]
-    lights: List[Surface] = [_circle_surface(radius) for radius in radius_]
+    light_rect: Rect = Rect(LIGHT_RECT)
+    light_rect.center = bonus.rect.center
+    if rect_inside_screen(light_rect, camera):
+        return True
+    return False
 
-    for i in range(2):
+
+def display_bonus(bonus: Bonus, screen: Surface, camera: Camera) -> None:
+    """
+    Displays a bonus along with its light effect.
+
+    :param bonus:
+    :param screen: screen surface
+    :param camera: camera data
+    """
+    screen.blit(BONUS_SPRITE, around(bonus.rect.topleft + camera.offset))
+
+    for light in bonus.lights:
         screen.blit(
-            lights[i],
-            around(pos - array((radius_[i], radius_[i]), dtype=int) + camera.offset),
+            light,
+            around(
+                array(bonus.rect.center, dtype=float) - array(light.get_rect().size, dtype=float) // 2 + camera.offset),
             special_flags=BLEND_RGB_ADD
         )

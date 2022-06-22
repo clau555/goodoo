@@ -11,7 +11,7 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.objects.bonus_code import destroy_bonus, update_bonus, display_light
+from data.objects.bonus_code import destroy_bonus, update_bonus, display_bonus, bonus_inside_screen
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
 from data.objects.lava_code import display_lava, update_lava, set_lava_triggered
@@ -19,10 +19,10 @@ from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus, display_player
 from data.objects.ray_code import update_ray, fire_ray, get_ray_velocity, display_ray
 from data.objects.ray_data import Ray
-from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, BONUS_SPRITE, \
-    CURSOR_SIZE, ICON, LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
+from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, CURSOR_SIZE, ICON, \
+    LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
     BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR
-from data.utils.functions import get_screen_grid, rect_inside_screen, background_position
+from data.utils.functions import get_screen_grid, background_position
 from data.utils.generation import generate_world
 
 
@@ -151,9 +151,8 @@ def main() -> None:
 
         # bonuses
         for bonus in bonuses:
-            if rect_inside_screen(bonus.rect, camera) and bonus.alive:
-                display_light(screen, array(bonus.rect.center), camera, timer)
-                screen.blit(BONUS_SPRITE, around(bonus.rect.topleft + camera.offset))
+            if bonus_inside_screen(bonus, camera) and bonus.alive:
+                display_bonus(bonus, screen, camera)
 
         # lava
         display_lava(lava, screen, camera, timer)

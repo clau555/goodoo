@@ -85,6 +85,7 @@ BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
 BONUS_VALUE: int = 15
 LIGHT_COLOR: Tuple[int, int, int] = (27, 41, 83)
 LIGHT_RADIUS: int = BONUS_SIZE[0] * 3
+LIGHT_RECT: Rect = Rect(0, 0, LIGHT_RADIUS * 2, LIGHT_RADIUS * 2)
 BONUS_ANIMATION_SPEED: float = 0.6  # duration of light pulse and bonus movement in seconds
 
 # lava

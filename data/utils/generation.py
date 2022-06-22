@@ -10,7 +10,8 @@ from data.objects.bonus_data import Bonus
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
 from data.utils.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
-    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, TILE_SPRITES, GRID_WIDTH
+    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, TILE_SPRITES, GRID_WIDTH, LIGHT_RADIUS
+from data.utils.functions import bonus_light_surface
 
 
 def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
@@ -292,7 +293,11 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
 
             bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
             bonus_rect: Rect = Rect(tuple(bonus_pos), tuple(BONUS_SIZE))
-            bonuses.append(Bonus(bonus_rect, array(bonus_rect.topleft, dtype=float)))
+            bonuses.append(Bonus(
+                bonus_rect,
+                array(bonus_rect.topleft, dtype=float),
+                [bonus_light_surface(LIGHT_RADIUS) for _ in range(2)]
+            ))
 
     # Convert to grid of tiles ------------------------------------------------
 

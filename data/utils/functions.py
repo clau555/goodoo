@@ -2,10 +2,11 @@ from typing import List
 
 from numpy import ndarray, clip, around, array
 from numpy.linalg import norm
-from pygame import Rect, Surface
+from pygame import Rect, Surface, SRCALPHA, draw
 
 from data.objects.camera_data import Camera
-from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SIZE, SCREEN_RECT, SCREEN_GRID_SIZE, ANIMATION_SPEED
+from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SIZE, SCREEN_RECT, SCREEN_GRID_SIZE, ANIMATION_SPEED, \
+    LIGHT_COLOR
 
 
 def scale_vec(v: ndarray, length: float) -> ndarray:
@@ -122,3 +123,16 @@ def get_moore_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
            idx_[0] - 1: idx_[0] + 2,
            idx_[1] - 1: idx_[1] + 2
            ]
+
+
+def bonus_light_surface(radius: float) -> Surface:
+    """
+    Returns a surface containing a transparent blue circle of the given radius.
+
+    :param radius: radius
+    :return: surface
+    """
+    surface: Surface = Surface((radius * 2, radius * 2), SRCALPHA)
+    draw.circle(surface, LIGHT_COLOR, (radius, radius), radius)
+    surface.set_alpha(255)
+    return surface
