@@ -9,8 +9,8 @@ from pygame.transform import flip
 
 from data.objects.camera_data import Camera
 from data.objects.player_data import Player
-from data.utils.constants import GRAVITY, PLAYER_MAX_V, PLAYER_COLOR_SPRITE, \
-    PLAYER_GROUND_COLOR_SPRITES
+from data.utils.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
+    PLAYER_GROUND_SPRITES
 from data.utils.functions import scale_vec, world_to_grid, get_moore_neighborhood, idx_inside_grid, animation_frame
 
 
@@ -28,9 +28,9 @@ def display_player(player: Player, screen: Surface, camera: Camera, timer: float
 
     # display ground sprites or jumping sprites
     if player.on_ground:
-        sprite: Surface = animation_frame(PLAYER_GROUND_COLOR_SPRITES, timer)
+        sprite: Surface = animation_frame(PLAYER_GROUND_SPRITES, timer)
     else:
-        sprite: Surface = PLAYER_COLOR_SPRITE
+        sprite: Surface = PLAYER_SPRITE
 
     # flipping sprites depending on orientation
     if around(player.rect.centerx + camera.offset[0]) - pygame.mouse.get_pos()[0] < 0:

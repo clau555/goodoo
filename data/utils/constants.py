@@ -52,8 +52,8 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
-PLAYER_COLOR_SPRITE: Surface = load(PLAYER_PATH / f"player_jump.png")
-PLAYER_GROUND_COLOR_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
+PLAYER_SPRITE: Surface = load(PLAYER_PATH / f"player_jump.png")
+PLAYER_GROUND_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 
 # cursor
@@ -71,10 +71,11 @@ CAMERA_TARGET_OFFSET: ndarray = array((0, -40))
 CAMERA_SPEED: float = 0.08
 SHAKE_AMPLITUDE: int = 50
 
-# ray
-RAY_VECTOR_STEP: float = TILE_EDGE / 3
-RAY_ACCELERATION: float = TILE_EDGE / 50
-RAY_COLOR: Tuple[int, int, int] = (40, 134, 185)
+# grapple
+GRAPPLE_VECTOR_STEP: float = TILE_EDGE / 3
+GRAPPLE_ACCELERATION: float = TILE_EDGE / 50
+GRAPPLE_COLOR: Tuple[int, int, int] = (40, 134, 185)
+GRAPPLE_HEAD_VELOCITY: float = TILE_EDGE * 2
 
 # lava
 LAVA_SPRITES: List[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]

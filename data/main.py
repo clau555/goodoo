@@ -1,7 +1,7 @@
 import time
 
 import pygame
-from numpy import ndarray, array, ndenumerate, around, clip
+from numpy import ndarray, array, ndenumerate, around, clip, zeros
 from numpy.random import choice
 from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED
 from pygame.rect import Rect
@@ -10,11 +10,11 @@ from pygame.time import Clock
 
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
+from data.objects.grapple_code import update_grapple_start, fire, grapple_acceleration, display_ray, update_grapple_head
+from data.objects.grapple_data import Grapple
 from data.objects.lava_code import display_lava, update_lava, set_lava_triggered
 from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, display_player
-from data.objects.ray_code import update_ray, fire, ray_velocity, display_ray
-from data.objects.ray_data import Ray
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, CURSOR_SIZE, ICON, \
     LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
     BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR, CAMERA_TARGET_OFFSET
@@ -34,7 +34,7 @@ def main() -> None:
 
     tile_grid, player = generate_world()
 
-    ray: Ray = Ray()
+    grapple: Grapple = Grapple()
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
     camera: Camera = Camera(array(player.rect.center, dtype=float))
 
@@ -97,15 +97,20 @@ def main() -> None:
                 camera = update_camera(camera, camera_target + random_offset, delta)
                 shake_counter -= delta_time
 
-        # ray starts from the player and aims at mouse position,
-        # it's fired on user click and consume player's goo
-        ray = update_ray(ray, player)
         if click:
-            ray = fire(ray, tile_grid, camera)
+            grapple = fire(grapple, tile_grid, camera)
 
-        input_velocity: ndarray = ray_velocity(ray) if clicking else array((0, 0))
+        if clicking:
+            grapple = update_grapple_head(grapple)
+
+        if clicking and grapple.head is grapple.end:
+            input_velocity: ndarray = grapple_acceleration(grapple)
+        else:
+            input_velocity: ndarray = zeros(2, dtype=float)
 
         player = update_player(player, input_velocity, tile_grid, delta)
+
+        grapple = update_grapple_start(grapple, player)
 
         # Display -------------------------------------------------------------
 
@@ -140,9 +145,9 @@ def main() -> None:
             if tile:
                 screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
 
-        # ray
+        # grapple
         if clicking:
-            display_ray(ray, screen, camera)
+            display_ray(grapple, screen, camera)
 
         # player
         display_player(player, screen, camera, timer)
