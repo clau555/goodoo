@@ -3,10 +3,9 @@ from typing import List
 from numpy import ndarray, clip, around, array
 from numpy.linalg import norm
 from pygame import Surface
-from pygame.rect import Rect
 
 from data.objects.camera_data import Camera
-from data.utils.constants import SCREEN_SIZE, GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED, SCREEN_RECT
+from data.utils.constants import GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED
 
 
 def scale_vec(v: ndarray, length: float) -> ndarray:
@@ -39,28 +38,6 @@ def background_position(camera: Camera) -> ndarray:
     :return: background screen position
     """
     return array((clip(around(camera.offset[0]), 0, None), 0))
-
-
-def pos_inside_screen(pos: ndarray, camera: Camera) -> bool:
-    """
-    Checks if a position is inside the screen.
-
-    :param pos: position in world space
-    :param camera: camera data
-    :return: True if inside screen, False otherwise
-    """
-    return (pos + camera.offset >= 0).all() and (pos + camera.offset < SCREEN_SIZE).all()
-
-
-def rect_inside_screen(rect: Rect, camera: Camera) -> bool:
-    """
-    Checks if a rectangle is visible on screen.
-
-    :param rect: rectangle in world space
-    :param camera: camera data
-    :return: True if visible, False otherwise
-    """
-    return SCREEN_RECT.colliderect(Rect(rect.topleft + camera.offset, rect.size))
 
 
 def idx_inside_grid(idx: ndarray) -> bool:
