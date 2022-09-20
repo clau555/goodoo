@@ -60,9 +60,6 @@ def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta:
     # getting neighbor tiles to check collision
     player_idx: ndarray = world_to_grid(array(player.rect.center))
     if not idx_inside_grid(player_idx):
-        if player_idx[1] <= 0:
-            print("You won!")
-            exit()
         raise ValueError("Player out of bounds")
     neighbor_tiles: ndarray = get_moore_neighborhood(grid, player_idx)
 

@@ -103,7 +103,7 @@ def main() -> None:
         if clicking:
             grapple = update_grapple_head(grapple)
 
-        if clicking and grapple.head is grapple.end:
+        if clicking and grapple.head is grapple.end:  # grapple is attached to a wall
             input_velocity: ndarray = grapple_acceleration(grapple)
         else:
             input_velocity: ndarray = zeros(2, dtype=float)
@@ -111,6 +111,13 @@ def main() -> None:
         player = update_player(player, input_velocity, tile_grid, delta)
 
         grapple = update_grapple_start(grapple, player)
+
+        if player.rect.centery <= 0:
+            print("You won!")
+            exit()
+        elif player.rect.centery >= lava.height:
+            print("You lost!")
+            exit()
 
         # Display -------------------------------------------------------------
 
