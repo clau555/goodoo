@@ -1,9 +1,10 @@
+import os
 import time
 
 import pygame
 from numpy import ndarray, array, ndenumerate, around, clip, zeros
 from numpy.random import choice
-from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED
+from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED, HIDDEN
 from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
@@ -24,9 +25,20 @@ from data.utils.generation import generate_world
 
 def main() -> None:
     pygame.init()
-    pygame.display.set_mode(SCREEN_SIZE, SCALED)
+
+    # setting centered window for SDL
+    pygame.display.set_mode(SCREEN_SIZE, HIDDEN | SCALED)
+    window_size_scaled: ndarray = array(pygame.display.get_window_size())
+    pygame.display.quit()
+    pygame.display.init()
+    info = pygame.display.Info()
+    window_pos: ndarray = array((info.current_w, info.current_h)) // 2 - window_size_scaled // 2
+    os.environ["SDL_VIDEO_WINDOW_POS"] = f"{window_pos[0]},{window_pos[1]}"
+
+    # initializing window
     pygame.display.set_icon(ICON)
     pygame.display.set_caption("Goodoo")
+    pygame.display.set_mode(SCREEN_SIZE, SCALED)
     pygame.mouse.set_visible(False)
     pygame.event.set_allowed([QUIT, KEYDOWN, MOUSEBUTTONUP, MOUSEBUTTONDOWN])
 
