@@ -6,12 +6,10 @@ from pygame import Rect, Surface
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
-from data.objects.bonus_data import Bonus
 from data.objects.player_data import Player
 from data.objects.tile_data import Tile
 from data.utils.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
-    PLAYER_SIZE, BONUS_REPARTITION, BONUS_SIZE, TILE_SPRITES, GRID_WIDTH, LIGHT_RADIUS
-from data.utils.functions import bonus_light_surface
+    PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH
 
 
 def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
@@ -114,10 +112,10 @@ def _to_tiles(grid: ndarray) -> ndarray:
     return tile_grid
 
 
-def generate_world() -> Tuple[ndarray, Player, ndarray]:
+def generate_world() -> Tuple[ndarray, Player]:
     """
     Returns a world grid containing the wall tiles, and none for the empty tiles.
-    Returns also the player, and the list of spawned bonuses.
+    Returns also the player.
 
     Algorithm uses procedural cave generation with cellular automaton and generation of connections between rooms.
     https://www.youtube.com/playlist?list=PLFt_AvWsXl0eZgMK_DT5_biRkWXftAOf9
@@ -125,7 +123,7 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
     Implementation uses uniform vectorization.
     https://lhoupert.fr/test-jbook/04-code-vectorization.html
 
-    :return: tile grid, player, bonuses
+    :return: tile grid, player
     """
 
     # Cellular automaton ------------------------------------------------------
@@ -282,25 +280,8 @@ def generate_world() -> Tuple[ndarray, Player, ndarray]:
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
     player = Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
 
-    # Bonuses -----------------------------------------------------------------
-
-    bonuses: List = []
-    for y in range(GRID_HEIGHT - BONUS_REPARTITION, 0, -BONUS_REPARTITION):
-
-        empty_xs: ndarray = argwhere(bool_grid[:, y] == False)
-        if empty_xs.size > 1:
-            x: int = int(empty_xs[randint(0, empty_xs.size - 1)])
-
-            bonus_pos: ndarray = array((x, y), dtype=float) * TILE_SIZE + TILE_SIZE / 2 - BONUS_SIZE / 2
-            bonus_rect: Rect = Rect(tuple(bonus_pos), tuple(BONUS_SIZE))
-            bonuses.append(Bonus(
-                bonus_rect,
-                array(bonus_rect.topleft, dtype=float),
-                [bonus_light_surface(LIGHT_RADIUS) for _ in range(2)]
-            ))
-
     # Convert to grid of tiles ------------------------------------------------
 
     tile_grid: ndarray = _to_tiles(bool_grid)
 
-    return tile_grid, player, array(bonuses)
+    return tile_grid, player

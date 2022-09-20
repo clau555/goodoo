@@ -52,12 +52,9 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
-PLAYER_COLOR_SPRITE: Surface = load(PLAYER_PATH / f"player_jump_color.png")
-PLAYER_PALE_SPRITE: Surface = load(PLAYER_PATH / f"player_jump_pale.png")
-PLAYER_GROUND_COLOR_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_color_{i}.png") for i in range(1, 5)]
-PLAYER_GROUND_PALE_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_pale_{i}.png") for i in range(1, 5)]
+PLAYER_COLOR_SPRITE: Surface = load(PLAYER_PATH / f"player_jump.png")
+PLAYER_GROUND_COLOR_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
-PLAYER_MAX_GOO: int = 20
 
 # cursor
 CURSOR_SIZE: ndarray = array((6, 6))
@@ -68,30 +65,21 @@ FPS: int = 60
 TARGET_FPS: float = 60.
 GRAVITY: ndarray = array((0, PLAYER_MAX_V / 100))
 ANIMATION_SPEED: float = 0.8  # duration of a sprite frame in seconds
+
+# camera
+CAMERA_TARGET_OFFSET: ndarray = array((0, -40))
 CAMERA_SPEED: float = 0.08
 SHAKE_AMPLITUDE: int = 50
 
 # ray
-RAY_POWER_DECREASE: float = 1 / (0.3 * TARGET_FPS)
 RAY_VECTOR_STEP: float = TILE_EDGE / 3
-RAY_MIN_STRENGTH: float = TILE_EDGE / 10
-RAY_MAX_STRENGTH: float = TILE_EDGE / 4
-RAY_COLOR: Tuple[int, int, int] = (255, 255, 255)
-
-# bonus
-BONUS_SIZE: ndarray = array((4, 4))
-BONUS_SPRITE: Surface = load(SPRITES_PATH / "bonus.png")
-BONUS_REPARTITION: int = GRID_HEIGHT // 10  # height space between bonuses
-BONUS_VALUE: int = 15
-LIGHT_COLOR: Tuple[int, int, int] = (27, 41, 83)
-LIGHT_RADIUS: int = BONUS_SIZE[0] * 3
-LIGHT_RECT: Rect = Rect(0, 0, LIGHT_RADIUS * 2, LIGHT_RADIUS * 2)
-BONUS_ANIMATION_SPEED: float = 0.6  # duration of light pulse and bonus movement in seconds
+RAY_ACCELERATION: float = TILE_EDGE / 50
+RAY_COLOR: Tuple[int, int, int] = (40, 134, 185)
 
 # lava
 LAVA_SPRITES: List[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]
 LAVA_SPEED: float = TILE_EDGE / 10
-LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - BONUS_REPARTITION - 20
+LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - GRID_HEIGHT // 10 - 20
 LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake when triggering lava
 
 # background

@@ -3,51 +3,50 @@ import time
 import pygame
 from numpy import ndarray, array, ndenumerate, around, clip
 from numpy.random import choice
-from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, FULLSCREEN, SCALED
-from pygame.display import set_mode, set_caption, flip, get_surface, set_icon
-from pygame.event import get
-from pygame.mouse import set_visible, get_pos
+from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED
 from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.objects.bonus_code import destroy_bonus, update_bonus, display_bonus, bonus_inside_screen
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
 from data.objects.lava_code import display_lava, update_lava, set_lava_triggered
 from data.objects.lava_data import Lava
-from data.objects.player_code import update_player, decrease_goo, add_goo_from_bonus, display_player
-from data.objects.ray_code import update_ray, fire_ray, get_ray_velocity, display_ray
+from data.objects.player_code import update_player, display_player
+from data.objects.ray_code import update_ray, fire, ray_velocity, display_ray
 from data.objects.ray_data import Ray
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, CURSOR_SIZE, ICON, \
     LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
-    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR
+    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR, CAMERA_TARGET_OFFSET
 from data.utils.functions import get_screen_grid, background_position
 from data.utils.generation import generate_world
 
 
 def main() -> None:
     pygame.init()
-    # set_mode(SCREEN_SIZE)
-    set_mode(SCREEN_SIZE, FULLSCREEN | SCALED)
-    set_icon(ICON)
-    set_caption("Goodoo")
-    set_visible(False)
+    pygame.display.set_mode(SCREEN_SIZE, SCALED)
+    pygame.display.set_icon(ICON)
+    pygame.display.set_caption("Goodoo")
+    pygame.mouse.set_visible(False)
+    pygame.event.set_allowed([QUIT, KEYDOWN, MOUSEBUTTONUP, MOUSEBUTTONDOWN])
 
-    tile_grid, player, bonuses = generate_world()
+    # TODO fake fullscreen (borderless window)
+
+    tile_grid, player = generate_world()
 
     ray: Ray = Ray()
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
     camera: Camera = Camera(array(player.rect.center, dtype=float))
 
     shake_counter: float = LAVA_WARNING_DURATION
-
     timer: float = 0  # incremented every frame by delta time
 
-    screen: Surface = get_surface()
+    screen: Surface = pygame.display.get_surface()
 
     clock: Clock = Clock()
     last_time: float = time.time()
+
+    clicking: bool = False  # true during mouse button press
 
     while True:
         clock.tick(FPS)  # limit fps
@@ -60,9 +59,9 @@ def main() -> None:
 
         # Events --------------------------------------------------------------
 
-        click: bool = False
+        click: bool = False  # true on mouse click
 
-        for event in get():
+        for event in pygame.event.get():
 
             if event.type == QUIT:
                 pygame.quit()
@@ -75,11 +74,16 @@ def main() -> None:
 
             elif event.type == MOUSEBUTTONDOWN:
                 click = True
+                clicking = True
 
-        # Model update --------------------------------------------------------
+            elif event.type == MOUSEBUTTONUP:
+                clicking = False
+
+        # Data update --------------------------------------------------------
 
         # camera follows player
-        camera = update_camera(camera, array(player.rect.center), delta)
+        camera_target: ndarray = player.rect.center + CAMERA_TARGET_OFFSET
+        camera = update_camera(camera, camera_target, delta)
 
         # lava is triggered when player reached a certain height
         if not lava.triggered and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
@@ -90,25 +94,18 @@ def main() -> None:
             if shake_counter > 0:
                 # camera shakes for a short period of time
                 random_offset: ndarray = choice((-1, 1)) * choice(SHAKE_AMPLITUDE, 2)
-                camera = update_camera(camera, player.rect.center + random_offset, delta)
+                camera = update_camera(camera, camera_target + random_offset, delta)
                 shake_counter -= delta_time
 
         # ray starts from the player and aims at mouse position,
         # it's fired on user click and consume player's goo
-        ray = update_ray(ray, player, tile_grid, camera, delta)
-        if click and ray.power == 0:
-            ray = fire_ray(ray)
-            player = decrease_goo(player)
+        ray = update_ray(ray, player)
+        if click:
+            ray = fire(ray, tile_grid, camera)
 
-        player = update_player(player, get_ray_velocity(ray, player), tile_grid, delta)
+        input_velocity: ndarray = ray_velocity(ray) if clicking else array((0, 0))
 
-        for i, bonus in ndenumerate(bonuses):
-            bonuses[i] = update_bonus(bonus, timer)
-
-            # player grabbing bonus destroys it, and gives goo to player
-            if player.rect.colliderect(bonus.rect) and bonus.alive:
-                bonuses[i] = destroy_bonus(bonus)
-                player = add_goo_from_bonus(player)
+        player = update_player(player, input_velocity, tile_grid, delta)
 
         # Display -------------------------------------------------------------
 
@@ -144,23 +141,18 @@ def main() -> None:
                 screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
 
         # ray
-        display_ray(ray, screen, camera)
+        if clicking:
+            display_ray(ray, screen, camera)
 
         # player
-        display_player(player, ray, screen, camera, timer)
-
-        # bonuses
-        for bonus in bonuses:
-            if bonus_inside_screen(bonus, camera) and bonus.alive:
-                display_bonus(bonus, screen, camera)
+        display_player(player, screen, camera, timer)
 
         # lava
         display_lava(lava, screen, camera, timer)
 
         # cursor
-        screen.blit(CURSOR_SPRITE, array(get_pos()) - CURSOR_SIZE / 2)
+        screen.blit(CURSOR_SPRITE, array(pygame.mouse.get_pos()) - CURSOR_SIZE / 2)
 
         timer += delta_time
 
-        flip()
-        # print(int(clock.get_fps()))
+        pygame.display.flip()
