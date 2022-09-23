@@ -55,6 +55,7 @@ PLAYER_SIZE: ndarray = array((8, 8))
 PLAYER_SPRITE: Surface = load(PLAYER_PATH / f"player_jump.png")
 PLAYER_GROUND_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
+PLAYER_INPUT_V: float = TILE_EDGE / 100
 
 # cursor
 CURSOR_SIZE: ndarray = array((6, 6))

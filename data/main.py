@@ -1,24 +1,26 @@
 import os
 import time
+from typing import Sequence
 
 import pygame
 from numpy import ndarray, array, ndenumerate, around, clip, zeros
 from numpy.random import choice
-from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED, HIDDEN
+from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED, HIDDEN, K_q, K_s, K_d, K_z
 from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
 
 from data.objects.camera_code import update_camera
 from data.objects.camera_data import Camera
-from data.objects.grapple_code import update_grapple_start, fire, grapple_acceleration, display_ray, update_grapple_head
+from data.objects.grapple_code import update_grapple_start, fire, grapple_acceleration, display_ray, \
+    update_grapple_head, reset_grapple_head
 from data.objects.grapple_data import Grapple
 from data.objects.lava_code import display_lava, update_lava, set_lava_triggered
 from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, display_player
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, CURSOR_SIZE, ICON, \
     LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
-    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR, CAMERA_TARGET_OFFSET
+    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V
 from data.utils.functions import get_screen_grid, background_position
 from data.utils.generation import generate_world
 
@@ -69,17 +71,14 @@ def main() -> None:
         delta: float = delta_time * TARGET_FPS
         last_time = now
 
-        # Events --------------------------------------------------------------
+        click: bool = False
+        input_velocity: ndarray = zeros(2, dtype=float)
 
-        click: bool = False  # true on mouse click
+        # Events -------------------------------------------------------------------------------------------------------
 
         for event in pygame.event.get():
 
-            if event.type == QUIT:
-                pygame.quit()
-                quit()
-
-            elif event.type == KEYDOWN:
+            if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     quit()
@@ -87,11 +86,26 @@ def main() -> None:
             elif event.type == MOUSEBUTTONDOWN:
                 click = True
                 clicking = True
-
             elif event.type == MOUSEBUTTONUP:
                 clicking = False
 
-        # Data update --------------------------------------------------------
+            elif event.type == QUIT:
+                pygame.quit()
+                quit()
+
+        keys: Sequence[bool] = pygame.key.get_pressed()
+        if not player.on_ground and grapple.head is grapple.end:
+            # TODO handle at least QWERTY
+            if keys[K_q]:
+                input_velocity += array((-PLAYER_INPUT_V, 0))
+            elif keys[K_d]:
+                input_velocity += array((PLAYER_INPUT_V, 0))
+            elif keys[K_z]:
+                input_velocity += array((0, -PLAYER_INPUT_V))
+            elif keys[K_s]:
+                input_velocity += array((0, PLAYER_INPUT_V))
+
+        # Data update --------------------------------------------------------------------------------------------------
 
         # camera follows player
         camera_target: ndarray = player.rect.center + CAMERA_TARGET_OFFSET
@@ -111,14 +125,13 @@ def main() -> None:
 
         if click:
             grapple = fire(grapple, tile_grid, camera)
-
         if clicking:
             grapple = update_grapple_head(grapple)
+        else:
+            grapple = reset_grapple_head(grapple)
 
         if clicking and grapple.head is grapple.end:  # grapple is attached to a wall
-            input_velocity: ndarray = grapple_acceleration(grapple)
-        else:
-            input_velocity: ndarray = zeros(2, dtype=float)
+            input_velocity += grapple_acceleration(grapple)
 
         player = update_player(player, input_velocity, tile_grid, delta)
 
@@ -131,7 +144,7 @@ def main() -> None:
             print("You lost!")
             exit()
 
-        # Display -------------------------------------------------------------
+        # Display ------------------------------------------------------------------------------------------------------
 
         screen.fill(WALL_COLOR)
 

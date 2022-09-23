@@ -104,6 +104,16 @@ def update_grapple_head(grapple: Grapple) -> Grapple:
     return replace(grapple, head=head)
 
 
+def reset_grapple_head(grapple: Grapple) -> Grapple:
+    """
+    Resets the grapple head position to the player's position.
+
+    :param grapple: grapple data
+    :return: updated grapple data
+    """
+    return replace(grapple, head=grapple.start, head_velocity=zeros(2), head_start=grapple.start)
+
+
 def grapple_acceleration(grapple: Grapple) -> ndarray:
     """
     Returns the acceleration impulse the grapple would give to the player.
