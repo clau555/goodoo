@@ -11,7 +11,7 @@ from data.objects.camera_data import Camera
 from data.objects.player_data import Player
 from data.utils.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
     PLAYER_GROUND_SPRITES
-from data.utils.functions import scale_vec, world_to_grid, get_moore_neighborhood, idx_inside_grid, animation_frame
+from data.utils.functions import scale_vec, world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame
 
 
 def display_player(player: Player, screen: Surface, camera: Camera, timer: float) -> None:
@@ -61,7 +61,7 @@ def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta:
     player_idx: ndarray = world_to_grid(array(player.rect.center))
     if not idx_inside_grid(player_idx):
         raise ValueError("Player out of bounds")
-    neighbor_tiles: ndarray = get_moore_neighborhood(grid, player_idx)
+    neighbor_tiles: ndarray = moore_neighborhood(grid, player_idx)
 
     player_pos: ndarray = array(player.pos)
     player_rect: Rect = Rect(player.rect)

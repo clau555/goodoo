@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from numpy import array, ndarray
 from pygame import Surface, Rect
@@ -90,3 +90,17 @@ BACKGROUND_LAVA_SPRITE: Surface = scale(load(SPRITES_PATH / "background_lava.png
 BACKGROUND_LAVA_DISTANCE: int = SCREEN_SIZE[1] * 2  # distance between lava and player at which background starts to
 # change to lava background
 WALL_COLOR: Tuple[int, int, int] = (50, 37, 29)
+
+# key maps
+KEY_MAPS: Dict[str, Dict[str, List[int]]] = {
+    "QWERTY": {
+        "left": [pygame.K_LEFT, pygame.K_a],
+        "down": [pygame.K_DOWN, pygame.K_s],
+        "right": [pygame.K_RIGHT, pygame.K_d],
+    },
+    "AZERTY": {
+        "left": [pygame.K_LEFT, pygame.K_q],
+        "down": [pygame.K_DOWN, pygame.K_s],
+        "right": [pygame.K_RIGHT, pygame.K_d],
+    },
+}

@@ -12,7 +12,7 @@ from data.utils.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_
     PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH
 
 
-def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
+def _neighbors_count_grid(grid: ndarray) -> ndarray:
     """
     Returns a grid with the number of neighbors for each cell.
     A neighbor is counted if it's true.
@@ -28,7 +28,7 @@ def _get_neighbors_count_grid(grid: ndarray) -> ndarray:
     return neighbors_mat
 
 
-def _get_circle_coords(center: ndarray, radius: int) -> ndarray:
+def _circle_coords(center: ndarray, radius: int) -> ndarray:
     """
     Returns the list of coordinates inside the circle.
 
@@ -64,7 +64,7 @@ def _cartesian_list():
     return cartesian_product
 
 
-def _get_von_neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
+def _von_neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     """
     Returns respectively up, right, down and left neighbors of the given index.
 
@@ -101,7 +101,7 @@ def _to_tiles(grid: ndarray) -> ndarray:
     for (i, j), cell in ndenumerate(grid):
         if cell:
             idx: ndarray = array((i, j))
-            neighbors: ndarray = _get_von_neumann_neighborhood(grid, idx)
+            neighbors: ndarray = _von_neumann_neighborhood(grid, idx)
 
             # choosing tile sprite depending on neighborhood
             sprite: Surface = TILE_SPRITES[neighbor_patterns.index(list(neighbors))]
@@ -136,12 +136,12 @@ def generate_world() -> Tuple[ndarray, Player]:
     )
 
     # number of wall tiles neighbors for each cell
-    n_count_grid: ndarray = _get_neighbors_count_grid(bool_grid)
+    n_count_grid: ndarray = _neighbors_count_grid(bool_grid)
 
     # cellular automaton execution
     for _ in range(AUTOMATON_ITERATION):
         # resetting neighbors count
-        n_count_grid = _get_neighbors_count_grid(bool_grid)
+        n_count_grid = _neighbors_count_grid(bool_grid)
 
         # flatten grids
         bool_grid_flat: ndarray = bool_grid.ravel()
@@ -156,7 +156,7 @@ def generate_world() -> Tuple[ndarray, Player]:
 
     # Exit generation ------------------------------------------------
 
-    exit_coords: ndarray = abs(_get_circle_coords(array((GRID_WIDTH // 2, 0)), GRID_WIDTH // 2 - 1))
+    exit_coords: ndarray = abs(_circle_coords(array((GRID_WIDTH // 2, 0)), GRID_WIDTH // 2 - 1))
     bool_grid[exit_coords[:, 0], exit_coords[:, 1]] = False
     bool_grid[:, 0] = False
 

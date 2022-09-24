@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Sequence
 
 from numpy import ndarray, clip, around, array
 from numpy.linalg import norm
 from pygame import Surface
 
 from data.objects.camera_data import Camera
-from data.utils.constants import GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED
+from data.utils.constants import GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED, KEY_MAPS
 
 
 def scale_vec(v: ndarray, length: float) -> ndarray:
@@ -72,7 +72,7 @@ def world_to_grid(pos: ndarray) -> ndarray:
     return (pos // TILE_SIZE).astype(int)
 
 
-def get_screen_grid(grid: ndarray, camera: Camera) -> ndarray:
+def visible_grid(grid: ndarray, camera: Camera) -> ndarray:
     """
     Returns a sub grid of `grid` which is the current grid visible on screen.
 
@@ -87,7 +87,7 @@ def get_screen_grid(grid: ndarray, camera: Camera) -> ndarray:
            ]
 
 
-def get_moore_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
+def moore_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     """
     Returns the Moore neighborhood grid of the given tile index.
 
@@ -100,3 +100,18 @@ def get_moore_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
            idx_[0] - 1: idx_[0] + 2,
            idx_[1] - 1: idx_[1] + 2
            ]
+
+
+def is_pressed(action: str, pressed_keys: Sequence[bool], keyboard_layout) -> bool:
+    """
+    Checks if the given action is pressed.
+
+    :param action: actin pressed ("left", "right" or "down")
+    :param pressed_keys: list of pressed keys
+    :param keyboard_layout: keyboard layout ("QWERTY" or "AZERTY")
+    :return:
+    """
+    for key in KEY_MAPS[keyboard_layout][action]:
+        if pressed_keys[key]:
+            return True
+    return False

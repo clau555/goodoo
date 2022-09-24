@@ -95,14 +95,11 @@ def main() -> None:
 
         keys: Sequence[bool] = pygame.key.get_pressed()
         if not player.on_ground and grapple.head is grapple.end:
-            # TODO handle at least QWERTY
-            if keys[K_q]:
+            if is_pressed("left", keys, keyboard_layout):
                 input_velocity += array((-PLAYER_INPUT_V, 0))
-            elif keys[K_d]:
+            elif is_pressed("right", keys, keyboard_layout):
                 input_velocity += array((PLAYER_INPUT_V, 0))
-            elif keys[K_z]:
-                input_velocity += array((0, -PLAYER_INPUT_V))
-            elif keys[K_s]:
+            elif is_pressed("down", keys, keyboard_layout):
                 input_velocity += array((0, PLAYER_INPUT_V))
 
         # Data update --------------------------------------------------------------------------------------------------
@@ -172,7 +169,7 @@ def main() -> None:
             screen.blit(background_portion, background_position(camera))
 
         # tiles
-        visible_tiles: ndarray = get_screen_grid(tile_grid, camera)
+        visible_tiles: ndarray = visible_grid(tile_grid, camera)
         for _, tile in ndenumerate(visible_tiles):
             if tile:
                 screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
