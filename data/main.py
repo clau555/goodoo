@@ -1,11 +1,10 @@
-import os
 import time
 from typing import Sequence
 
 import pygame
 from numpy import ndarray, array, ndenumerate, around, clip, zeros
 from numpy.random import choice
-from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED, HIDDEN, K_q, K_s, K_d, K_z
+from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED, FULLSCREEN
 from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
@@ -20,31 +19,19 @@ from data.objects.lava_data import Lava
 from data.objects.player_code import update_player, display_player
 from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, CURSOR_SIZE, ICON, \
     LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
-    BACKGROUND_LAVA_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V
-from data.utils.functions import get_screen_grid, background_position
+    LAVA_WARNING_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, \
+    FONT, WHITE
+from data.utils.functions import visible_grid, background_position, is_pressed
 from data.utils.generation import generate_world
 
 
-def main() -> None:
+def main(keyboard_layout: str) -> None:
     pygame.init()
-
-    # setting centered window for SDL
-    pygame.display.set_mode(SCREEN_SIZE, HIDDEN | SCALED)
-    window_size_scaled: ndarray = array(pygame.display.get_window_size())
-    pygame.display.quit()
-    pygame.display.init()
-    info = pygame.display.Info()
-    window_pos: ndarray = array((info.current_w, info.current_h)) // 2 - window_size_scaled // 2
-    os.environ["SDL_VIDEO_WINDOW_POS"] = f"{window_pos[0]},{window_pos[1]}"
-
-    # initializing window
     pygame.display.set_icon(ICON)
     pygame.display.set_caption("Goodoo")
-    pygame.display.set_mode(SCREEN_SIZE, SCALED)
+    pygame.display.set_mode(SCREEN_SIZE, FULLSCREEN | SCALED)
     pygame.mouse.set_visible(False)
     pygame.event.set_allowed([QUIT, KEYDOWN, MOUSEBUTTONUP, MOUSEBUTTONDOWN])
-
-    # TODO fake fullscreen (borderless window)
 
     tile_grid, player = generate_world()
 
@@ -65,6 +52,7 @@ def main() -> None:
     while True:
         clock.tick(FPS)  # limit fps
 
+        # FIXME player falls through blocks on high delta time
         # delta update using time module because pygame is less accurate
         now: float = time.time()
         delta_time = (now - last_time)
@@ -162,10 +150,10 @@ def main() -> None:
             background_portion.set_alpha(shake_counter / LAVA_WARNING_DURATION * 255)
             screen.blit(background_portion, background_position(camera))
 
-        elif abs(player.pos[1] - lava.height) < BACKGROUND_LAVA_DISTANCE:
+        elif abs(player.pos[1] - lava.height) < LAVA_WARNING_DISTANCE:
             # lava background fades out as player goes away from it and vice versa
             background_portion: Surface = BACKGROUND_LAVA_SPRITE.subsurface(portion_rect)
-            background_portion.set_alpha(255 - abs(player.pos[1] - lava.height) / BACKGROUND_LAVA_DISTANCE * 255)
+            background_portion.set_alpha(255 - abs(player.pos[1] - lava.height) / LAVA_WARNING_DISTANCE * 255)
             screen.blit(background_portion, background_position(camera))
 
         # tiles
@@ -183,6 +171,16 @@ def main() -> None:
 
         # lava
         display_lava(lava, screen, camera, timer)
+
+        # lava distance counter
+        lava_distance: int = int(
+            (lava.height - player.rect.y) // TILE_EDGE)  # lava distance relative to player in number of tiles
+        if lava_distance <= GRID_HEIGHT - LAVA_TRIGGER_HEIGHT:
+            lava_distance_surf: Surface = FONT.render(str(lava_distance), False, WHITE)
+            lava_distance_surf.set_alpha(255 - lava_distance / (GRID_HEIGHT - LAVA_TRIGGER_HEIGHT) * 255)
+            lava_distance_rect: Rect = lava_distance_surf.get_rect()
+            lava_distance_rect.center = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] - SCREEN_SIZE[1] // 8)
+            screen.blit(lava_distance_surf, lava_distance_rect)
 
         # cursor
         screen.blit(CURSOR_SPRITE, array(pygame.mouse.get_pos()) - CURSOR_SIZE / 2)

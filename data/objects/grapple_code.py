@@ -9,7 +9,7 @@ from pygame.surface import Surface
 from data.objects.camera_data import Camera
 from data.objects.grapple_data import Grapple
 from data.objects.player_data import Player
-from data.utils.constants import GRAPPLE_VECTOR_STEP, GRAPPLE_COLOR, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY
+from data.utils.constants import GRAPPLE_VECTOR_STEP, BLUE_PLAYER, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY
 from data.utils.functions import scale_vec, world_to_grid, pos_inside_grid
 
 
@@ -23,14 +23,14 @@ def display_ray(grapple: Grapple, screen: Surface, camera: Camera) -> None:
     """
     line(
         screen,
-        GRAPPLE_COLOR,
+        BLUE_PLAYER,
         grapple.start + camera.offset,
         grapple.head + camera.offset,
         3
     )
     circle(
         screen,
-        GRAPPLE_COLOR,
+        BLUE_PLAYER,
         grapple.head + camera.offset,
         4
     )

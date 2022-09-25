@@ -1,8 +1,10 @@
 from pathlib import Path
 from typing import List, Tuple, Dict
 
+import pygame.font
 from numpy import array, ndarray
 from pygame import Surface, Rect
+from pygame.font import Font
 from pygame.image import load
 from pygame.transform import scale
 
@@ -16,6 +18,11 @@ LAVA_PATH: Path = SPRITES_PATH / "lava"
 ICON: Surface = load(RESOURCES_PATH / "icon.png")
 SCREEN_SIZE: ndarray = array((384, 216))
 SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
+
+# font
+pygame.font.init()
+FONT = Font(RESOURCES_PATH / "Retro Gaming.ttf", 11)
+WHITE: Tuple[int, int, int] = (255, 255, 255)
 
 # tiles
 TILE_EDGE: int = 12  # tile edge size in pixels
@@ -75,19 +82,19 @@ SHAKE_AMPLITUDE: int = 50
 # grapple
 GRAPPLE_VECTOR_STEP: float = TILE_EDGE / 3
 GRAPPLE_ACCELERATION: float = TILE_EDGE / 50
-GRAPPLE_COLOR: Tuple[int, int, int] = (40, 134, 185)
 GRAPPLE_HEAD_VELOCITY: float = TILE_EDGE * 2
+BLUE_PLAYER: Tuple[int, int, int] = (40, 134, 185)
 
 # lava
 LAVA_SPRITES: List[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]
 LAVA_SPEED: float = TILE_EDGE / 10
-LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - GRID_HEIGHT // 10 - 20
+LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - 64
 LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake when triggering lava
 
 # background
 BACKGROUND_SPRITE: Surface = scale(load(SPRITES_PATH / "background.png"), SCREEN_SIZE)
 BACKGROUND_LAVA_SPRITE: Surface = scale(load(SPRITES_PATH / "background_lava.png"), SCREEN_SIZE)
-BACKGROUND_LAVA_DISTANCE: int = SCREEN_SIZE[1] * 2  # distance between lava and player at which background starts to
+LAVA_WARNING_DISTANCE: int = SCREEN_SIZE[1] * 2  # distance between lava and player at which background starts to
 # change to lava background
 WALL_COLOR: Tuple[int, int, int] = (50, 37, 29)
 
