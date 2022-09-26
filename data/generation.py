@@ -6,10 +6,9 @@ from pygame import Rect, Surface
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
-from data.objects.player_data import Player
-from data.objects.tile_data import Tile
-from data.utils.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
+from data.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
     PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH
+from data.dataclasses import Player, Tile
 
 
 def _neighbors_count_grid(grid: ndarray) -> ndarray:

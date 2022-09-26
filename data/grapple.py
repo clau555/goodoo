@@ -6,11 +6,9 @@ from numpy.linalg import linalg
 from pygame.draw import line, circle
 from pygame.surface import Surface
 
-from data.objects.camera_data import Camera
-from data.objects.grapple_data import Grapple
-from data.objects.player_data import Player
-from data.utils.constants import GRAPPLE_VECTOR_STEP, BLUE_PLAYER, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY
-from data.utils.functions import scale_vec, world_to_grid, pos_inside_grid
+from data.constants import GRAPPLE_VECTOR_STEP, BLUE_PLAYER, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY
+from data.dataclasses import Camera, Grapple, Player
+from data.utils import scale_vec, world_to_grid, pos_inside_grid
 
 
 def display_ray(grapple: Grapple, screen: Surface, camera: Camera) -> None:

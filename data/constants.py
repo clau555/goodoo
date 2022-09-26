@@ -8,7 +8,7 @@ from pygame.font import Font
 from pygame.image import load
 from pygame.transform import scale
 
-DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
+DIR_PATH: Path = Path(__file__).parents[1]  # pointing on main directory
 RESOURCES_PATH: Path = DIR_PATH / "resources"
 SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
 PLAYER_PATH: Path = SPRITES_PATH / "player"

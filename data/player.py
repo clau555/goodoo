@@ -7,11 +7,10 @@ from pygame import Surface
 from pygame.rect import Rect
 from pygame.transform import flip
 
-from data.objects.camera_data import Camera
-from data.objects.player_data import Player
-from data.utils.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
+from data.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
     PLAYER_GROUND_SPRITES
-from data.utils.functions import scale_vec, world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame
+from data.dataclasses import Camera, Player
+from data.utils import scale_vec, world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame
 
 
 def display_player(player: Player, screen: Surface, camera: Camera, timer: float) -> None:

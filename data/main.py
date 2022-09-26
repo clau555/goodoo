@@ -9,20 +9,18 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.objects.camera_code import update_camera
-from data.objects.camera_data import Camera
-from data.objects.grapple_code import update_grapple_start, fire, grapple_acceleration, display_ray, \
-    update_grapple_head, reset_grapple_head
-from data.objects.grapple_data import Grapple
-from data.objects.lava_code import display_lava, update_lava, set_lava_triggered
-from data.objects.lava_data import Lava
-from data.objects.player_code import update_player, display_player
-from data.utils.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, CURSOR_SIZE, ICON, \
+from data.camera import update_camera
+from data.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, TILE_EDGE, CURSOR_SIZE, ICON, \
     LAVA_TRIGGER_HEIGHT, SHAKE_AMPLITUDE, LAVA_WARNING_DURATION, TARGET_FPS, \
     LAVA_WARNING_DISTANCE, BACKGROUND_LAVA_SPRITE, GRID_HEIGHT, WALL_COLOR, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, \
     FONT, WHITE
-from data.utils.functions import visible_grid, background_position, is_pressed
-from data.utils.generation import generate_world
+from data.dataclasses import Camera, Grapple, Lava
+from data.generation import generate_world
+from data.grapple import update_grapple_start, fire, grapple_acceleration, display_ray, \
+    update_grapple_head, reset_grapple_head
+from data.lava import display_lava, update_lava, set_lava_triggered
+from data.player import update_player, display_player
+from data.utils import visible_grid, background_position, is_pressed
 
 
 def main(keyboard_layout: str) -> None:
@@ -70,6 +68,7 @@ def main(keyboard_layout: str) -> None:
                     pygame.quit()
                     quit()
 
+            # mouse click
             elif event.type == MOUSEBUTTONDOWN:
                 click = True
                 clicking = True
@@ -80,13 +79,14 @@ def main(keyboard_layout: str) -> None:
                 pygame.quit()
                 quit()
 
+        # key actions
         keys: Sequence[bool] = pygame.key.get_pressed()
         if not player.on_ground and grapple.head is grapple.end:
             if is_pressed("left", keys, keyboard_layout):
                 input_velocity += array((-PLAYER_INPUT_V, 0))
-            elif is_pressed("right", keys, keyboard_layout):
+            if is_pressed("right", keys, keyboard_layout):
                 input_velocity += array((PLAYER_INPUT_V, 0))
-            elif is_pressed("down", keys, keyboard_layout):
+            if is_pressed("down", keys, keyboard_layout):
                 input_velocity += array((0, PLAYER_INPUT_V))
 
         # Data update --------------------------------------------------------------------------------------------------

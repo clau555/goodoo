@@ -4,8 +4,8 @@ from numpy import ndarray, clip, around, array
 from numpy.linalg import norm
 from pygame import Surface
 
-from data.objects.camera_data import Camera
-from data.utils.constants import GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED, KEY_MAPS
+from data.constants import GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED, KEY_MAPS
+from data.dataclasses import Camera
 
 
 def scale_vec(v: ndarray, length: float) -> ndarray:
@@ -109,7 +109,7 @@ def is_pressed(action: str, pressed_keys: Sequence[bool], keyboard_layout) -> bo
     :param action: actin pressed ("left", "right" or "down")
     :param pressed_keys: list of pressed keys
     :param keyboard_layout: keyboard layout ("QWERTY" or "AZERTY")
-    :return:
+    :return: True if the action is pressed, False otherwise
     """
     for key in KEY_MAPS[keyboard_layout][action]:
         if pressed_keys[key]:

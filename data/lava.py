@@ -5,10 +5,9 @@ from pygame import draw
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from data.objects.camera_data import Camera
-from data.objects.lava_data import Lava
-from data.utils.constants import LAVA_SPEED, GRID_WIDTH, LAVA_SPRITES, TILE_EDGE, SCREEN_SIZE, TILE_SIZE
-from data.utils.functions import animation_frame, world_to_grid
+from data.constants import LAVA_SPEED, GRID_WIDTH, LAVA_SPRITES, TILE_EDGE, SCREEN_SIZE, TILE_SIZE
+from data.dataclasses import Camera, Lava
+from data.utils import animation_frame, world_to_grid
 
 
 def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> None:
