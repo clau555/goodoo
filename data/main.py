@@ -52,7 +52,6 @@ def main(keyboard_layout: str) -> None:
     while True:
         clock.tick(FPS)  # limit fps
 
-        # FIXME player falls through blocks on high delta time
         # delta update using time module because pygame is less accurate
         now: float = time.time()
         delta_time = (now - last_time)
@@ -111,7 +110,7 @@ def main(keyboard_layout: str) -> None:
         if click:
             grapple = fire(grapple, tile_grid, camera)
         if clicking:
-            grapple = update_grapple_head(grapple)
+            grapple = update_grapple_head(grapple, delta)
         else:
             grapple = reset_grapple_head(grapple)
 

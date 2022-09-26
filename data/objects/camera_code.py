@@ -1,9 +1,11 @@
 from dataclasses import replace
 
 from numpy import ndarray
+from numpy.linalg import linalg
 
 from data.objects.camera_data import Camera
 from data.utils.constants import CAMERA_SPEED, SCREEN_SIZE
+from data.utils.functions import scale_vec
 
 
 def update_camera(camera: Camera, focus_pos: ndarray, delta: float) -> Camera:
@@ -16,7 +18,13 @@ def update_camera(camera: Camera, focus_pos: ndarray, delta: float) -> Camera:
     :return: updated camera data
     """
     heading: ndarray = focus_pos - camera.center
-    center: ndarray = camera.center + heading * CAMERA_SPEED * delta
+
+    # clamping camera velocity
+    v: ndarray = heading * CAMERA_SPEED * delta
+    if linalg.norm(v) > linalg.norm(heading):
+        v = scale_vec(v, linalg.norm(heading))
+    
+    center: ndarray = camera.center + v
     top_left: ndarray = center - SCREEN_SIZE / 2
     offset: ndarray = SCREEN_SIZE / 2 - center
 

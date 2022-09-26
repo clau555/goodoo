@@ -89,15 +89,16 @@ def fire(grapple: Grapple, tile_grid: ndarray, camera: Camera) -> Grapple:
     return replace(grapple, end=end, head=grapple.start, head_velocity=head_velocity, head_start=grapple.start)
 
 
-def update_grapple_head(grapple: Grapple) -> Grapple:
+def update_grapple_head(grapple: Grapple, delta: float) -> Grapple:
     """
     Updates the grapple head position making it fly towards the grapple end point.
     The head stops when it reaches the end point.
 
     :param grapple: grapple data
+    :param delta: delta between two frames
     :return: updated grapple data
     """
-    head: ndarray = grapple.head + grapple.head_velocity
+    head: ndarray = grapple.head + grapple.head_velocity * delta
     diff: ndarray = absolute(grapple.end - grapple.head_start) - absolute(head - grapple.head_start)
     if diff[0] < 0 or diff[1] < 0:
         head = grapple.end

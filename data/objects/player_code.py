@@ -26,13 +26,13 @@ def display_player(player: Player, screen: Surface, camera: Camera, timer: float
     """
     player_screen_pos: ndarray = around(player.rect.topleft + camera.offset)
 
-    # display ground sprites or jumping sprites
+    # display ground sprite or jumping sprite
     if player.on_ground:
         sprite: Surface = animation_frame(PLAYER_GROUND_SPRITES, timer)
     else:
         sprite: Surface = PLAYER_SPRITE
 
-    # flipping sprites depending on orientation
+    # flipping sprites depending on orientation (player always looks at the user mouse)
     if around(player.rect.centerx + camera.offset[0]) - pygame.mouse.get_pos()[0] < 0:
         screen.blit(sprite, player_screen_pos)
     else:
@@ -67,7 +67,7 @@ def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta:
     player_rect: Rect = Rect(player.rect)
 
     # x movement executes first
-    player_pos[0] += v[0] * delta
+    player_pos[0] += v[0]
     player_rect.x = round(player_pos[0])
 
     # x collision and correction
@@ -89,7 +89,7 @@ def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta:
                     break
 
     # y movement executes second
-    player_pos[1] += v[1] * delta
+    player_pos[1] += v[1]
     player_rect.y = round(player_pos[1])
 
     on_ground: bool = False
