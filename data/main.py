@@ -86,8 +86,6 @@ def main(keyboard_layout: str) -> None:
                 input_velocity += array((-PLAYER_INPUT_V, 0))
             if is_pressed("right", keys, keyboard_layout):
                 input_velocity += array((PLAYER_INPUT_V, 0))
-            if is_pressed("down", keys, keyboard_layout):
-                input_velocity += array((0, PLAYER_INPUT_V))
 
         # Data update --------------------------------------------------------------------------------------------------
 

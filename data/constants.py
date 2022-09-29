@@ -102,12 +102,10 @@ WALL_COLOR: Tuple[int, int, int] = (50, 37, 29)
 KEY_MAPS: Dict[str, Dict[str, List[int]]] = {
     "QWERTY": {
         "left": [pygame.K_LEFT, pygame.K_a],
-        "down": [pygame.K_DOWN, pygame.K_s],
         "right": [pygame.K_RIGHT, pygame.K_d],
     },
     "AZERTY": {
         "left": [pygame.K_LEFT, pygame.K_q],
-        "down": [pygame.K_DOWN, pygame.K_s],
         "right": [pygame.K_RIGHT, pygame.K_d],
     },
 }

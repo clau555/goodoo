@@ -40,8 +40,7 @@ using the following keys.
 | Action       | Key (QWERTY)  |
 |--------------|:-------------:|
 | fire grapple | `left click`  |
-| left         |  `a` / `up`   |
-| down         | `s` / `down`  |
+| left         | `a` / `left`  |
 | right        | `d` / `right` |
 
 ## I don't like OOP :(
