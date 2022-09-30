@@ -11,6 +11,13 @@ class Tile:
 
 
 @dataclass(frozen=True)
+class Obstacle:
+    rect: Rect
+    sprite: Surface
+    orientation: ndarray
+
+
+@dataclass(frozen=True)
 class Player:
     pos: ndarray
     rect: Rect

@@ -1,14 +1,16 @@
 from typing import Tuple, List
 
-from numpy import ndarray, zeros, array, random, argwhere, invert, amin, sign, ndenumerate, empty
-from numpy.random import randint
+from numpy import ndarray, zeros, array, random, argwhere, invert, amin, sign, ndenumerate, empty, int8
+from numpy.random import randint, random_sample
 from pygame import Rect, Surface
+from pygame.transform import rotate, flip
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
 from data.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
-    PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH
-from data.dataclasses import Player, Tile
+    PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH, AMETHYST_SPRITE, AMETHYST_DENSITY
+from data.dataclasses import Player, Tile, Obstacle
+from data.utils import moore_neighborhood
 
 
 def _neighbors_count_grid(grid: ndarray) -> ndarray:
@@ -63,7 +65,7 @@ def _cartesian_list():
     return cartesian_product
 
 
-def _von_neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
+def _neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     """
     Returns respectively up, right, down and left neighbors of the given index.
 
@@ -94,17 +96,49 @@ def _to_tiles(grid: ndarray) -> ndarray:
     :param grid: boolean grid
     :return: tile grid
     """
+
+    # output grid
     tile_grid: ndarray = empty(grid.shape).astype(Tile)
+
+    # all neumann neighborhood combinations possible
     neighbor_patterns: List = _cartesian_list()
 
-    for (i, j), cell in ndenumerate(grid):
-        if cell:
-            idx: ndarray = array((i, j))
-            neighbors: ndarray = _von_neumann_neighborhood(grid, idx)
+    # input grid but with integers (used for obstacles generation)
+    # 0 = no tile, 1 = tile, 2 = obstacle
+    grid_with_obstacles: ndarray = array(grid, copy=True, dtype=int8)
 
+    for (i, j), cell in ndenumerate(grid):
+        idx: ndarray = array((i, j))
+        neumann_neighbors: ndarray = _neumann_neighborhood(grid, idx)
+        moore_neighbors: ndarray = moore_neighborhood(grid_with_obstacles, idx)
+
+        # converting bool to tile
+        if cell:
             # choosing tile sprite depending on neighborhood
-            sprite: Surface = TILE_SPRITES[neighbor_patterns.index(list(neighbors))]
+            sprite: Surface = TILE_SPRITES[neighbor_patterns.index(list(neumann_neighbors))]
             tile_grid[i, j] = Tile(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite)
+
+        # adding randomly obstacle on empty tile
+        elif random_sample() < AMETHYST_DENSITY \
+                and not (neumann_neighbors == (False, False, True, False)).all() \
+                and True in neumann_neighbors \
+                and 2 not in moore_neighbors:
+
+            # choosing obstacle orientation depending on neighborhood
+            orientation: ndarray = array((
+                0 + int(neumann_neighbors[3]) - (1 + int(neumann_neighbors[3])) * int(neumann_neighbors[1]),
+                0 + int(neumann_neighbors[0])
+            ))
+
+            top_neighborhood: ndarray = idx + orientation
+            if not grid[top_neighborhood[0], top_neighborhood[1]]:
+                sprite: Surface = flip(AMETHYST_SPRITE, True, False) if random_sample() < 0.5 else AMETHYST_SPRITE
+                sprite = rotate(sprite, 90 * orientation[0]) if not orientation[1] else sprite
+                tile_grid[i, j] = Obstacle(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite, orientation)
+                grid_with_obstacles[i, j] = 2
+            else:
+                tile_grid[i, j] = None
+
         else:
             tile_grid[i, j] = None
 
@@ -125,7 +159,7 @@ def generate_world() -> Tuple[ndarray, Player]:
     :return: tile grid, player
     """
 
-    # Cellular automaton ------------------------------------------------------
+    # Cellular automaton -----------------------------------------------------------------------------------------------
 
     # initial noise grid
     bool_grid: ndarray = random.choice(
@@ -153,13 +187,13 @@ def generate_world() -> Tuple[ndarray, Player]:
         # border tiles are walls during generation
         bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
 
-    # Exit generation ------------------------------------------------
+    # Exit generation --------------------------------------------------------------------------------------------------
 
     exit_coords: ndarray = abs(_circle_coords(array((GRID_WIDTH // 2, 0)), GRID_WIDTH // 2 - 1))
     bool_grid[exit_coords[:, 0], exit_coords[:, 1]] = False
     bool_grid[:, 0] = False
 
-    # Rooms connections -------------------------------------------------------
+    # Rooms connections ------------------------------------------------------------------------------------------------
 
     # localizing rooms of empty tiles
     room_grid, n_rooms = label(invert(bool_grid))
@@ -200,7 +234,7 @@ def generate_world() -> Tuple[ndarray, Player]:
 
     connections_idxes: ndarray = array(connections_idxes, dtype=int)
 
-    # Digging connections -----------------------------------------------------
+    # Digging connections ----------------------------------------------------------------------------------------------
 
     for connection in connections_idxes:
 
@@ -257,7 +291,7 @@ def generate_world() -> Tuple[ndarray, Player]:
     # ensuring borders are walls, except for the top which is the exit
     bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, -1] = True
 
-    # Player ------------------------------------------------------------------
+    # Player -----------------------------------------------------------------------------------------------------------
 
     # getting the first row with empty tiles starting from bottom of the grid
     spawn_height: int = GRID_HEIGHT - 1
@@ -279,7 +313,7 @@ def generate_world() -> Tuple[ndarray, Player]:
     player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
     player = Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
 
-    # Convert to grid of tiles ------------------------------------------------
+    # Convert to grid of tiles -----------------------------------------------------------------------------------------
 
     tile_grid: ndarray = _to_tiles(bool_grid)
 

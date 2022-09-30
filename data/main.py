@@ -16,7 +16,7 @@ from data.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, BACKGROUND_SPRITE, T
     FONT, WHITE
 from data.dataclasses import Camera, Grapple, Lava
 from data.generation import generate_world
-from data.grapple import update_grapple_start, fire, grapple_acceleration, display_ray, \
+from data.grapple import update_grapple_start, fire, grapple_acceleration, display_grapple, \
     update_grapple_head, reset_grapple_head
 from data.lava import display_lava, update_lava, set_lava_triggered
 from data.player import update_player, display_player
@@ -47,6 +47,7 @@ def main(keyboard_layout: str) -> None:
 
     clicking: bool = False  # true during mouse button press
 
+    # main loop
     while True:
         clock.tick(FPS)  # limit fps
 
@@ -105,6 +106,7 @@ def main(keyboard_layout: str) -> None:
                 camera = update_camera(camera, camera_target + random_offset, delta)
                 shake_counter -= delta_time
 
+        # grapple update
         if click:
             grapple = fire(grapple, tile_grid, camera)
         if clicking:
@@ -115,10 +117,12 @@ def main(keyboard_layout: str) -> None:
         if clicking and grapple.head is grapple.end:  # grapple is attached to a wall
             input_velocity += grapple_acceleration(grapple)
 
+        # player update
         player = update_player(player, input_velocity, tile_grid, delta)
 
         grapple = update_grapple_start(grapple, player)
 
+        # game end
         if player.rect.centery <= 0:
             print("You won!")
             exit()
@@ -161,7 +165,7 @@ def main(keyboard_layout: str) -> None:
 
         # grapple
         if clicking:
-            display_ray(grapple, screen, camera)
+            display_grapple(grapple, screen, camera)
 
         # player
         display_player(player, screen, camera, timer)

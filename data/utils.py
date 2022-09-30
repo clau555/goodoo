@@ -106,7 +106,7 @@ def is_pressed(action: str, pressed_keys: Sequence[bool], keyboard_layout) -> bo
     """
     Checks if the given action is pressed.
 
-    :param action: actin pressed ("left", "right" or "down")
+    :param action: action pressed ("left", "right" or "down")
     :param pressed_keys: list of pressed keys
     :param keyboard_layout: keyboard layout ("QWERTY" or "AZERTY")
     :return: True if the action is pressed, False otherwise

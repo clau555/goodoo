@@ -1,17 +1,18 @@
 from dataclasses import replace
 
 import pygame
-from numpy import ndarray, array, zeros, absolute
+from numpy import ndarray, array, zeros, absolute, around
 from numpy.linalg import linalg
 from pygame.draw import line, circle
 from pygame.surface import Surface
 
-from data.constants import GRAPPLE_VECTOR_STEP, BLUE_PLAYER, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY
+from data.constants import GRAPPLE_VECTOR_STEP, BLUE_PLAYER, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY, \
+    GRAPPLE_THICKNESS, GRAPPLE_HEAD_RADIUS
 from data.dataclasses import Camera, Grapple, Player
 from data.utils import scale_vec, world_to_grid, pos_inside_grid
 
 
-def display_ray(grapple: Grapple, screen: Surface, camera: Camera) -> None:
+def display_grapple(grapple: Grapple, screen: Surface, camera: Camera) -> None:
     """
     Displays the grapple on the screen.
 
@@ -22,15 +23,15 @@ def display_ray(grapple: Grapple, screen: Surface, camera: Camera) -> None:
     line(
         screen,
         BLUE_PLAYER,
-        grapple.start + camera.offset,
-        grapple.head + camera.offset,
-        3
+        around(grapple.start + camera.offset),
+        around(grapple.head + camera.offset),
+        GRAPPLE_THICKNESS
     )
     circle(
         screen,
         BLUE_PLAYER,
-        grapple.head + camera.offset,
-        4
+        around(grapple.head + camera.offset),
+        GRAPPLE_HEAD_RADIUS
     )
 
 

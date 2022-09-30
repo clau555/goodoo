@@ -44,6 +44,8 @@ def load_tiles_from_sheet() -> List[Surface]:
 
 
 TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
+AMETHYST_SPRITE: Surface = load(SPRITES_PATH / "amethyst.png")
+AMETHYST_DENSITY: float = 0.05  # probability of an amethyst to spawn on a tile
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
@@ -83,6 +85,8 @@ SHAKE_AMPLITUDE: int = 50
 GRAPPLE_VECTOR_STEP: float = TILE_EDGE / 3
 GRAPPLE_ACCELERATION: float = TILE_EDGE / 50
 GRAPPLE_HEAD_VELOCITY: float = TILE_EDGE * 2
+GRAPPLE_THICKNESS: int = 3
+GRAPPLE_HEAD_RADIUS: int = 4
 BLUE_PLAYER: Tuple[int, int, int] = (40, 134, 185)
 
 # lava
