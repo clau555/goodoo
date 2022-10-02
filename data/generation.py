@@ -1,6 +1,7 @@
+from math import radians
 from typing import Tuple, List
 
-from numpy import ndarray, zeros, array, random, argwhere, invert, amin, sign, ndenumerate, empty, int8
+from numpy import ndarray, zeros, array, random, argwhere, invert, amin, sign, ndenumerate, empty, int8, cos, sin
 from numpy.random import randint, random_sample
 from pygame import Rect, Surface
 from pygame.transform import rotate, flip
@@ -50,7 +51,7 @@ def _circle_coords(center: ndarray, radius: int) -> ndarray:
     return array(coords) + center
 
 
-def _cartesian_list():
+def _cartesian_list() -> List:
     """
     Returns a list of all possible combinations of 4 neighbors.
 
@@ -75,6 +76,7 @@ def _neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     """
     offsets: ndarray = array(((0, -1), (1, 0), (0, 1), (-1, 0)))
 
+    # TODO are you sure about that?
     if idx[0] == 0:
         offsets[3] = zeros(2)
     elif idx[0] == grid.shape[0] - 1:
@@ -87,6 +89,25 @@ def _neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     offset_idxes: ndarray = idx + offsets
 
     return grid[offset_idxes[:, 0], offset_idxes[:, 1]]
+
+
+def obstacle_angle(moore_neighbors: ndarray) -> int:
+    """
+    Returns the angle of an obstacle given its moore neighborhood (90, 180 or 270 degrees).
+    Returns zero if the obstacle is not placeable.
+
+    :param moore_neighbors: moore neighborhood of the obstacle, contains integers (0 = no tile, 1 = tile, 2 = obstacle).
+    :return: degree angle of the obstacle
+    """
+    if 2 in moore_neighbors:
+        return 0
+    if moore_neighbors[:, 0].all() and not moore_neighbors[:, 1:].any():
+        return 180
+    if moore_neighbors[0, :].all() and not moore_neighbors[1:, :].any():
+        return 270
+    if moore_neighbors[-1, :].all() and not moore_neighbors[:-1, :].any():
+        return 90
+    return 0
 
 
 def _to_tiles(grid: ndarray) -> ndarray:
@@ -108,9 +129,10 @@ def _to_tiles(grid: ndarray) -> ndarray:
     grid_with_obstacles: ndarray = array(grid, copy=True, dtype=int8)
 
     for (i, j), cell in ndenumerate(grid):
+
         idx: ndarray = array((i, j))
         neumann_neighbors: ndarray = _neumann_neighborhood(grid, idx)
-        moore_neighbors: ndarray = moore_neighborhood(grid_with_obstacles, idx)
+        angle: int = obstacle_angle(moore_neighborhood(grid_with_obstacles, idx))
 
         # converting bool to tile
         if cell:
@@ -119,25 +141,20 @@ def _to_tiles(grid: ndarray) -> ndarray:
             tile_grid[i, j] = Tile(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite)
 
         # adding randomly obstacle on empty tile
-        elif random_sample() < AMETHYST_DENSITY \
-                and not (neumann_neighbors == (False, False, True, False)).all() \
-                and True in neumann_neighbors \
-                and 2 not in moore_neighbors:
+        # the higher the tile the more it's likely to spawn
+        elif random_sample() < AMETHYST_DENSITY * (GRID_HEIGHT - j) / GRID_HEIGHT and angle:
 
-            # choosing obstacle orientation depending on neighborhood
-            orientation: ndarray = array((
-                0 + int(neumann_neighbors[3]) - (1 + int(neumann_neighbors[3])) * int(neumann_neighbors[1]),
-                0 + int(neumann_neighbors[0])
-            ))
+            sprite: Surface = flip(AMETHYST_SPRITE, True, False) if random_sample() < 0.5 else AMETHYST_SPRITE
+            sprite = rotate(sprite, angle)
+            orientation: ndarray = array((round(cos(radians(90 + angle))), round(sin(radians(90 + angle)))))
 
-            top_neighborhood: ndarray = idx + orientation
-            if not grid[top_neighborhood[0], top_neighborhood[1]]:
-                sprite: Surface = flip(AMETHYST_SPRITE, True, False) if random_sample() < 0.5 else AMETHYST_SPRITE
-                sprite = rotate(sprite, 90 * orientation[0]) if not orientation[1] else sprite
-                tile_grid[i, j] = Obstacle(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite, orientation)
-                grid_with_obstacles[i, j] = 2
-            else:
-                tile_grid[i, j] = None
+            # adding obstacle
+            tile_grid[i, j] = Obstacle(
+                Rect(idx * TILE_SIZE, tuple(TILE_SIZE)),
+                sprite,
+                orientation
+            )
+            grid_with_obstacles[i, j] = 2  # marking this tile as occupied by an obstacle
 
         else:
             tile_grid[i, j] = None

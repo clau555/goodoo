@@ -45,7 +45,7 @@ def load_tiles_from_sheet() -> List[Surface]:
 
 TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
 AMETHYST_SPRITE: Surface = load(SPRITES_PATH / "amethyst.png")
-AMETHYST_DENSITY: float = 0.05  # probability of an amethyst to spawn on a tile
+AMETHYST_DENSITY: float = 0.4  # probability of an amethyst to spawn on a tile
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
