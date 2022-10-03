@@ -1,8 +1,8 @@
 from math import radians
 from typing import Tuple, List
 
-from numpy import ndarray, zeros, array, random, argwhere, invert, amin, sign, ndenumerate, empty, int8, cos, sin
-from numpy.random import randint, random_sample
+from numpy import ndarray, zeros, array, argwhere, invert, amin, sign, ndenumerate, empty, int8, cos, sin
+from numpy.random import randint, random_sample, choice
 from pygame import Rect, Surface
 from pygame.transform import rotate, flip
 from scipy.ndimage.measurements import label
@@ -146,7 +146,7 @@ def _to_tiles(grid: ndarray) -> ndarray:
 
             sprite: Surface = flip(AMETHYST_SPRITE, True, False) if random_sample() < 0.5 else AMETHYST_SPRITE
             sprite = rotate(sprite, angle)
-            orientation: ndarray = array((round(cos(radians(90 + angle))), round(sin(radians(90 + angle)))))
+            orientation: ndarray = array((round(cos(radians(90 + angle))), -round(sin(radians(90 + angle)))))
 
             # adding obstacle
             tile_grid[i, j] = Obstacle(
@@ -179,8 +179,8 @@ def generate_world() -> Tuple[ndarray, Player]:
     # Cellular automaton -----------------------------------------------------------------------------------------------
 
     # initial noise grid
-    bool_grid: ndarray = random.choice(
-        a=[True, False],
+    bool_grid: ndarray = choice(
+        a=(True, False),
         size=GRID_SIZE,
         p=[NOISE_DENSITY, 1 - NOISE_DENSITY]
     )

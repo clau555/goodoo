@@ -23,14 +23,14 @@ def display_grapple(grapple: Grapple, screen: Surface, camera: Camera) -> None:
     line(
         screen,
         BLUE_PLAYER,
-        around(grapple.start + camera.offset),
-        around(grapple.head + camera.offset),
+        around(around(grapple.start) + camera.offset),
+        around(around(grapple.head) + camera.offset),
         GRAPPLE_THICKNESS
     )
     circle(
         screen,
         BLUE_PLAYER,
-        around(grapple.head + camera.offset),
+        around(around(grapple.head) + camera.offset),
         GRAPPLE_HEAD_RADIUS
     )
 

@@ -8,8 +8,8 @@ from pygame.rect import Rect
 from pygame.transform import flip
 
 from data.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
-    PLAYER_GROUND_SPRITES
-from data.dataclasses import Camera, Player
+    PLAYER_GROUND_SPRITES, AMETHYST_BUMP_FACTOR
+from data.dataclasses import Camera, Player, Obstacle
 from data.utils import scale_vec, world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame
 
 
@@ -71,21 +71,26 @@ def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta:
 
     # x collision and correction
     for _, tile in ndenumerate(neighbor_tiles):
-        if tile:
+        if tile and player_rect.colliderect(tile.rect):
 
-            if player_rect.colliderect(tile.rect):
+            obstacle_impulse: float = 0
+            if isinstance(tile, Obstacle):
+                if tile.orientation[0]:
+                    obstacle_impulse = -v[0] * AMETHYST_BUMP_FACTOR
+                else:
+                    obstacle_impulse = -v[0] / AMETHYST_BUMP_FACTOR
 
-                if v[0] > 0:
-                    player_rect.right = tile.rect.left
-                    player_pos[0] = player_rect.x
-                    v[0] = 0
-                    break
+            if v[0] > 0:
+                player_rect.right = tile.rect.left
+                player_pos[0] = player_rect.x
+                v[0] = obstacle_impulse
+                break
 
-                elif v[0] < 0:
-                    player_rect.left = tile.rect.right
-                    player_pos[0] = player_rect.x
-                    v[0] = 0
-                    break
+            if v[0] < 0:
+                player_rect.left = tile.rect.right
+                player_pos[0] = player_rect.x
+                v[0] = obstacle_impulse
+                break
 
     # y movement executes second
     player_pos[1] += v[1]
@@ -103,17 +108,30 @@ def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta:
 
             if player_rect.colliderect(tile.rect):
 
+                obstacle_impulse: float = 0
+                if isinstance(tile, Obstacle):
+                    if tile.orientation[1]:
+                        obstacle_impulse = -v[1] * AMETHYST_BUMP_FACTOR
+                    else:
+                        obstacle_impulse = -v[1] / AMETHYST_BUMP_FACTOR
+
                 if v[1] > 0:
                     player_rect.bottom = tile.rect.top
                     player_pos[1] = player_rect.y
-                    v = array((0, 0))
+                    v = array((v[0], obstacle_impulse)) if obstacle_impulse else array((0, 0))
                     on_ground = True
                     break
 
-                elif v[1] < 0:
+                if v[1] < 0:
                     player_rect.top = tile.rect.bottom
                     player_pos[1] = player_rect.y
-                    v[1] = 0
+                    v[1] = obstacle_impulse
                     break
 
-    return replace(player, pos=player_pos, rect=player_rect, velocity=v, on_ground=on_ground)
+    return replace(
+        player,
+        pos=player_pos,
+        rect=player_rect,
+        velocity=v,
+        on_ground=on_ground
+    )

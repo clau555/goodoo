@@ -18,6 +18,12 @@ class Obstacle:
 
 
 @dataclass(frozen=True)
+class Particle:
+    pos: ndarray
+    timer: float = 0
+
+
+@dataclass(frozen=True)
 class Player:
     pos: ndarray
     rect: Rect

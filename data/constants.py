@@ -13,6 +13,7 @@ RESOURCES_PATH: Path = DIR_PATH / "resources"
 SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
 PLAYER_PATH: Path = SPRITES_PATH / "player"
 LAVA_PATH: Path = SPRITES_PATH / "lava"
+AMETHYST_PARTICLE_PATH: Path = SPRITES_PATH / "amethyst_particle"
 
 # screen
 ICON: Surface = load(RESOURCES_PATH / "icon.png")
@@ -44,8 +45,14 @@ def load_tiles_from_sheet() -> List[Surface]:
 
 
 TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
+
+# obstacle tiles
 AMETHYST_SPRITE: Surface = load(SPRITES_PATH / "amethyst.png")
 AMETHYST_DENSITY: float = 0.4  # probability of an amethyst to spawn on a tile
+AMETHYST_BUMP_FACTOR: float = 1.5
+AMETHYST_PARTICLES_SPRITES: List[Surface] = [
+    load(AMETHYST_PARTICLE_PATH / f"amethyst_particle_{i}.png") for i in range(1, 5)
+]
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
