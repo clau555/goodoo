@@ -14,6 +14,225 @@ from data.dataclasses import Player, Tile, Obstacle
 from data.utils import moore_neighborhood
 
 
+def generate_world() -> Tuple[ndarray, Player]:
+    """
+    Returns a world grid containing the wall tiles, and none for the empty tiles.
+    Returns also the player.
+
+    :return: tile grid and player data
+    """
+    cave: ndarray = _generate_cave()
+    cave = _generate_exit(cave)
+
+    connections: ndarray = _rooms_connections_points(cave)
+    cave = _generate_connections(cave, connections)
+
+    player: Player = _spawn_player(cave)
+    tile_cave: ndarray = _generate_tiles(cave)
+
+    return tile_cave, player
+
+
+def _generate_cave() -> ndarray:
+    """
+    Generates a cave of booleans (true = wall, false = empty) using cellular automaton.
+
+    https://youtu.be/v7yyZZjF1z4
+    https://lhoupert.fr/test-jbook/04-code-vectorization.html
+
+    :return: boolean grid
+    """
+
+    # initial noise grid
+    cave: ndarray = choice(
+        a=(True, False),
+        size=GRID_SIZE,
+        p=[NOISE_DENSITY, 1 - NOISE_DENSITY]
+    )
+
+    # cellular automaton execution
+    for _ in range(AUTOMATON_ITERATION):
+        # number of wall tiles neighbors for each cell
+        n_count_grid = _neighbors_count_grid(cave)
+
+        # flatten grids
+        cave_flat: ndarray = cave.ravel()
+        n_count_grid_flat: ndarray = n_count_grid.ravel()
+
+        # rules application
+        cave_flat[argwhere(n_count_grid_flat > 4)] = True
+        cave_flat[argwhere(n_count_grid_flat <= 3)] = False
+
+        # border tiles are walls during generation
+        cave[0, :] = cave[-1, :] = cave[:, 0] = cave[:, -1] = True
+
+    return cave
+
+
+def _generate_exit(cave: ndarray) -> ndarray:
+    """
+    Generates an exit in the cave by digging a circle at the top of the cave.
+
+    :param cave: boolean grid
+    :return: updated boolean grid
+    """
+    cave_ = array(cave)
+    exit_coords: ndarray = abs(_circle_coords(array((GRID_WIDTH // 2, 0)), GRID_WIDTH // 2 - 1))
+    cave_[exit_coords[:, 0], exit_coords[:, 1]] = False
+    cave_[:, 0] = False
+    return cave_
+
+
+def _rooms_connections_points(cave: ndarray) -> ndarray:
+    """
+    Generates the points where the rooms will be connected.
+
+    https://youtu.be/eVb9kQXvEZM
+
+    :param cave: boolean grid
+    :return: array of points
+    """
+
+    # number of wall tiles neighbors for each cell
+    n_count_grid: ndarray = _neighbors_count_grid(cave)
+
+    # localizing rooms of empty tiles
+    room_grid, n_rooms = label(invert(cave))
+
+    # matrix indicating if two rooms are connected between each other
+    connections: ndarray = zeros((n_rooms, n_rooms), dtype=bool)
+
+    connections_idxes: List = []
+
+    # starting from room 1 because room 0 contains all the wall tiles
+    for room_a_idx in range(1, n_rooms):
+        for room_b_idx in range(1, n_rooms):
+
+            # skipping to next room if the two rooms are the same
+            # or if they are already connected
+            if room_a_idx == room_b_idx or connections[room_a_idx, room_b_idx] or connections[room_b_idx, room_a_idx]:
+                continue
+
+            # indexes of rooms contours
+            contours_a_idxes: ndarray = argwhere((room_grid == room_a_idx) & (n_count_grid > 0))
+            contours_b_idxes: ndarray = argwhere((room_grid == room_b_idx) & (n_count_grid > 0))
+
+            # matrix of distances between each contours
+            distances: ndarray = cdist(contours_a_idxes, contours_b_idxes)
+
+            # finding the smallest distance index
+            min_dist_idx: ndarray = argwhere(distances == amin(distances))[0]
+
+            # getting the two closest tiles, ie the two connection line ends
+            tile_a_idx: ndarray = contours_a_idxes[min_dist_idx[0]]
+            tile_b_idx: ndarray = contours_b_idxes[min_dist_idx[1]]
+
+            # marking the two rooms as connected
+            connections[room_a_idx, room_b_idx] = connections[room_b_idx, room_a_idx] = True
+
+            # adding the two points to our list of connections
+            connections_idxes.append((tile_a_idx, tile_b_idx))
+
+    return array(connections_idxes, dtype=int)
+
+
+def _generate_connections(cave: ndarray, connections_points: ndarray) -> ndarray:
+    """
+    Generates the connections between the rooms.
+
+    https://youtu.be/7RiGikVLS3c
+
+    :param cave: boolean grid
+    :param connections_points: array of points
+    :return: updated boolean grid
+    """
+
+    for connection in connections_points:
+
+        x: int = connection[0, 0]
+        y: int = connection[0, 1]
+
+        d_x: int = connection[1, 0] - x
+        d_y: int = connection[1, 1] - y
+
+        inverted: bool = False
+        step: int = sign(d_x)
+        step_grad: int = sign(d_y)
+        longest: int = abs(d_x)
+        shortest: int = abs(d_y)
+
+        if longest < shortest:
+            inverted = True
+            step = sign(d_y)
+            step_grad = sign(d_x)
+            longest = abs(d_y)
+            shortest = abs(d_x)
+
+        grad: float = longest / 2
+
+        # will store tile coordinates which are on the current line
+        line: ndarray = zeros((longest, 2), dtype=int)
+
+        for i in range(longest):
+            line[i] = array((x, y))
+
+            if inverted:
+                y += step
+            else:
+                x += step
+
+            grad += shortest
+
+            if grad >= longest:
+                if inverted:
+                    x += step_grad
+                else:
+                    y += step_grad
+                grad -= longest
+
+        # making sure the path doesn't cross another room
+        if False not in cave[line[1:-1, 0], line[1:-1, 1]]:
+            # digging in a cross pattern to ensure space for player
+            cave[line[:, 0], line[:, 1]] = \
+                cave[line[:, 0] + 1, line[:, 1]] = \
+                cave[line[:, 0] - 1, line[:, 1]] = \
+                cave[line[:, 0], line[:, 1] + 1] = \
+                cave[line[:, 0], line[:, 1] - 1] = False
+
+    # ensuring borders are walls, except for the top which is the exit
+    cave[0, :] = cave[-1, :] = cave[:, -1] = True
+
+    return cave
+
+
+def _spawn_player(cave: ndarray) -> Player:
+    """
+    Spawns the player in the cave by searching for the most bottom free tile.
+    :param cave: boolean grid
+    :return: player
+    """
+
+    # getting the first row with empty tiles starting from bottom of the grid
+    spawn_height: int = GRID_HEIGHT - 1
+    empty_xs: ndarray = argwhere(cave[:, spawn_height])
+    for j in range(GRID_HEIGHT - 1, 0, -1):
+        empty_xs = argwhere(cave[:, j] == False)  # have to do this boolean comparison because of numpy
+        if empty_xs.size > 0:
+            spawn_height = j
+            break
+
+    if empty_xs.size == 0:
+        raise Exception("No player spawn point found")
+    if empty_xs.size == 1:
+        x: int = int(empty_xs[0])  # choosing the only empty tile
+    else:
+        x: int = int(empty_xs[randint(0, empty_xs.size - 1)])  # choosing a random empty tile
+
+    player_idx: ndarray = array((x, spawn_height))  # grid space
+    player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
+    return Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+
+
 def _neighbors_count_grid(grid: ndarray) -> ndarray:
     """
     Returns a grid with the number of neighbors for each cell.
@@ -51,21 +270,6 @@ def _circle_coords(center: ndarray, radius: int) -> ndarray:
     return array(coords) + center
 
 
-def _cartesian_list() -> List:
-    """
-    Returns a list of all possible combinations of 4 neighbors.
-
-    :return: all possible combinations of 4 neighbors
-    """
-    cartesian_product: List = []
-    for a in [False, True]:
-        for b in [False, True]:
-            for c in [False, True]:
-                for d in [False, True]:
-                    cartesian_product.append([a, b, c, d])
-    return cartesian_product
-
-
 def _neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     """
     Returns respectively up, right, down and left neighbors of the given index.
@@ -91,7 +295,7 @@ def _neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
     return grid[offset_idxes[:, 0], offset_idxes[:, 1]]
 
 
-def obstacle_angle(moore_neighbors: ndarray) -> int:
+def _obstacle_angle(moore_neighbors: ndarray) -> int:
     """
     Returns the angle of an obstacle given its moore neighborhood (90, 180 or 270 degrees).
     Returns zero if the obstacle is not placeable.
@@ -110,7 +314,7 @@ def obstacle_angle(moore_neighbors: ndarray) -> int:
     return 0
 
 
-def _to_tiles(grid: ndarray) -> ndarray:
+def _generate_tiles(grid: ndarray) -> ndarray:
     """
     Returns a grid with the corresponding tile data for each cell.
 
@@ -119,7 +323,7 @@ def _to_tiles(grid: ndarray) -> ndarray:
     """
 
     # output grid
-    tile_grid: ndarray = empty(grid.shape).astype(Tile)
+    tile_cave: ndarray = empty(grid.shape).astype(Tile)
 
     # all neumann neighborhood combinations possible
     neighbor_patterns: List = _cartesian_list()
@@ -132,13 +336,13 @@ def _to_tiles(grid: ndarray) -> ndarray:
 
         idx: ndarray = array((i, j))
         neumann_neighbors: ndarray = _neumann_neighborhood(grid, idx)
-        angle: int = obstacle_angle(moore_neighborhood(grid_with_obstacles, idx))
+        angle: int = _obstacle_angle(moore_neighborhood(grid_with_obstacles, idx))
 
         # converting bool to tile
         if cell:
             # choosing tile sprite depending on neighborhood
             sprite: Surface = TILE_SPRITES[neighbor_patterns.index(list(neumann_neighbors))]
-            tile_grid[i, j] = Tile(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite)
+            tile_cave[i, j] = Tile(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite)
 
         # adding randomly obstacle on empty tile
         # the higher the tile the more it's likely to spawn
@@ -149,7 +353,7 @@ def _to_tiles(grid: ndarray) -> ndarray:
             orientation: ndarray = array((round(cos(radians(90 + angle))), -round(sin(radians(90 + angle)))))
 
             # adding obstacle
-            tile_grid[i, j] = Obstacle(
+            tile_cave[i, j] = Obstacle(
                 Rect(idx * TILE_SIZE, tuple(TILE_SIZE)),
                 sprite,
                 orientation
@@ -157,181 +361,21 @@ def _to_tiles(grid: ndarray) -> ndarray:
             grid_with_obstacles[i, j] = 2  # marking this tile as occupied by an obstacle
 
         else:
-            tile_grid[i, j] = None
+            tile_cave[i, j] = None
 
-    return tile_grid
+    return tile_cave
 
 
-def generate_world() -> Tuple[ndarray, Player]:
+def _cartesian_list() -> List:
     """
-    Returns a world grid containing the wall tiles, and none for the empty tiles.
-    Returns also the player.
+    Returns a list of all possible combinations of 4 neighbors.
 
-    Algorithm uses procedural cave generation with cellular automaton and generation of connections between rooms.
-    https://www.youtube.com/playlist?list=PLFt_AvWsXl0eZgMK_DT5_biRkWXftAOf9
-
-    Implementation uses uniform vectorization.
-    https://lhoupert.fr/test-jbook/04-code-vectorization.html
-
-    :return: tile grid, player
+    :return: all possible combinations of 4 neighbors
     """
-
-    # Cellular automaton -----------------------------------------------------------------------------------------------
-
-    # initial noise grid
-    bool_grid: ndarray = choice(
-        a=(True, False),
-        size=GRID_SIZE,
-        p=[NOISE_DENSITY, 1 - NOISE_DENSITY]
-    )
-
-    # number of wall tiles neighbors for each cell
-    n_count_grid: ndarray = _neighbors_count_grid(bool_grid)
-
-    # cellular automaton execution
-    for _ in range(AUTOMATON_ITERATION):
-        # resetting neighbors count
-        n_count_grid = _neighbors_count_grid(bool_grid)
-
-        # flatten grids
-        bool_grid_flat: ndarray = bool_grid.ravel()
-        n_count_grid_flat: ndarray = n_count_grid.ravel()
-
-        # rules application
-        bool_grid_flat[argwhere(n_count_grid_flat > 4)] = True
-        bool_grid_flat[argwhere(n_count_grid_flat <= 3)] = False
-
-        # border tiles are walls during generation
-        bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, 0] = bool_grid[:, -1] = True
-
-    # Exit generation --------------------------------------------------------------------------------------------------
-
-    exit_coords: ndarray = abs(_circle_coords(array((GRID_WIDTH // 2, 0)), GRID_WIDTH // 2 - 1))
-    bool_grid[exit_coords[:, 0], exit_coords[:, 1]] = False
-    bool_grid[:, 0] = False
-
-    # Rooms connections ------------------------------------------------------------------------------------------------
-
-    # localizing rooms of empty tiles
-    room_grid, n_rooms = label(invert(bool_grid))
-
-    # matrix indicating if two rooms are connected between each other
-    connections: ndarray = zeros((n_rooms, n_rooms), dtype=bool)
-
-    connections_idxes: List = []
-
-    # starting from room 1 because room 0 contains all the wall tiles
-    for a in range(1, n_rooms):
-        for b in range(1, n_rooms):
-
-            # skipping to next room if the two rooms are the same
-            # or if they are already connected
-            if a == b or connections[a, b] or connections[b, a]:
-                continue
-
-            # indexes of rooms contours
-            contours_a_idxes: ndarray = argwhere((room_grid == a) & (n_count_grid > 0))
-            contours_b_idxes: ndarray = argwhere((room_grid == b) & (n_count_grid > 0))
-
-            # matrix of distances between each contours
-            distances: ndarray = cdist(contours_a_idxes, contours_b_idxes)
-
-            # finding the smallest distance index
-            min_dist_idx: ndarray = argwhere(distances == amin(distances))[0]
-
-            # getting the two closest tiles, ie the two connection line ends
-            tile_a_idx: ndarray = contours_a_idxes[min_dist_idx[0]]
-            tile_b_idx: ndarray = contours_b_idxes[min_dist_idx[1]]
-
-            # marking the two rooms as connected
-            connections[a, b] = connections[b, a] = True
-
-            # adding the two points to our list of connections
-            connections_idxes.append((tile_a_idx, tile_b_idx))
-
-    connections_idxes: ndarray = array(connections_idxes, dtype=int)
-
-    # Digging connections ----------------------------------------------------------------------------------------------
-
-    for connection in connections_idxes:
-
-        x: int = connection[0, 0]
-        y: int = connection[0, 1]
-
-        dx: int = connection[1, 0] - x
-        dy: int = connection[1, 1] - y
-
-        inverted: bool = False
-        step: int = sign(dx)
-        step_grad: int = sign(dy)
-        longest: int = abs(dx)
-        shortest: int = abs(dy)
-
-        if longest < shortest:
-            inverted = True
-            step = sign(dy)
-            step_grad = sign(dx)
-            longest = abs(dy)
-            shortest = abs(dx)
-
-        grad: float = longest / 2
-
-        # will store tile coordinates which are on the current line
-        line: ndarray = zeros((longest, 2), dtype=int)
-
-        for i in range(longest):
-            line[i] = array((x, y))
-
-            if inverted:
-                y += step
-            else:
-                x += step
-
-            grad += shortest
-
-            if grad >= longest:
-                if inverted:
-                    x += step_grad
-                else:
-                    y += step_grad
-                grad -= longest
-
-        # making sure the path doesn't cross another room
-        if False not in bool_grid[line[1:-1, 0], line[1:-1, 1]]:
-            # digging in a cross pattern to ensure space for player
-            bool_grid[line[:, 0], line[:, 1]] = \
-                bool_grid[line[:, 0] + 1, line[:, 1]] = \
-                bool_grid[line[:, 0] - 1, line[:, 1]] = \
-                bool_grid[line[:, 0], line[:, 1] + 1] = \
-                bool_grid[line[:, 0], line[:, 1] - 1] = False
-
-    # ensuring borders are walls, except for the top which is the exit
-    bool_grid[0, :] = bool_grid[-1, :] = bool_grid[:, -1] = True
-
-    # Player -----------------------------------------------------------------------------------------------------------
-
-    # getting the first row with empty tiles starting from bottom of the grid
-    spawn_height: int = GRID_HEIGHT - 1
-    empty_xs: ndarray = argwhere(bool_grid[:, spawn_height])
-    for j in range(GRID_HEIGHT - 1, 0, -1):
-        empty_xs = argwhere(bool_grid[:, j] == False)
-        if empty_xs.size > 0:
-            spawn_height = j
-            break
-
-    if empty_xs.size == 0:
-        raise Exception("No player spawn point found")
-    elif empty_xs.size == 1:
-        x: int = int(empty_xs[0])  # choosing the only empty tile
-    else:
-        x: int = int(empty_xs[randint(0, empty_xs.size - 1)])  # choosing a random empty tile
-
-    player_idx: ndarray = array((x, spawn_height))  # grid space
-    player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
-    player = Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
-
-    # Convert to grid of tiles -----------------------------------------------------------------------------------------
-
-    tile_grid: ndarray = _to_tiles(bool_grid)
-
-    return tile_grid, player
+    cartesian_product: List = []
+    for bit_1 in [False, True]:
+        for bit_2 in [False, True]:
+            for bit_3 in [False, True]:
+                for bit_4 in [False, True]:
+                    cartesian_product.append([bit_1, bit_2, bit_3, bit_4])
+    return cartesian_product

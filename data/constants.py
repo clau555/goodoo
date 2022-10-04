@@ -4,6 +4,7 @@ from typing import List, Tuple, Dict
 import pygame.font
 from numpy import array, ndarray
 from pygame import Surface, Rect
+from pygame.constants import K_LEFT, K_RIGHT, K_a, K_d, K_q
 from pygame.font import Font
 from pygame.image import load
 from pygame.transform import scale
@@ -68,7 +69,7 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
-PLAYER_SPRITE: Surface = load(PLAYER_PATH / f"player_jump.png")
+PLAYER_SPRITE: Surface = load(PLAYER_PATH / "player_jump.png")
 PLAYER_GROUND_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 PLAYER_INPUT_V: float = TILE_EDGE / 100
@@ -112,11 +113,11 @@ WALL_COLOR: Tuple[int, int, int] = (50, 37, 29)
 # key maps
 KEY_MAPS: Dict[str, Dict[str, List[int]]] = {
     "QWERTY": {
-        "left": [pygame.K_LEFT, pygame.K_a],
-        "right": [pygame.K_RIGHT, pygame.K_d],
+        "left": [K_LEFT, K_a],
+        "right": [K_RIGHT, K_d],
     },
     "AZERTY": {
-        "left": [pygame.K_LEFT, pygame.K_q],
-        "right": [pygame.K_RIGHT, pygame.K_d],
+        "left": [K_LEFT, K_q],
+        "right": [K_RIGHT, K_d],
     },
 }

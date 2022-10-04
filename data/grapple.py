@@ -2,7 +2,7 @@ from dataclasses import replace
 
 import pygame
 from numpy import ndarray, array, zeros, absolute, around
-from numpy.linalg import linalg
+from numpy.linalg import norm
 from pygame.draw import line, circle
 from pygame.surface import Surface
 
@@ -46,13 +46,13 @@ def update_grapple_start(grapple: Grapple, player: Player) -> Grapple:
     return replace(grapple, start=array(player.rect.center).astype(float))
 
 
-def fire(grapple: Grapple, tile_grid: ndarray, camera: Camera) -> Grapple:
+def fire(grapple: Grapple, tile_cave: ndarray, camera: Camera) -> Grapple:
     """
     Projects the grapple starting from the player's position
     to the mouse position and beyond until it collides with a tile.
 
     :param grapple: grapple data
-    :param tile_grid: world tile grid
+    :param tile_cave: world tile grid
     :param camera: camera data
     :return: updated grapple data
     """
@@ -61,7 +61,7 @@ def fire(grapple: Grapple, tile_grid: ndarray, camera: Camera) -> Grapple:
     end: ndarray = array(grapple.start, dtype=float)
     step: ndarray = array(pygame.mouse.get_pos()) - camera.offset - grapple.start
 
-    if linalg.norm(step) != 0:
+    if norm(step) != 0:
 
         step = scale_vec(step, GRAPPLE_VECTOR_STEP)
 
@@ -74,7 +74,7 @@ def fire(grapple: Grapple, tile_grid: ndarray, camera: Camera) -> Grapple:
         while not collide and inside_grid:
 
             idx: ndarray = world_to_grid(end)
-            if tile_grid[idx[0], idx[1]]:
+            if tile_cave[idx[0], idx[1]]:
                 collide = True
             end += step
             inside_grid = pos_inside_grid(end)
@@ -82,7 +82,7 @@ def fire(grapple: Grapple, tile_grid: ndarray, camera: Camera) -> Grapple:
     # head velocity
     head_velocity: ndarray = zeros(2)
     v: ndarray = end - grapple.start
-    if linalg.norm(v) != 0:
+    if norm(v) != 0:
         head_velocity = scale_vec(v, GRAPPLE_HEAD_VELOCITY)
 
     return replace(grapple, end=end, head=grapple.start, head_velocity=head_velocity, head_start=grapple.start)
@@ -122,6 +122,6 @@ def grapple_acceleration(grapple: Grapple) -> ndarray:
     :return: updated grapple data
     """
     v: ndarray = grapple.end - grapple.start
-    if linalg.norm(v) != 0:
+    if norm(v) != 0:
         return scale_vec(v, GRAPPLE_ACCELERATION)
     return array((0, 0))

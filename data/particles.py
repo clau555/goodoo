@@ -2,7 +2,7 @@ from dataclasses import replace
 from typing import List
 
 from numpy import around, ndarray
-from numpy.random import rand, choice, random_sample
+from numpy.random import rand, choice
 from pygame.surface import Surface
 
 from data.constants import ANIMATION_SPEED, AMETHYST_PARTICLES_SPRITES, TILE_SIZE
@@ -48,7 +48,6 @@ def spawn_particle(particles: List[Particle], pos: ndarray) -> List[Particle]:
     :return: updated particles data list
     """
     particles_: List[Particle] = particles.copy()
-    if random_sample() < 0.01:
-        particle_pos: ndarray = pos + rand(2) * choice([-1, 1], 2) * TILE_SIZE / 2
-        particles_.append(Particle(particle_pos))
+    particle_pos: ndarray = pos + rand(2) * choice([-1, 1], 2) * TILE_SIZE / 2
+    particles_.append(Particle(particle_pos))
     return particles_

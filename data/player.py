@@ -2,7 +2,7 @@ from dataclasses import replace
 
 import pygame
 from numpy import ndarray, array, ndenumerate, around
-from numpy.linalg import linalg
+from numpy.linalg import norm
 from pygame import Surface
 from pygame.rect import Rect
 from pygame.transform import flip
@@ -38,29 +38,30 @@ def display_player(player: Player, screen: Surface, camera: Camera, timer: float
         screen.blit(flip(sprite, True, False), player_screen_pos)
 
 
-def update_player(player: Player, input_velocity: ndarray, grid: ndarray, delta: float) -> Player:
+def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, delta: float) -> Player:
     """
     Moves the player according to the input velocity then collide with the tiles.
     If any collision occurs, the player is moved to the appropriate position, and its velocity is updated accordingly.
 
     :param player: player data
     :param input_velocity: velocity inputted by user
-    :param grid: world tile grid
+    :param tile_cave: world tile grid
     :param delta: delta between two frames
     :return: updated player data
     """
+
     # velocity update
     v: ndarray = player.velocity + GRAVITY + input_velocity * delta
 
     # clamp velocity
-    if linalg.norm(v) > PLAYER_MAX_V:
+    if norm(v) > PLAYER_MAX_V:
         v = scale_vec(v, PLAYER_MAX_V)
 
     # getting neighbor tiles to check collision
     player_idx: ndarray = world_to_grid(array(player.rect.center))
     if not idx_inside_grid(player_idx):
         raise ValueError("Player out of bounds")
-    neighbor_tiles: ndarray = moore_neighborhood(grid, player_idx)
+    neighbor_tiles: ndarray = moore_neighborhood(tile_cave, player_idx)
 
     player_pos: ndarray = array(player.pos)
     player_rect: Rect = Rect(player.rect)
