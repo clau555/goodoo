@@ -72,10 +72,10 @@ def main(keyboard_layout: str) -> None:
                     sys.exit("Game ended by player.")
 
             # mouse click
-            elif event.type == MOUSEBUTTONDOWN:
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                 click = True
                 clicking = True
-            elif event.type == MOUSEBUTTONUP:
+            elif event.type == MOUSEBUTTONUP and event.button == 1:
                 clicking = False
 
             elif event.type == QUIT:
