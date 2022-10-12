@@ -75,7 +75,7 @@ def update_lava(lava: Lava, delta: float) -> Lava:
     return replace(lava, height=height)
 
 
-def set_lava_triggered(lava: Lava) -> Lava:
+def trigger_lava(lava: Lava) -> Lava:
     """
     Sets lava's triggered state at True.
 

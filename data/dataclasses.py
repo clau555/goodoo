@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
-from numpy import ndarray, array, zeros
+from numpy import ndarray, zeros
 from pygame import Rect, Surface
+
+from data.constants import GOO_PARTICLES_INIT_RADIUS
 
 
 @dataclass(frozen=True)
@@ -18,9 +20,17 @@ class Obstacle:
 
 
 @dataclass(frozen=True)
-class Particle:
+class AmethystParticle:
     pos: ndarray
     timer: float = 0
+
+
+@dataclass(frozen=True)
+class GooParticle:
+    pos: ndarray
+    velocity: ndarray
+    timer: float = 0
+    radius: float = GOO_PARTICLES_INIT_RADIUS
 
 
 @dataclass(frozen=True)
@@ -29,6 +39,7 @@ class Player:
     rect: Rect
     velocity: ndarray = zeros(2, dtype=float)
     on_ground: bool = False
+    obstacle_collision: bool = False
 
 
 @dataclass(frozen=True)
@@ -49,6 +60,6 @@ class Lava:
 @dataclass(frozen=True)
 class Camera:
     center: ndarray  # world position on which the camera is centered
-    heading: ndarray = array((0, 0), dtype=float)  # world vector pointing on focus position
-    top_left: ndarray = array((0, 0), dtype=float)  # world position of the top left corner of the camera
-    offset: ndarray = array((0, 0), dtype=float)  # offset to apply to a sprite position to get its screen position
+    heading: ndarray = zeros(2, dtype=float)  # world vector pointing on focus position
+    top_left: ndarray = zeros(2, dtype=float)  # world position of the top left corner of the camera
+    offset: ndarray = zeros(2, dtype=float)  # offset to apply to a sprite position to get its screen position

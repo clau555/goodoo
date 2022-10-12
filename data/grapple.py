@@ -6,7 +6,7 @@ from numpy.linalg import norm
 from pygame.draw import line, circle
 from pygame.surface import Surface
 
-from data.constants import GRAPPLE_VECTOR_STEP, BLUE_PLAYER, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY, \
+from data.constants import GRAPPLE_VECTOR_STEP, PLAYER_COLOR, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY, \
     GRAPPLE_THICKNESS, GRAPPLE_HEAD_RADIUS
 from data.dataclasses import Camera, Grapple, Player
 from data.utils import scale_vec, world_to_grid, pos_inside_grid
@@ -22,14 +22,14 @@ def display_grapple(grapple: Grapple, screen: Surface, camera: Camera) -> None:
     """
     line(
         screen,
-        BLUE_PLAYER,
+        PLAYER_COLOR,
         around(around(grapple.start) + camera.offset),
         around(around(grapple.head) + camera.offset),
         GRAPPLE_THICKNESS
     )
     circle(
         screen,
-        BLUE_PLAYER,
+        PLAYER_COLOR,
         around(around(grapple.head) + camera.offset),
         GRAPPLE_HEAD_RADIUS
     )

@@ -5,21 +5,22 @@ from typing import Sequence, List
 import pygame
 from numpy import ndarray, array, ndenumerate, around, zeros
 from numpy.random import random_sample
-from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, SCALED, FULLSCREEN
+from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, FULLSCREEN, SCALED
 from pygame.surface import Surface
 from pygame.time import Clock
 
+from data.amethyst_particles import update_and_display_amethyst_particles, spawn_amethyst_particle
 from data.background import display_background
 from data.camera import update_camera, shake_camera
 from data.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, TILE_EDGE, CURSOR_SIZE, ICON, \
     LAVA_TRIGGER_HEIGHT, LAVA_WARNING_DURATION, TARGET_FPS, \
     GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V
-from data.dataclasses import Camera, Grapple, Lava, Obstacle, Particle
+from data.dataclasses import Camera, Grapple, Lava, Obstacle, AmethystParticle, GooParticle
 from data.generation import generate_world
+from data.goo_particles import spawn_goo_particles, update_and_display_goo_particles
 from data.grapple import update_grapple_start, fire, grapple_acceleration, display_grapple, \
     update_grapple_head, reset_grapple_head
-from data.lava import display_lava, update_lava, set_lava_triggered, display_lava_counter
-from data.particles import update_and_display_particles, spawn_particle
+from data.lava import display_lava, update_lava, trigger_lava, display_lava_counter
 from data.player import update_player, display_player
 from data.utils import visible_grid, is_pressed
 
@@ -37,7 +38,9 @@ def main(keyboard_layout: str) -> None:
     grapple: Grapple = Grapple()
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
     camera: Camera = Camera(array(player.rect.center, dtype=float))
-    particles: List[Particle] = []
+
+    amethyst_particles: List[AmethystParticle] = []
+    goo_particles: List[GooParticle] = []
 
     shake_counter: float = LAVA_WARNING_DURATION
     timer: float = 0  # incremented every frame by delta time
@@ -98,7 +101,7 @@ def main(keyboard_layout: str) -> None:
 
         # lava is triggered when player reached a certain height
         if not lava.triggered and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
-            lava = set_lava_triggered(lava)
+            lava = trigger_lava(lava)
 
         if lava.triggered:
             lava = update_lava(lava, delta)  # lava is moving up
@@ -122,6 +125,10 @@ def main(keyboard_layout: str) -> None:
         player = update_player(player, input_velocity, tile_cave, delta)
         grapple = update_grapple_start(grapple, player)  # grapple follows player
 
+        # goo particles update
+        if player.obstacle_collision:
+            goo_particles = spawn_goo_particles(goo_particles, array(player.rect.center, dtype=float))
+
         # TODO game end
         if player.rect.centery <= 0:
             pygame.quit()
@@ -143,7 +150,11 @@ def main(keyboard_layout: str) -> None:
 
                 # generates amethyst particles
                 if isinstance(tile, Obstacle) and random_sample() < 0.01:
-                    particles = spawn_particle(particles, array(tile.rect.center, dtype=float))
+                    amethyst_particles = spawn_amethyst_particle(amethyst_particles,
+                                                                 array(tile.rect.center, dtype=float))
+
+        # goo particles
+        goo_particles = update_and_display_goo_particles(goo_particles, screen, camera, delta)
 
         # player
         if clicking:
@@ -151,7 +162,7 @@ def main(keyboard_layout: str) -> None:
         display_player(player, screen, camera, timer)
 
         # particles
-        particles = update_and_display_particles(particles, screen, camera, delta_time)
+        amethyst_particles = update_and_display_amethyst_particles(amethyst_particles, screen, camera, delta_time)
 
         # lava
         display_lava(lava, screen, camera, timer)

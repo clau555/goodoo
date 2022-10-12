@@ -23,14 +23,9 @@ def generate_world() -> Tuple[ndarray, Player]:
     """
     cave: ndarray = _generate_cave()
     cave = _generate_exit(cave)
+    cave = _generate_connections(cave, _rooms_connections_points(cave))
 
-    connections: ndarray = _rooms_connections_points(cave)
-    cave = _generate_connections(cave, connections)
-
-    player: Player = _spawn_player(cave)
-    tile_cave: ndarray = _generate_tiles(cave)
-
-    return tile_cave, player
+    return _generate_tiles(cave), _spawn_player(cave)
 
 
 def _generate_cave() -> ndarray:

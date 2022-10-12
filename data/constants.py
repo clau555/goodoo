@@ -71,8 +71,15 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 PLAYER_SIZE: ndarray = array((8, 8))
 PLAYER_SPRITE: Surface = load(PLAYER_PATH / "player_jump.png")
 PLAYER_GROUND_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
+PLAYER_COLOR: Tuple[int, int, int] = (40, 134, 185)
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 PLAYER_INPUT_V: float = TILE_EDGE / 100
+
+# goo particles
+GOO_PARTICLES_INIT_RADIUS: int = 4
+GOO_PARTICLES_DECREASE_VELOCITY: float = 0.1
+GOO_PARTICLES_INIT_VELOCITY: float = 2.5
+GOO_PARTICLES_SPAWN_NUMBER: int = 3
 
 # cursor
 CURSOR_SIZE: ndarray = array((6, 6))
@@ -95,7 +102,6 @@ GRAPPLE_ACCELERATION: float = TILE_EDGE / 50
 GRAPPLE_HEAD_VELOCITY: float = TILE_EDGE * 2
 GRAPPLE_THICKNESS: int = 3
 GRAPPLE_HEAD_RADIUS: int = 4
-BLUE_PLAYER: Tuple[int, int, int] = (40, 134, 185)
 
 # lava
 LAVA_SPRITES: List[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]
