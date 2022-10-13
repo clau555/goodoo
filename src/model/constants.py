@@ -1,3 +1,4 @@
+from enum import Enum
 from pathlib import Path
 from typing import List, Tuple, Dict
 
@@ -9,7 +10,7 @@ from pygame.font import Font
 from pygame.image import load
 from pygame.transform import scale
 
-DIR_PATH: Path = Path(__file__).parents[1]  # pointing on main directory
+DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
 RESOURCES_PATH: Path = DIR_PATH / "resources"
 SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
 PLAYER_PATH: Path = SPRITES_PATH / "player"
@@ -47,13 +48,34 @@ def load_tiles_from_sheet() -> List[Surface]:
 
 TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
 
+
 # obstacle tiles
+class ObstacleType(Enum):
+    MUSHROOM = 0
+    AMETHYST = 1
+
+
+OBSTACLE_DENSITY: float = 0.4  # probability of an amethyst to spawn on a tile
 AMETHYST_SPRITE: Surface = load(SPRITES_PATH / "amethyst.png")
-AMETHYST_DENSITY: float = 0.4  # probability of an amethyst to spawn on a tile
-AMETHYST_BUMP_FACTOR: float = 1.5
-AMETHYST_PARTICLES_SPRITES: List[Surface] = [
+AMETHYST_DENSITY: float = 0.95  # probability of an obstacle to be an amethyst
+MUSHROOM_SPRITE: Surface = load(SPRITES_PATH / "mushroom.png")
+MUSHROOM_BUMP_FACTOR: float = 1.5
+OBSTACLE_SPRITES: Dict[ObstacleType, Surface] = {
+    ObstacleType.MUSHROOM: MUSHROOM_SPRITE,
+    ObstacleType.AMETHYST: AMETHYST_SPRITE
+}
+
+# obstacle particles
+OBSTACLE_PARTICLE_SPAWN_RATE: float = 0.01  # probability of a particle to spawn on an obstacle in one frame
+AMETHYST_PARTICLE_SPRITES: List[Surface] = [
     load(AMETHYST_PARTICLE_PATH / f"amethyst_particle_{i}.png") for i in range(1, 5)
 ]
+MUSHROOM_PARTICLE_LIFESPAN: float = 0.3  # in seconds
+MUSHROOM_PARTICLE_VELOCITY_NORM: float = TILE_EDGE / 10
+MUSHROOM_PARTICLE_RADIUS: float = 1.5
+MUSHROOM_PARTICLE_COLOR: Tuple[int, int, int] = (218, 255, 0)
+MUSHROOM_PARTICLE_LIGHT_RADIUS: int = 3
+MUSHROOM_PARTICLE_LIGHT_TRANSPARENCY: int = 100
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
@@ -76,9 +98,9 @@ PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 PLAYER_INPUT_V: float = TILE_EDGE / 100
 
 # goo particles
-GOO_PARTICLES_INIT_RADIUS: int = 4
-GOO_PARTICLES_DECREASE_VELOCITY: float = 0.1
-GOO_PARTICLES_INIT_VELOCITY: float = 2.5
+GOO_PARTICLE_INIT_RADIUS: int = 4
+GOO_PARTICLE_DECREASE_VELOCITY: float = 0.1
+GOO_PARTICLE_INIT_VELOCITY: float = 2.5
 GOO_PARTICLES_SPAWN_NUMBER: int = 3
 
 # cursor

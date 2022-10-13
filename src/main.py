@@ -9,20 +9,21 @@ from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP, FULL
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from data.amethyst_particles import update_and_display_amethyst_particles, spawn_amethyst_particle
-from data.background import display_background
-from data.camera import update_camera, shake_camera
-from data.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, TILE_EDGE, CURSOR_SIZE, ICON, \
-    LAVA_TRIGGER_HEIGHT, LAVA_WARNING_DURATION, TARGET_FPS, \
-    GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V
-from data.dataclasses import Camera, Grapple, Lava, Obstacle, AmethystParticle, GooParticle
-from data.generation import generate_world
-from data.goo_particles import spawn_goo_particles, update_and_display_goo_particles
-from data.grapple import update_grapple_start, fire, grapple_acceleration, display_grapple, \
+from src.display.background import display_background
+from src.display.camera import update_camera, shake_camera
+from src.display.goo_particles import spawn_goo_particles, update_and_display_goo_particles
+from src.display.obstacle_particles import update_and_display_amethyst_particles, spawn_obstacle_particle, \
+    update_and_display_mushroom_particles
+from src.game.grapple import update_grapple_start, fire, grapple_acceleration, display_grapple, \
     update_grapple_head, reset_grapple_head
-from data.lava import display_lava, update_lava, trigger_lava, display_lava_counter
-from data.player import update_player, display_player
-from data.utils import visible_grid, is_pressed
+from src.game.lava import display_lava, update_lava, trigger_lava, display_lava_counter
+from src.game.player import update_player, display_player
+from src.model.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, TILE_EDGE, CURSOR_SIZE, ICON, \
+    LAVA_TRIGGER_HEIGHT, LAVA_WARNING_DURATION, TARGET_FPS, \
+    GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, OBSTACLE_PARTICLE_SPAWN_RATE, ObstacleType
+from src.model.dataclasses import Camera, Grapple, Lava, Obstacle, ObstacleParticle, GooParticle
+from src.model.generation import generate_world
+from src.model.utils import visible_grid, is_pressed
 
 
 def main(keyboard_layout: str) -> None:
@@ -39,7 +40,8 @@ def main(keyboard_layout: str) -> None:
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
     camera: Camera = Camera(array(player.rect.center, dtype=float))
 
-    amethyst_particles: List[AmethystParticle] = []
+    amethyst_particles: List[ObstacleParticle] = []
+    mushroom_particles: List[ObstacleParticle] = []
     goo_particles: List[GooParticle] = []
 
     shake_counter: float = LAVA_WARNING_DURATION
@@ -148,10 +150,19 @@ def main(keyboard_layout: str) -> None:
             if tile:
                 screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
 
-                # generates amethyst particles
-                if isinstance(tile, Obstacle) and random_sample() < 0.01:
-                    amethyst_particles = spawn_amethyst_particle(amethyst_particles,
-                                                                 array(tile.rect.center, dtype=float))
+                # generates random particles on obstacles
+                if isinstance(tile, Obstacle) and random_sample() < OBSTACLE_PARTICLE_SPAWN_RATE:
+
+                    if tile.type is ObstacleType.MUSHROOM:
+                        mushroom_particles = spawn_obstacle_particle(
+                            mushroom_particles,
+                            array(tile.rect.center, dtype=float)
+                        )
+                    elif tile.type is ObstacleType.AMETHYST:
+                        amethyst_particles = spawn_obstacle_particle(
+                            amethyst_particles,
+                            array(tile.rect.center, dtype=float)
+                        )
 
         # goo particles
         goo_particles = update_and_display_goo_particles(goo_particles, screen, camera, delta)
@@ -161,8 +172,9 @@ def main(keyboard_layout: str) -> None:
             display_grapple(grapple, screen, camera)
         display_player(player, screen, camera, timer)
 
-        # particles
+        # obstacles particles
         amethyst_particles = update_and_display_amethyst_particles(amethyst_particles, screen, camera, delta_time)
+        mushroom_particles = update_and_display_mushroom_particles(mushroom_particles, screen, camera, delta_time)
 
         # lava
         display_lava(lava, screen, camera, timer)

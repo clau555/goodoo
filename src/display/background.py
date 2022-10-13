@@ -1,9 +1,9 @@
 from numpy import clip, around, ndarray, array
 from pygame import Rect, Surface
 
-from data.constants import WALL_COLOR, BACKGROUND_SPRITE, BACKGROUND_LAVA_SPRITE, LAVA_WARNING_DISTANCE, \
+from src.model.constants import WALL_COLOR, BACKGROUND_SPRITE, BACKGROUND_LAVA_SPRITE, LAVA_WARNING_DISTANCE, \
     LAVA_WARNING_DURATION, SCREEN_SIZE
-from data.dataclasses import Camera, Lava, Player
+from src.model.dataclasses import Camera, Lava, Player
 
 
 def display_background(

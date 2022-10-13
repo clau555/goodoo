@@ -1,3 +1,4 @@
+import sys
 from dataclasses import replace
 
 import pygame
@@ -7,10 +8,10 @@ from pygame import Surface
 from pygame.rect import Rect
 from pygame.transform import flip
 
-from data.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
-    PLAYER_GROUND_SPRITES, AMETHYST_BUMP_FACTOR
-from data.dataclasses import Camera, Player, Obstacle
-from data.utils import scale_vec, world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame
+from src.model.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
+    PLAYER_GROUND_SPRITES, MUSHROOM_BUMP_FACTOR, ObstacleType
+from src.model.dataclasses import Camera, Player, Obstacle
+from src.model.utils import scale_vec, world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame
 
 
 def display_player(player: Player, screen: Surface, camera: Camera, timer: float) -> None:
@@ -64,17 +65,22 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
     for _, tile in ndenumerate(neighbor_tiles):
         if tile and player_rect.colliderect(tile.rect):
 
+            # obstacle repulsion
             obstacle_impulse: float = 0
             if isinstance(tile, Obstacle):
-                obstacle_collision = True
-                obstacle_impulse = -v[0] * AMETHYST_BUMP_FACTOR
+                if tile.type is ObstacleType.MUSHROOM:
+                    obstacle_collision = True
+                    obstacle_impulse = -v[0] * MUSHROOM_BUMP_FACTOR
+                elif tile.type is ObstacleType.AMETHYST:
+                    pygame.quit()
+                    sys.exit("You've been impaled!")
 
+            # collision correction
             if v[0] > 0:
                 player_rect.right = tile.rect.left
                 player_pos[0] = player_rect.x
                 v[0] = obstacle_impulse
                 break
-
             if v[0] < 0:
                 player_rect.left = tile.rect.right
                 player_pos[0] = player_rect.x
@@ -100,16 +106,20 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
                 # obstacle repulsion
                 obstacle_impulse: float = 0
                 if isinstance(tile, Obstacle):
-                    obstacle_collision = True
-                    obstacle_impulse = -v[1] * AMETHYST_BUMP_FACTOR
+                    if tile.type is ObstacleType.MUSHROOM:
+                        obstacle_collision = True
+                        obstacle_impulse = -v[1] * MUSHROOM_BUMP_FACTOR
+                    elif tile.type is ObstacleType.AMETHYST:
+                        pygame.quit()
+                        sys.exit("You've been impaled!")
 
+                # collision correction
                 if v[1] > 0:
                     player_rect.bottom = tile.rect.top
                     player_pos[1] = player_rect.y
                     v = array((v[0], obstacle_impulse)) if obstacle_impulse else array((0, 0))
                     on_ground = True
                     break
-
                 if v[1] < 0:
                     player_rect.top = tile.rect.bottom
                     player_pos[1] = player_rect.y

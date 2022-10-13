@@ -1,6 +1,6 @@
 import argparse
 
-from data.main import main
+from src.main import main
 
 if __name__ == "__main__":
     # getting user keyboard layout if set by user

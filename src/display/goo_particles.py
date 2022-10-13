@@ -6,9 +6,9 @@ from numpy.random import rand, choice
 from pygame import Surface
 from pygame.draw import circle
 
-from data.constants import GRAVITY, PLAYER_COLOR, GOO_PARTICLES_INIT_VELOCITY, GOO_PARTICLES_DECREASE_VELOCITY, \
+from src.model.constants import GRAVITY, PLAYER_COLOR, GOO_PARTICLE_INIT_VELOCITY, GOO_PARTICLE_DECREASE_VELOCITY, \
     GOO_PARTICLES_SPAWN_NUMBER
-from data.dataclasses import GooParticle, Camera
+from src.model.dataclasses import GooParticle, Camera
 
 
 def spawn_goo_particles(particles: List[GooParticle], pos: ndarray) -> List[GooParticle]:
@@ -21,7 +21,7 @@ def spawn_goo_particles(particles: List[GooParticle], pos: ndarray) -> List[GooP
     """
     particles_: List[GooParticle] = particles.copy()
     for _ in range(GOO_PARTICLES_SPAWN_NUMBER):
-        velocity: ndarray = rand(2) * GOO_PARTICLES_INIT_VELOCITY * choice(a=(-1, 1), size=2)
+        velocity: ndarray = rand(2) * GOO_PARTICLE_INIT_VELOCITY * choice(a=(-1, 1), size=2)
         particles_.append(GooParticle(pos, velocity))
     return particles_
 
@@ -64,7 +64,7 @@ def _update_goo_particle(particle: GooParticle, delta: float) -> GooParticle:
     :return: updated goo particle data
     """
     v: ndarray = particle.velocity + GRAVITY * delta
-    radius: float = particle.radius - GOO_PARTICLES_DECREASE_VELOCITY * delta
+    radius: float = particle.radius - GOO_PARTICLE_DECREASE_VELOCITY * delta
     pos: ndarray = particle.pos + v
 
     return replace(

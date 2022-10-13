@@ -4,14 +4,15 @@ from typing import Tuple, List
 from numpy import ndarray, zeros, array, argwhere, invert, amin, sign, ndenumerate, empty, int8, cos, sin
 from numpy.random import randint, random_sample, choice
 from pygame import Rect, Surface
-from pygame.transform import rotate, flip
+from pygame.transform import rotate
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
-from data.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
-    PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH, AMETHYST_SPRITE, AMETHYST_DENSITY
-from data.dataclasses import Player, Tile, Obstacle
-from data.utils import moore_neighborhood
+from src.model.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
+    PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH, OBSTACLE_DENSITY, AMETHYST_DENSITY, \
+    ObstacleType, OBSTACLE_SPRITES
+from src.model.dataclasses import Player, Tile, Obstacle
+from src.model.utils import moore_neighborhood
 
 
 def generate_world() -> Tuple[ndarray, Player]:
@@ -265,50 +266,6 @@ def _circle_coords(center: ndarray, radius: int) -> ndarray:
     return array(coords) + center
 
 
-def _neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
-    """
-    Returns respectively up, right, down and left neighbors of the given index.
-
-    :param grid: boolean grid
-    :param idx: index
-    :return: von neumann neighborhood of index
-    """
-    offsets: ndarray = array(((0, -1), (1, 0), (0, 1), (-1, 0)))
-
-    # TODO are you sure about that?
-    if idx[0] == 0:
-        offsets[3] = zeros(2)
-    elif idx[0] == grid.shape[0] - 1:
-        offsets[1] = zeros(2)
-    if idx[1] == 0:
-        offsets[0] = zeros(2)
-    elif idx[1] == grid.shape[1] - 1:
-        offsets[2] = zeros(2)
-
-    offset_idxes: ndarray = idx + offsets
-
-    return grid[offset_idxes[:, 0], offset_idxes[:, 1]]
-
-
-def _obstacle_angle(moore_neighbors: ndarray) -> int:
-    """
-    Returns the angle of an obstacle given its moore neighborhood (90, 180 or 270 degrees).
-    Returns zero if the obstacle is not placeable.
-
-    :param moore_neighbors: moore neighborhood of the obstacle, contains integers (0 = no tile, 1 = tile, 2 = obstacle).
-    :return: degree angle of the obstacle
-    """
-    if 2 in moore_neighbors:
-        return 0
-    if moore_neighbors[:, 0].all() and not moore_neighbors[:, 1:].any():
-        return 180
-    if moore_neighbors[0, :].all() and not moore_neighbors[1:, :].any():
-        return 270
-    if moore_neighbors[-1, :].all() and not moore_neighbors[:-1, :].any():
-        return 90
-    return 0
-
-
 def _generate_tiles(grid: ndarray) -> ndarray:
     """
     Returns a grid with the corresponding tile data for each cell.
@@ -341,24 +298,41 @@ def _generate_tiles(grid: ndarray) -> ndarray:
 
         # adding randomly obstacle on empty tile
         # the higher the tile the more it's likely to spawn
-        elif random_sample() < AMETHYST_DENSITY * (GRID_HEIGHT - j) / GRID_HEIGHT and angle:
-
-            sprite: Surface = flip(AMETHYST_SPRITE, True, False) if random_sample() < 0.5 else AMETHYST_SPRITE
-            sprite = rotate(sprite, angle)
-            orientation: ndarray = array((round(cos(radians(90 + angle))), -round(sin(radians(90 + angle)))))
-
-            # adding obstacle
-            tile_cave[i, j] = Obstacle(
-                Rect(idx * TILE_SIZE, tuple(TILE_SIZE)),
-                sprite,
-                orientation
-            )
+        elif random_sample() < OBSTACLE_DENSITY * (GRID_HEIGHT - j) / GRID_HEIGHT and angle:
+            type_: ObstacleType = ObstacleType.AMETHYST if random_sample() > AMETHYST_DENSITY else ObstacleType.MUSHROOM
+            sprite: Surface = OBSTACLE_SPRITES[type_]
+            tile_cave[i, j] = _spawn_obstacle(idx, angle, sprite, type_)
             grid_with_obstacles[i, j] = 2  # marking this tile as occupied by an obstacle
 
         else:
             tile_cave[i, j] = None
 
     return tile_cave
+
+
+def _neumann_neighborhood(grid: ndarray, idx: ndarray) -> ndarray:
+    """
+    Returns respectively up, right, down and left neighbors of the given index.
+
+    :param grid: boolean grid
+    :param idx: index
+    :return: von neumann neighborhood of index
+    """
+    offsets: ndarray = array(((0, -1), (1, 0), (0, 1), (-1, 0)))
+
+    # TODO are you sure about that?
+    if idx[0] == 0:
+        offsets[3] = zeros(2)
+    elif idx[0] == grid.shape[0] - 1:
+        offsets[1] = zeros(2)
+    if idx[1] == 0:
+        offsets[0] = zeros(2)
+    elif idx[1] == grid.shape[1] - 1:
+        offsets[2] = zeros(2)
+
+    offset_idxes: ndarray = idx + offsets
+
+    return grid[offset_idxes[:, 0], offset_idxes[:, 1]]
 
 
 def _cartesian_list() -> List:
@@ -374,3 +348,40 @@ def _cartesian_list() -> List:
                 for bit_4 in [False, True]:
                     cartesian_product.append([bit_1, bit_2, bit_3, bit_4])
     return cartesian_product
+
+
+def _obstacle_angle(moore_neighbors: ndarray) -> int:
+    """
+    Returns the angle of an obstacle given its moore neighborhood (90, 180 or 270 degrees).
+    Returns zero if the obstacle is not placeable.
+
+    :param moore_neighbors: moore neighborhood of the obstacle, contains integers (0 = no tile, 1 = tile, 2 = obstacle).
+    :return: degree angle of the obstacle
+    """
+    if 2 in moore_neighbors:
+        return 0
+    if moore_neighbors[-1, :].all() and not moore_neighbors[:-1, :].any():
+        return 90
+    if moore_neighbors[:, 0].all() and not moore_neighbors[:, 1:].any():
+        return 180
+    if moore_neighbors[0, :].all() and not moore_neighbors[1:, :].any():
+        return 270
+    return 0
+
+
+def _spawn_obstacle(idx: ndarray, angle: int, sprite: Surface, type_: ObstacleType) -> Obstacle:
+    """
+    Returns an obstacle from the given parameters.
+
+    :type idx: index of the tile
+    :type angle: degree angle at which the amethyst will be spawned
+    :param sprite: sprite of the obstacle
+    :param type_: type of the obstacle (AMETHYST or MUSHROOM)
+    :return: obstacle data
+    """
+    return Obstacle(
+        Rect(idx * TILE_SIZE, tuple(TILE_SIZE)),
+        rotate(sprite, angle),
+        array((round(cos(radians(90 + angle))), -round(sin(radians(90 + angle))))),
+        type_
+    )

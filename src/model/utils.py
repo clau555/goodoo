@@ -4,8 +4,8 @@ from numpy import ndarray
 from numpy.linalg import norm
 from pygame import Surface
 
-from data.constants import GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED, KEY_MAPS
-from data.dataclasses import Camera
+from src.model.constants import GRID_SIZE, TILE_SIZE, SCREEN_GRID_SIZE, ANIMATION_SPEED, KEY_MAPS
+from src.model.dataclasses import Camera
 
 
 def scale_vec(v: ndarray, length: float) -> ndarray:

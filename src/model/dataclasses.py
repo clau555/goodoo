@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from numpy import ndarray, zeros
 from pygame import Rect, Surface
 
-from data.constants import GOO_PARTICLES_INIT_RADIUS
+from src.model.constants import GOO_PARTICLE_INIT_RADIUS, ObstacleType
 
 
 @dataclass(frozen=True)
@@ -17,10 +17,11 @@ class Obstacle:
     rect: Rect
     sprite: Surface
     orientation: ndarray
+    type: ObstacleType
 
 
 @dataclass(frozen=True)
-class AmethystParticle:
+class ObstacleParticle:
     pos: ndarray
     timer: float = 0
 
@@ -29,8 +30,7 @@ class AmethystParticle:
 class GooParticle:
     pos: ndarray
     velocity: ndarray
-    timer: float = 0
-    radius: float = GOO_PARTICLES_INIT_RADIUS
+    radius: float = GOO_PARTICLE_INIT_RADIUS
 
 
 @dataclass(frozen=True)

@@ -4,9 +4,9 @@ from numpy import ndarray
 from numpy.linalg import norm
 from numpy.random import choice
 
-from data.constants import CAMERA_SPEED, SCREEN_SIZE, SHAKE_AMPLITUDE
-from data.dataclasses import Camera
-from data.utils import scale_vec
+from src.model.constants import CAMERA_SPEED, SCREEN_SIZE, SHAKE_AMPLITUDE
+from src.model.dataclasses import Camera
+from src.model.utils import scale_vec
 
 
 def update_camera(camera: Camera, focus_pos: ndarray, delta: float) -> Camera:
