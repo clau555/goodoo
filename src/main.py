@@ -12,15 +12,16 @@ from pygame.time import Clock
 from src.display.background import display_background
 from src.display.camera import update_camera, shake_camera
 from src.display.goo_particles import spawn_goo_particles, update_and_display_goo_particles
+from src.display.jauge import display_jauge
 from src.display.obstacle_particles import update_and_display_amethyst_particles, spawn_obstacle_particle, \
     update_and_display_mushroom_particles
 from src.game.grapple import update_grapple_start, fire, grapple_acceleration, display_grapple, \
     update_grapple_head, reset_grapple_head
-from src.game.lava import display_lava, update_lava, trigger_lava, display_lava_counter
+from src.game.lava import display_lava, update_lava, trigger_lava
 from src.game.player import update_player, display_player
-from src.model.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, TILE_EDGE, CURSOR_SIZE, ICON, \
+from src.model.constants import FPS, CURSOR_SPRITE, SCREEN_SIZE, TILE_EDGE, CURSOR_SIZE, WINDOW_ICON, \
     LAVA_TRIGGER_HEIGHT, LAVA_WARNING_DURATION, TARGET_FPS, \
-    GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, OBSTACLE_PARTICLE_SPAWN_RATE, ObstacleType
+    GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, OBSTACLE_PARTICLE_SPAWN_RATE, ObstacleType, WINDOW_TITLE
 from src.model.dataclasses import Camera, Grapple, Lava, Obstacle, ObstacleParticle, GooParticle
 from src.model.generation import generate_world
 from src.model.utils import visible_grid, is_pressed
@@ -28,8 +29,8 @@ from src.model.utils import visible_grid, is_pressed
 
 def main(keyboard_layout: str) -> None:
     pygame.init()
-    pygame.display.set_icon(ICON)
-    pygame.display.set_caption("Goodoo")
+    pygame.display.set_icon(WINDOW_ICON)
+    pygame.display.set_caption(WINDOW_TITLE)
     pygame.display.set_mode(SCREEN_SIZE, FULLSCREEN | SCALED)
     pygame.mouse.set_visible(False)
     pygame.event.set_allowed([QUIT, KEYDOWN, MOUSEBUTTONUP, MOUSEBUTTONDOWN])
@@ -38,7 +39,7 @@ def main(keyboard_layout: str) -> None:
 
     grapple: Grapple = Grapple()
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
-    camera: Camera = Camera(array(player.rect.center, dtype=float))
+    camera: Camera = Camera(array(player.rect.center))
 
     amethyst_particles: List[ObstacleParticle] = []
     mushroom_particles: List[ObstacleParticle] = []
@@ -65,7 +66,7 @@ def main(keyboard_layout: str) -> None:
         last_time = now
 
         click: bool = False
-        input_velocity: ndarray = zeros(2, dtype=float)
+        input_velocity: ndarray = zeros(2)
 
         # Events -------------------------------------------------------------------------------------------------------
 
@@ -129,7 +130,7 @@ def main(keyboard_layout: str) -> None:
 
         # goo particles update
         if player.obstacle_collision:
-            goo_particles = spawn_goo_particles(goo_particles, array(player.rect.center, dtype=float))
+            goo_particles = spawn_goo_particles(goo_particles, array(player.rect.center))
 
         # TODO game end
         if player.rect.centery <= 0:
@@ -156,12 +157,12 @@ def main(keyboard_layout: str) -> None:
                     if tile.type is ObstacleType.MUSHROOM:
                         mushroom_particles = spawn_obstacle_particle(
                             mushroom_particles,
-                            array(tile.rect.center, dtype=float)
+                            array(tile.rect.center)
                         )
                     elif tile.type is ObstacleType.AMETHYST:
                         amethyst_particles = spawn_obstacle_particle(
                             amethyst_particles,
-                            array(tile.rect.center, dtype=float)
+                            array(tile.rect.center)
                         )
 
         # goo particles
@@ -178,7 +179,9 @@ def main(keyboard_layout: str) -> None:
 
         # lava
         display_lava(lava, screen, camera, timer)
-        display_lava_counter(lava, player, screen)
+
+        # jauge
+        display_jauge(player, lava, screen)
 
         # user cursor
         screen.blit(CURSOR_SPRITE, array(pygame.mouse.get_pos()) - CURSOR_SIZE / 2)

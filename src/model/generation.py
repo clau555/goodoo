@@ -9,7 +9,7 @@ from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
 from src.model.constants import TILE_SIZE, GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_HEIGHT, \
-    PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH, OBSTACLE_DENSITY, AMETHYST_DENSITY, \
+    PLAYER_SIZE, TILE_SPRITES, GRID_WIDTH, OBSTACLE_MAX_DENSITY, AMETHYST_DENSITY, \
     ObstacleType, OBSTACLE_SPRITES
 from src.model.dataclasses import Player, Tile, Obstacle
 from src.model.utils import moore_neighborhood
@@ -298,7 +298,7 @@ def _generate_tiles(grid: ndarray) -> ndarray:
 
         # adding randomly obstacle on empty tile
         # the higher the tile the more it's likely to spawn
-        elif random_sample() < OBSTACLE_DENSITY * (GRID_HEIGHT - j) / GRID_HEIGHT and angle:
+        elif random_sample() < OBSTACLE_MAX_DENSITY * (GRID_HEIGHT - j) / GRID_HEIGHT and angle:
             type_: ObstacleType = ObstacleType.AMETHYST if random_sample() > AMETHYST_DENSITY else ObstacleType.MUSHROOM
             sprite: Surface = OBSTACLE_SPRITES[type_]
             tile_cave[i, j] = _spawn_obstacle(idx, angle, sprite, type_)

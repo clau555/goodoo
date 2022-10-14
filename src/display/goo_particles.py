@@ -3,8 +3,7 @@ from typing import List
 
 from numpy import ndarray, around
 from numpy.random import rand, choice
-from pygame import Surface
-from pygame.draw import circle
+from pygame import Surface, draw
 
 from src.model.constants import GRAVITY, PLAYER_COLOR, GOO_PARTICLE_INIT_VELOCITY, GOO_PARTICLE_DECREASE_VELOCITY, \
     GOO_PARTICLES_SPAWN_NUMBER
@@ -84,7 +83,7 @@ def _display_goo_particle(particle: GooParticle, screen: Surface, camera: Camera
     :param camera: camera data
     :return: None
     """
-    circle(
+    draw.circle(
         screen,
         PLAYER_COLOR,
         around(particle.pos + camera.offset),

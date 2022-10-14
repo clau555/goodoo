@@ -18,9 +18,11 @@ LAVA_PATH: Path = SPRITES_PATH / "lava"
 AMETHYST_PARTICLE_PATH: Path = SPRITES_PATH / "amethyst_particle"
 
 # screen
-ICON: Surface = load(RESOURCES_PATH / "icon.png")
+WINDOW_ICON: Surface = load(RESOURCES_PATH / "icon.png")
+WINDOW_TITLE: str = "Goodoo"
 SCREEN_SIZE: ndarray = array((384, 216))
 SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
+BLACK: Tuple[int, int, int] = (0, 0, 0)
 
 # font
 pygame.font.init()
@@ -55,7 +57,7 @@ class ObstacleType(Enum):
     AMETHYST = 1
 
 
-OBSTACLE_DENSITY: float = 0.4  # probability of an amethyst to spawn on a tile
+OBSTACLE_MAX_DENSITY: float = 0.3  # probability of an obstacle to spawn on a tile at highest map height
 AMETHYST_SPRITE: Surface = load(SPRITES_PATH / "amethyst.png")
 AMETHYST_DENSITY: float = 0.95  # probability of an obstacle to be an amethyst
 MUSHROOM_SPRITE: Surface = load(SPRITES_PATH / "mushroom.png")
@@ -130,6 +132,21 @@ LAVA_SPRITES: List[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(
 LAVA_SPEED: float = TILE_EDGE / 10
 LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - 64
 LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake when triggering lava
+LAVA_COLOR: Tuple[int, int, int] = (254, 56, 7)
+
+# jauge
+JAUGE_SIZE: ndarray = array((2, 100))  # in screen space
+JAUGE_RECT: Rect = Rect((0, 0), tuple(JAUGE_SIZE))
+JAUGE_RECT.center = SCREEN_SIZE[0] - 10, SCREEN_SIZE[1] // 2
+JAUGE_POS: ndarray = array(JAUGE_RECT.topleft)
+JAUGE_PLAYER_SIZE: ndarray = array((JAUGE_SIZE[0], 2))
+
+# jauge outline
+JAUGE_OUTLINE_SIZE: ndarray = JAUGE_RECT.size + array((2, 2))
+JAUGE_OUTLINE_POS: ndarray = JAUGE_POS - array((1, 1))
+JAUGE_OUTLINE_SURFACE: Surface = Surface(JAUGE_OUTLINE_SIZE)
+JAUGE_OUTLINE_SURFACE.fill((128, 128, 128))
+JAUGE_OUTLINE_SURFACE.set_alpha(64)
 
 # background
 BACKGROUND_SPRITE: Surface = scale(load(SPRITES_PATH / "background.png"), SCREEN_SIZE)

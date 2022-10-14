@@ -3,7 +3,7 @@ from dataclasses import replace
 import pygame
 from numpy import ndarray, array, zeros, absolute, around
 from numpy.linalg import norm
-from pygame.draw import line, circle
+from pygame import draw
 from pygame.surface import Surface
 
 from src.model.constants import GRAPPLE_VECTOR_STEP, PLAYER_COLOR, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY, \
@@ -20,14 +20,14 @@ def display_grapple(grapple: Grapple, screen: Surface, camera: Camera) -> None:
     :param screen: screen surface
     :param camera: camera data
     """
-    line(
+    draw.line(
         screen,
         PLAYER_COLOR,
         around(around(grapple.start) + camera.offset),
         around(around(grapple.head) + camera.offset),
         GRAPPLE_THICKNESS
     )
-    circle(
+    draw.circle(
         screen,
         PLAYER_COLOR,
         around(around(grapple.head) + camera.offset),
@@ -58,7 +58,7 @@ def fire(grapple: Grapple, tile_cave: ndarray, camera: Camera) -> Grapple:
     """
 
     # finding the end point of the grapple
-    end: ndarray = array(grapple.start, dtype=float)
+    end: ndarray = array(grapple.start)
     step: ndarray = array(pygame.mouse.get_pos()) - camera.offset - grapple.start
 
     if norm(step) != 0:

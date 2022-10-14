@@ -4,12 +4,12 @@ from typing import List
 
 from numpy import around, ndarray, array
 from numpy.random import rand, choice
-from pygame.draw import circle
+from pygame import draw
 from pygame.surface import Surface
 
 from src.model.constants import ANIMATION_SPEED, AMETHYST_PARTICLE_SPRITES, TILE_SIZE, MUSHROOM_PARTICLE_LIFESPAN, \
     MUSHROOM_PARTICLE_VELOCITY_NORM, MUSHROOM_PARTICLE_RADIUS, MUSHROOM_PARTICLE_COLOR, \
-    MUSHROOM_PARTICLE_LIGHT_RADIUS, MUSHROOM_PARTICLE_LIGHT_TRANSPARENCY
+    MUSHROOM_PARTICLE_LIGHT_RADIUS, MUSHROOM_PARTICLE_LIGHT_TRANSPARENCY, BLACK
 from src.model.dataclasses import ObstacleParticle, Camera
 from src.model.utils import scale_vec
 
@@ -109,18 +109,18 @@ def _display_mushroom_particle(particle: ObstacleParticle, screen: Surface, came
     # light blur
     surface: Surface = Surface((MUSHROOM_PARTICLE_LIGHT_RADIUS * 2, MUSHROOM_PARTICLE_LIGHT_RADIUS * 2))
     surface_center: ndarray = array((MUSHROOM_PARTICLE_LIGHT_RADIUS, MUSHROOM_PARTICLE_LIGHT_RADIUS))
-    circle(
+    draw.circle(
         surface,
         MUSHROOM_PARTICLE_COLOR,
         surface_center,
         MUSHROOM_PARTICLE_LIGHT_RADIUS
     )
-    surface.set_colorkey((0, 0, 0))
+    surface.set_colorkey(BLACK)
     surface.set_alpha(MUSHROOM_PARTICLE_LIGHT_TRANSPARENCY)
     screen.blit(surface, around(around(particle.pos) - surface_center + camera.offset))
 
     # particle center
-    circle(
+    draw.circle(
         screen,
         MUSHROOM_PARTICLE_COLOR,
         around(around(particle.pos) + camera.offset),
