@@ -28,7 +28,7 @@ def _player_rect(player: Player) -> Rect:
     :param player: player data
     :return: player jauge rect
     """
-    player_progression: float = 1 - ((player.pos[1] / TILE_EDGE) / GRID_HEIGHT * JAUGE_SIZE[1] / 100)
+    player_progression: float = 1 - ((player.pos[1] / TILE_EDGE) / GRID_HEIGHT)
     player_pos: ndarray = JAUGE_POS - around(array((0, -JAUGE_SIZE[1] + JAUGE_SIZE[1] * player_progression)))
     player_rect: Rect = Rect(tuple(player_pos), tuple(JAUGE_PLAYER_SIZE))
     player_rect.bottom = min(player_rect.bottom, JAUGE_POS[1] + JAUGE_SIZE[1])  # clamping player at bottom of the jauge
@@ -42,7 +42,9 @@ def _lava_rect(lava: Lava) -> Rect:
     :param lava: lava data
     :return: lava jauge rect
     """
-    lava_progression: float = 1 - ((lava.height / TILE_EDGE) / GRID_HEIGHT * JAUGE_SIZE[1] / 100)
+    lava_progression: float = 1 - ((lava.height / TILE_EDGE) / GRID_HEIGHT)
     lava_pos: ndarray = JAUGE_POS - around(array((0, -JAUGE_SIZE[1] + JAUGE_SIZE[1] * lava_progression)))
     lava_rect_height: float = JAUGE_POS[1] + JAUGE_SIZE[1] - lava_pos[1]
-    return Rect(tuple(lava_pos), (JAUGE_SIZE[0], lava_rect_height))
+    lava_rect: Rect = Rect(tuple(lava_pos), (JAUGE_SIZE[0], lava_rect_height))
+    lava_rect.top = max(lava_rect.top, JAUGE_POS[1])  # clamping lava rect at top of the jauge
+    return lava_rect

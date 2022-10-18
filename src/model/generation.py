@@ -218,7 +218,7 @@ def _spawn_player(cave: ndarray) -> Player:
             break
 
     if empty_xs.size == 0:
-        raise Exception("No player spawn point found")
+        raise ValueError("No player spawn point found")
     if empty_xs.size == 1:
         x: int = int(empty_xs[0])  # choosing the only empty tile
     else:

@@ -53,8 +53,8 @@ TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
 
 # obstacle tiles
 class ObstacleType(Enum):
-    MUSHROOM = 0
-    AMETHYST = 1
+    MUSHROOM = "mushroom"
+    AMETHYST = "amethyst"
 
 
 OBSTACLE_MAX_DENSITY: float = 0.3  # probability of an obstacle to spawn on a tile at highest map height
@@ -99,11 +99,11 @@ PLAYER_COLOR: Tuple[int, int, int] = (40, 134, 185)
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 PLAYER_INPUT_V: float = TILE_EDGE / 100
 
-# goo particles
-GOO_PARTICLE_INIT_RADIUS: int = 4
-GOO_PARTICLE_DECREASE_VELOCITY: float = 0.1
-GOO_PARTICLE_INIT_VELOCITY: float = 2.5
-GOO_PARTICLES_SPAWN_NUMBER: int = 3
+# player particles
+PLAYER_PARTICLE_INIT_RADIUS: int = 4
+PLAYER_PARTICLE_DECREASE_VELOCITY: float = 0.1
+PLAYER_PARTICLE_INIT_VELOCITY: float = 2.5
+PLAYER_PARTICLES_SPAWN_NUMBER: int = 3
 
 # cursor
 CURSOR_SIZE: ndarray = array((6, 6))
@@ -135,7 +135,7 @@ LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake w
 LAVA_COLOR: Tuple[int, int, int] = (254, 56, 7)
 
 # jauge
-JAUGE_SIZE: ndarray = array((2, 100))  # in screen space
+JAUGE_SIZE: ndarray = array((2, 128))  # in screen space
 JAUGE_RECT: Rect = Rect((0, 0), tuple(JAUGE_SIZE))
 JAUGE_RECT.center = SCREEN_SIZE[0] - 10, SCREEN_SIZE[1] // 2
 JAUGE_POS: ndarray = array(JAUGE_RECT.topleft)

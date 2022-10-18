@@ -8,7 +8,7 @@ from pygame.surface import Surface
 
 from src.model.constants import GRAPPLE_VECTOR_STEP, PLAYER_COLOR, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY, \
     GRAPPLE_THICKNESS, GRAPPLE_HEAD_RADIUS
-from src.model.dataclasses import Camera, Grapple, Player
+from src.model.dataclasses import Camera, Grapple, Player, PygameEvents
 from src.model.utils import scale_vec, world_to_grid, pos_inside_grid
 
 
@@ -35,6 +35,34 @@ def display_grapple(grapple: Grapple, screen: Surface, camera: Camera) -> None:
     )
 
 
+def update_grapple(
+        grapple: Grapple,
+        events: PygameEvents,
+        tile_cave: ndarray,
+        camera: Camera,
+        delta: float
+) -> Grapple:
+    """
+    Updates the grapple data.
+
+    :param grapple: grapple data
+    :param events: pygame events
+    :param tile_cave: world tile grid
+    :param camera: camera data
+    :param delta: delta between two frames
+    :return: updated grapple data
+    """
+    grapple_ = replace(grapple)
+
+    if events.click:
+        grapple_ = _fire(grapple_, tile_cave, camera)
+
+    if events.clicking:
+        return _update_grapple_head(grapple_, delta)
+
+    return _reset_grapple_head(grapple_)
+
+
 def update_grapple_start(grapple: Grapple, player: Player) -> Grapple:
     """
     Updates the grapple start position to the player's position.
@@ -46,10 +74,11 @@ def update_grapple_start(grapple: Grapple, player: Player) -> Grapple:
     return replace(grapple, start=array(player.rect.center).astype(float))
 
 
-def fire(grapple: Grapple, tile_cave: ndarray, camera: Camera) -> Grapple:
+def _fire(grapple: Grapple, tile_cave: ndarray, camera: Camera) -> Grapple:
     """
     Projects the grapple starting from the player's position
     to the mouse position and beyond until it collides with a tile.
+    Sets the grapple targeted point in the end.
 
     :param grapple: grapple data
     :param tile_cave: world tile grid
@@ -88,7 +117,7 @@ def fire(grapple: Grapple, tile_cave: ndarray, camera: Camera) -> Grapple:
     return replace(grapple, end=end, head=grapple.start, head_velocity=head_velocity, head_start=grapple.start)
 
 
-def update_grapple_head(grapple: Grapple, delta: float) -> Grapple:
+def _update_grapple_head(grapple: Grapple, delta: float) -> Grapple:
     """
     Updates the grapple head position making it fly towards the grapple end point.
     The head stops when it reaches the end point.
@@ -104,7 +133,7 @@ def update_grapple_head(grapple: Grapple, delta: float) -> Grapple:
     return replace(grapple, head=head)
 
 
-def reset_grapple_head(grapple: Grapple) -> Grapple:
+def _reset_grapple_head(grapple: Grapple) -> Grapple:
     """
     Resets the grapple head position to the player's position.
 

@@ -5,8 +5,9 @@ from pygame import draw
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from src.model.constants import LAVA_SPEED, GRID_WIDTH, LAVA_SPRITES, TILE_EDGE, SCREEN_SIZE, TILE_SIZE, LAVA_COLOR
-from src.model.dataclasses import Camera, Lava
+from src.model.constants import LAVA_SPEED, GRID_WIDTH, LAVA_SPRITES, TILE_EDGE, SCREEN_SIZE, TILE_SIZE, \
+    LAVA_TRIGGER_HEIGHT, LAVA_COLOR
+from src.model.dataclasses import Camera, Lava, Player
 from src.model.utils import animation_frame, world_to_grid
 
 
@@ -40,23 +41,24 @@ def display_lava(lava: Lava, screen: Surface, camera: Camera, timer: float) -> N
         )
 
 
-def update_lava(lava: Lava, delta: float) -> Lava:
+def update_lava(lava: Lava, player: Player, delta: float) -> Lava:
     """
-    Increases continuously lava's height.
+    Updates lava's height and triggered state.
 
     :param lava: lava data
+    :param player: player data
     :param delta: delta between two frames
-    :return: updated lava rectangle
-    """
-    height: float = lava.height - LAVA_SPEED * delta
-    return replace(lava, height=height)
-
-
-def trigger_lava(lava: Lava) -> Lava:
-    """
-    Sets lava's triggered state at True.
-
-    :param lava: lava data
     :return: updated lava data
     """
-    return replace(lava, triggered=True)
+    lava_: Lava = lava
+
+    # lava is triggered when player reached a certain height
+    if not lava_.triggered and player.pos[1] <= LAVA_TRIGGER_HEIGHT * TILE_EDGE:
+        lava_ = replace(lava_, triggered=True)
+
+    # lava is moving up
+    if lava_.triggered:
+        height: float = lava_.height - LAVA_SPEED * delta
+        lava_ = replace(lava_, height=height)
+
+    return lava_

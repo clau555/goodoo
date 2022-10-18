@@ -10,13 +10,13 @@ from pygame.surface import Surface
 from src.model.constants import ANIMATION_SPEED, AMETHYST_PARTICLE_SPRITES, TILE_SIZE, MUSHROOM_PARTICLE_LIFESPAN, \
     MUSHROOM_PARTICLE_VELOCITY_NORM, MUSHROOM_PARTICLE_RADIUS, MUSHROOM_PARTICLE_COLOR, \
     MUSHROOM_PARTICLE_LIGHT_RADIUS, MUSHROOM_PARTICLE_LIGHT_TRANSPARENCY, BLACK
-from src.model.dataclasses import ObstacleParticle, Camera
+from src.model.dataclasses import ObstacleParticle, Camera, ObstacleParticles
 from src.model.utils import scale_vec
 
 
 def spawn_obstacle_particle(particles: List[ObstacleParticle], pos: ndarray) -> List[ObstacleParticle]:
     """
-    Spawns a particle at the given position.
+    Spawns a particle in a particle list at the given world position.
 
     :param particles: particles data list
     :param pos: world position
@@ -28,12 +28,12 @@ def spawn_obstacle_particle(particles: List[ObstacleParticle], pos: ndarray) -> 
     return particles_
 
 
-def update_and_display_amethyst_particles(
-        particles: List[ObstacleParticle],
+def update_display_amethyst_particles(
+        particles: ObstacleParticles,
         screen: Surface,
         camera: Camera,
         delta_time: float
-) -> List[ObstacleParticle]:
+) -> ObstacleParticles:
     """
     Updates and display amethyst particles on screen.
     Increments their timer and removes them if they finished their animation.
@@ -44,7 +44,7 @@ def update_and_display_amethyst_particles(
     :param delta_time: delta time between two frames
     :return: updated particles data list
     """
-    particles_: List[ObstacleParticle] = particles.copy()
+    particles_: List[ObstacleParticle] = particles.amethyst
     for i, _ in enumerate(particles_):
 
         particles_[i] = replace(particles_[i], timer=particles_[i].timer + delta_time)
@@ -56,15 +56,15 @@ def update_and_display_amethyst_particles(
         else:
             screen.blit(AMETHYST_PARTICLE_SPRITES[sprite_idx], around(around(particles_[i].pos) + camera.offset))
 
-    return particles_
+    return replace(particles, amethyst=particles_)
 
 
-def update_and_display_mushroom_particles(
-        particles: List[ObstacleParticle],
+def update_display_mushroom_particles(
+        particles: ObstacleParticles,
         screen: Surface,
         camera: Camera,
         delta_time: float
-) -> List[ObstacleParticle]:
+) -> ObstacleParticles:
     """
     Updates mushroom particles position and display on screen.
     Increments their timer and removes them if they finished their animation.
@@ -75,7 +75,7 @@ def update_and_display_mushroom_particles(
     :param delta_time: delta time between two frames
     :return: updated particles data list
     """
-    particles_: List[ObstacleParticle] = particles.copy()
+    particles_: List[ObstacleParticle] = particles.mushroom
     for i, _ in enumerate(particles_):
 
         # particle goes up in random direction
@@ -93,7 +93,7 @@ def update_and_display_mushroom_particles(
         else:
             _display_mushroom_particle(particles_[i], screen, camera)
 
-    return particles_
+    return replace(particles, mushroom=particles_)
 
 
 def _display_mushroom_particle(particle: ObstacleParticle, screen: Surface, camera: Camera) -> None:
@@ -106,7 +106,7 @@ def _display_mushroom_particle(particle: ObstacleParticle, screen: Surface, came
     :param camera: camera data
     """
 
-    # light blur
+    # light transparent disk
     surface: Surface = Surface((MUSHROOM_PARTICLE_LIGHT_RADIUS * 2, MUSHROOM_PARTICLE_LIGHT_RADIUS * 2))
     surface_center: ndarray = array((MUSHROOM_PARTICLE_LIGHT_RADIUS, MUSHROOM_PARTICLE_LIGHT_RADIUS))
     draw.circle(

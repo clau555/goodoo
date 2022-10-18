@@ -1,9 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 from numpy import ndarray, zeros
 from pygame import Rect, Surface
 
-from src.model.constants import GOO_PARTICLE_INIT_RADIUS, ObstacleType
+from src.model.constants import ObstacleType, PLAYER_PARTICLE_INIT_RADIUS
 
 
 @dataclass(frozen=True)
@@ -27,10 +28,16 @@ class ObstacleParticle:
 
 
 @dataclass(frozen=True)
-class GooParticle:
+class ObstacleParticles:
+    amethyst: List[ObstacleParticle] = field(default_factory=lambda: [])
+    mushroom: List[ObstacleParticle] = field(default_factory=lambda: [])
+
+
+@dataclass(frozen=True)
+class PlayerParticle:
     pos: ndarray  # in world space
     velocity: ndarray
-    radius: float = GOO_PARTICLE_INIT_RADIUS
+    radius: float = PLAYER_PARTICLE_INIT_RADIUS
 
 
 @dataclass(frozen=True)
@@ -63,3 +70,9 @@ class Camera:
     heading: ndarray = zeros(2)  # world vector pointing on focus position
     top_left: ndarray = zeros(2)  # world position of the top left corner of the camera
     offset: ndarray = zeros(2)  # offset to apply to a sprite position to get its screen position
+
+
+@dataclass(frozen=True)
+class PygameEvents:
+    click: bool = False
+    clicking: bool = False
