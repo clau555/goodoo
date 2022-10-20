@@ -5,21 +5,26 @@ from numpy import ndarray, around
 from numpy.random import rand, choice
 from pygame import Surface, draw
 
-from src.model.constants import GRAVITY, PLAYER_COLOR, PLAYER_PARTICLES_SPAWN_NUMBER, PLAYER_PARTICLE_INIT_VELOCITY, \
+from src.model.constants import GRAVITY, PLAYER_COLOR, PLAYER_PARTICLE_INIT_VELOCITY, \
     PLAYER_PARTICLE_DECREASE_VELOCITY
 from src.model.dataclasses import PlayerParticle, Camera
 
 
-def spawn_player_particles(particles: List[PlayerParticle], pos: ndarray) -> List[PlayerParticle]:
+def spawn_player_particles(
+        particles: List[PlayerParticle],
+        pos: ndarray,
+        particles_number: int
+) -> List[PlayerParticle]:
     """
     Spawns a player at the given position, with a random velocity.
 
     :param particles: player particles data list
     :param pos: world position
+    :param particles_number: number of particles that will be spawned
     :return: updated player data list
     """
     particles_: List[PlayerParticle] = particles.copy()
-    for _ in range(PLAYER_PARTICLES_SPAWN_NUMBER):
+    for _ in range(particles_number):
         velocity: ndarray = rand(2) * PLAYER_PARTICLE_INIT_VELOCITY * choice(a=(-1, 1), size=2)
         particles_.append(PlayerParticle(pos, velocity))
     return particles_

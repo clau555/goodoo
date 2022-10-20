@@ -3,7 +3,6 @@ from dataclasses import replace
 
 import pygame
 from numpy import ndarray, array, ndenumerate, around
-from numpy.linalg import norm
 from pygame import Surface
 from pygame.rect import Rect
 from pygame.transform import flip
@@ -11,7 +10,7 @@ from pygame.transform import flip
 from src.model.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
     PLAYER_GROUND_SPRITES, MUSHROOM_BUMP_FACTOR, ObstacleType
 from src.model.dataclasses import Camera, Player, Obstacle
-from src.model.utils import scale_vec, world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame
+from src.model.utils import world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame, clamp_vec
 
 
 def display_player(player: Player, screen: Surface, camera: Camera, timer: float) -> None:
@@ -56,6 +55,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
 
     neighbor_tiles: ndarray = _neighbor_tiles(player, tile_cave)
     v: ndarray = _update_velocity(player, input_velocity, delta)
+    v = clamp_vec(v, PLAYER_MAX_V)
 
     # x movement executes first
     player_pos[0] += v[0]
@@ -74,6 +74,8 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
                 elif tile.type is ObstacleType.AMETHYST:
                     pygame.quit()
                     sys.exit("You've been impaled!")
+                else:
+                    raise ValueError("Unknown obstacle type.")
 
             # collision correction
             if v[0] > 0:
@@ -112,6 +114,8 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
                     elif tile.type is ObstacleType.AMETHYST:
                         pygame.quit()
                         sys.exit("You've been impaled!")
+                    else:
+                        raise ValueError("Unknown obstacle type.")
 
                 # collision correction
                 if v[1] > 0:
@@ -127,7 +131,7 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
                     break
 
     # clamp velocity
-    v = _clamp_velocity(v)
+    v = clamp_vec(v, PLAYER_MAX_V)
 
     return replace(
         player,
@@ -163,16 +167,3 @@ def _update_velocity(player: Player, input_velocity: ndarray, delta: float):
     :return: updated velocity
     """
     return player.velocity + GRAVITY + input_velocity * delta
-
-
-def _clamp_velocity(v: ndarray) -> ndarray:
-    """
-    Avoid velocity to be too high.
-    Player can go through tiles if its velocity reaches above this `PLAYER_MAX_V`.
-
-    :param v: velocity
-    :return: clamped velocity
-    """
-    if norm(v) > PLAYER_MAX_V:
-        return scale_vec(v, PLAYER_MAX_V)
-    return v

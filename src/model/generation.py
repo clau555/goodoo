@@ -1,7 +1,6 @@
-from math import radians
 from typing import Tuple, List
 
-from numpy import ndarray, zeros, array, argwhere, invert, amin, sign, ndenumerate, empty, int8, cos, sin
+from numpy import ndarray, zeros, array, argwhere, invert, amin, sign, ndenumerate, empty, int8
 from numpy.random import randint, random_sample, choice
 from pygame import Rect, Surface
 from pygame.transform import rotate
@@ -225,8 +224,8 @@ def _spawn_player(cave: ndarray) -> Player:
         x: int = int(empty_xs[randint(0, empty_xs.size - 1)])  # choosing a random empty tile
 
     player_idx: ndarray = array((x, spawn_height))  # grid space
-    player_pos = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
-    return Player(player_pos.astype(float), Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+    player_pos: ndarray = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
+    return Player(player_pos, Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
 
 
 def _neighbors_count_grid(grid: ndarray) -> ndarray:
@@ -382,6 +381,5 @@ def _spawn_obstacle(idx: ndarray, angle: int, sprite: Surface, type_: ObstacleTy
     return Obstacle(
         Rect(idx * TILE_SIZE, tuple(TILE_SIZE)),
         rotate(sprite, angle),
-        array((round(cos(radians(90 + angle))), -round(sin(radians(90 + angle))))),
         type_
     )

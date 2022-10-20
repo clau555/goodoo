@@ -10,6 +10,7 @@ from pygame.font import Font
 from pygame.image import load
 from pygame.transform import scale
 
+# files paths
 DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
 RESOURCES_PATH: Path = DIR_PATH / "resources"
 SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
@@ -22,11 +23,9 @@ WINDOW_ICON: Surface = load(RESOURCES_PATH / "icon.png")
 WINDOW_TITLE: str = "Goodoo"
 SCREEN_SIZE: ndarray = array((384, 216))
 SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
-BLACK: Tuple[int, int, int] = (0, 0, 0)
 
-# font
-pygame.font.init()
-FONT = Font(RESOURCES_PATH / "Retro Gaming.ttf", 11)
+# basic colors
+BLACK: Tuple[int, int, int] = (0, 0, 0)
 WHITE: Tuple[int, int, int] = (255, 255, 255)
 
 # tiles
@@ -103,7 +102,8 @@ PLAYER_INPUT_V: float = TILE_EDGE / 100
 PLAYER_PARTICLE_INIT_RADIUS: int = 4
 PLAYER_PARTICLE_DECREASE_VELOCITY: float = 0.1
 PLAYER_PARTICLE_INIT_VELOCITY: float = 2.5
-PLAYER_PARTICLES_SPAWN_NUMBER: int = 3
+PLAYER_PARTICLES_SPAWN_NUMBER_COLLISION: int = 3
+PLAYER_PARTICLES_SPAWN_NUMBER_DEATH: int = 30
 
 # cursor
 CURSOR_SIZE: ndarray = array((6, 6))
@@ -145,14 +145,14 @@ JAUGE_PLAYER_SIZE: ndarray = array((JAUGE_SIZE[0], 2))
 JAUGE_OUTLINE_SIZE: ndarray = JAUGE_RECT.size + array((2, 2))
 JAUGE_OUTLINE_POS: ndarray = JAUGE_POS - array((1, 1))
 JAUGE_OUTLINE_SURFACE: Surface = Surface(JAUGE_OUTLINE_SIZE)
-JAUGE_OUTLINE_SURFACE.fill((128, 128, 128))
+JAUGE_OUTLINE_SURFACE.fill(WHITE)
 JAUGE_OUTLINE_SURFACE.set_alpha(64)
 
 # background
 BACKGROUND_SPRITE: Surface = scale(load(SPRITES_PATH / "background.png"), SCREEN_SIZE)
 BACKGROUND_LAVA_SPRITE: Surface = scale(load(SPRITES_PATH / "background_lava.png"), SCREEN_SIZE)
-LAVA_WARNING_DISTANCE: int = SCREEN_SIZE[1] * 2  # distance between lava and player at which background starts to
-# change to lava background
+# distance between lava and player at which background starts to change to lava background
+LAVA_WARNING_DISTANCE: int = SCREEN_SIZE[1] * 2
 WALL_COLOR: Tuple[int, int, int] = (50, 37, 29)
 
 # key maps
@@ -166,3 +166,16 @@ KEY_MAPS: Dict[str, Dict[str, List[int]]] = {
         "right": [K_RIGHT, K_d],
     },
 }
+
+GAME_OVER_DURATION: float = 1.8  # number of seconds between player death and game over screen
+
+# font
+pygame.font.init()
+FONT_TEXT = Font(RESOURCES_PATH / "Retro Gaming.ttf", TILE_EDGE)
+FONT_TITLE = Font(RESOURCES_PATH / "Retro Gaming.ttf", TILE_EDGE * 4)
+
+# menu
+MENU_TITLE: str = "GOODOO"
+MENU_START: str = "Press any key to start"
+MENU_PARTICLE_SPAWN_RATE: float = 0.05
+MENU_TEXT_BLINK_SPEED: float = 0.5

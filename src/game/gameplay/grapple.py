@@ -8,7 +8,7 @@ from pygame.surface import Surface
 
 from src.model.constants import GRAPPLE_VECTOR_STEP, PLAYER_COLOR, GRAPPLE_ACCELERATION, GRAPPLE_HEAD_VELOCITY, \
     GRAPPLE_THICKNESS, GRAPPLE_HEAD_RADIUS
-from src.model.dataclasses import Camera, Grapple, Player, PygameEvents
+from src.model.dataclasses import Camera, Grapple, Player, GameEvents
 from src.model.utils import scale_vec, world_to_grid, pos_inside_grid
 
 
@@ -37,7 +37,7 @@ def display_grapple(grapple: Grapple, screen: Surface, camera: Camera) -> None:
 
 def update_grapple(
         grapple: Grapple,
-        events: PygameEvents,
+        events: GameEvents,
         tile_cave: ndarray,
         camera: Camera,
         delta: float

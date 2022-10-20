@@ -105,3 +105,16 @@ def is_pressed(action: str, pressed_keys: Sequence[bool], keyboard_layout) -> bo
         if pressed_keys[key]:
             return True
     return False
+
+
+def clamp_vec(vec: ndarray, maximum: float) -> ndarray:
+    """
+    Clamps a vector to a maximum norm.
+
+    :param vec: velocity
+    :param maximum: maximum velocity length
+    :return: clamped velocity
+    """
+    if norm(vec) > maximum:
+        return scale_vec(vec, maximum)
+    return vec
