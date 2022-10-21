@@ -32,7 +32,7 @@ def update_camera(camera: Camera, focus_pos: ndarray, delta: float) -> Camera:
     # camera stops going up when top is reached
     offset[1] = offset[1] if offset[1] <= 0 else 0
 
-    return replace(camera, heading=heading, center=center, top_left=top_left, offset=offset)
+    return replace(camera, center=center, top_left=top_left, offset=offset)
 
 
 def shake_camera(camera: Camera, focus_pos: ndarray, delta: float) -> Camera:

@@ -17,6 +17,17 @@ class Tile:
 
 
 @dataclass(frozen=True)
+class TileMaps:
+    """
+    Stores the two tile maps of the game.
+    The cave map contains tile that will collide with the player.
+    The decoration map will be displayed on top of the cave map and will not collide with the player.
+    """
+    cave: ndarray
+    decoration: ndarray
+
+
+@dataclass(frozen=True)
 class Obstacle:
     """
     Tile with special behavior when colliding with player.
@@ -100,7 +111,6 @@ class Camera:
     Determine the boundaries and offset to apply to displayed sprites to follow a target during game.
     """
     center: ndarray  # world position on which the camera is centered
-    heading: ndarray = zeros(2)  # world vector pointing on focus position
     top_left: ndarray = zeros(2)  # world position of the top left corner of the camera
     offset: ndarray = zeros(2)  # offset to apply to a sprite position to get its screen position
 

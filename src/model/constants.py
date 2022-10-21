@@ -17,6 +17,8 @@ SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
 PLAYER_PATH: Path = SPRITES_PATH / "player"
 LAVA_PATH: Path = SPRITES_PATH / "lava"
 AMETHYST_PARTICLE_PATH: Path = SPRITES_PATH / "amethyst_particle"
+FOSSILS_PATH: Path = SPRITES_PATH / "fossils"
+SPIKES_PATH: Path = SPRITES_PATH / "spikes"
 
 # screen
 WINDOW_ICON: Surface = load(RESOURCES_PATH / "icon.png")
@@ -49,6 +51,12 @@ def load_tiles_from_sheet() -> List[Surface]:
 
 TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
 
+# fossil tiles
+FOSSIL_SPRITES: List[Surface] = [load(FOSSILS_PATH / f"fossil_{i}.png") for i in range(1, 7)]
+FOSSIL_DENSITY: float = 0.025  # chance for a fossil tile to appear on a full tile
+SPIKE_SPRITES: List[Surface] = [load(SPIKES_PATH / f"spike_{i}.png") for i in range(1, 4)]
+SPIKE_DENSITY: float = 0.6  # chance for a spike tile to appear on a full tile
+
 
 # obstacle tiles
 class ObstacleType(Enum):
@@ -60,7 +68,7 @@ OBSTACLE_MAX_DENSITY: float = 0.3  # probability of an obstacle to spawn on a ti
 AMETHYST_SPRITE: Surface = load(SPRITES_PATH / "amethyst.png")
 AMETHYST_DENSITY: float = 0.95  # probability of an obstacle to be an amethyst
 MUSHROOM_SPRITE: Surface = load(SPRITES_PATH / "mushroom.png")
-MUSHROOM_BUMP_FACTOR: float = 1.5
+MUSHROOM_BUMP_FACTOR: float = -0.9  # factor by which the player's speed is multiplied when hitting a mushroom
 OBSTACLE_SPRITES: Dict[ObstacleType, Surface] = {
     ObstacleType.MUSHROOM: MUSHROOM_SPRITE,
     ObstacleType.AMETHYST: AMETHYST_SPRITE

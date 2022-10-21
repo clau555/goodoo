@@ -5,7 +5,7 @@ from random import random
 from typing import Tuple, List
 
 import pygame
-from pygame import KEYDOWN, K_ESCAPE, QUIT
+from pygame import KEYDOWN, K_ESCAPE, QUIT, MOUSEBUTTONDOWN
 from pygame.surface import Surface
 from pygame.time import Clock
 
@@ -72,9 +72,12 @@ def _update_events(events: MenuEvents) -> MenuEvents:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 pygame.quit()
-                sys.exit("Game ended by player.")
+                sys.exit("Game ended by user.")
             else:
                 start = True
+
+        elif event.type == MOUSEBUTTONDOWN:
+            start = True
 
         elif event.type == QUIT:
             pygame.quit()

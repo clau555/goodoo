@@ -23,8 +23,8 @@ def display_background(
     :param camera: camera data
     :param screen: screen surface
     """
-    portion: Rect = portion_rect(camera)
-    pos: ndarray = background_position(camera)
+    portion: Rect = _portion_rect(camera)
+    pos: ndarray = _background_position(camera)
 
     screen.fill(WALL_COLOR)  # side walls
     screen.blit(BACKGROUND_SPRITE.subsurface(portion), pos)  # background sprite
@@ -42,7 +42,7 @@ def display_background(
         screen.blit(background_portion, pos)
 
 
-def portion_rect(camera: Camera) -> Rect:
+def _portion_rect(camera: Camera) -> Rect:
     """
     Returns current background portion rect in background sprite space.
 
@@ -57,7 +57,7 @@ def portion_rect(camera: Camera) -> Rect:
     )
 
 
-def background_position(camera: Camera) -> ndarray:
+def _background_position(camera: Camera) -> ndarray:
     """
     Returns current background top left position in screen space.
 

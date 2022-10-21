@@ -20,12 +20,12 @@ from src.game.gameplay.grapple import update_grapple_start, grapple_acceleration
     update_grapple
 from src.game.gameplay.lava import display_lava, update_lava
 from src.game.gameplay.player import update_player, display_player
+from src.generation.generation import generate_world
 from src.model.constants import FPS, CURSOR_SPRITE, TILE_EDGE, CURSOR_SIZE, LAVA_WARNING_DURATION, TARGET_FPS, \
     GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, OBSTACLE_PARTICLE_SPAWN_RATE, ObstacleType, \
     PLAYER_PARTICLES_SPAWN_NUMBER_COLLISION, PLAYER_PARTICLES_SPAWN_NUMBER_DEATH, GAME_OVER_DURATION
 from src.model.dataclasses import Camera, Grapple, Lava, Obstacle, PlayerParticle, Player, GameEvents, \
-    ObstacleParticles
-from src.model.generation import generate_world
+    ObstacleParticles, TileMaps
 from src.model.utils import visible_grid, is_pressed
 
 
@@ -35,7 +35,7 @@ def game(keyboard_layout: str) -> None:
 
     :param keyboard_layout: keyboard layout string
     """
-    tile_cave, player = generate_world()
+    tile_maps, player = generate_world()
 
     grapple: Grapple = Grapple()
     lava: Lava = Lava(GRID_HEIGHT * TILE_EDGE)
@@ -86,15 +86,20 @@ def game(keyboard_layout: str) -> None:
             camera = shake_camera(camera, camera_target, delta)
             shake_counter -= delta_time
 
+        player_was_alive: bool = player.alive
         if player.alive:
             # grapple update handling player click and grapple movement
-            grapple = update_grapple(grapple, events, tile_cave, camera, delta)
+            grapple = update_grapple(grapple, events, tile_maps.cave, camera, delta)
 
             # player update
             if events.clicking and grapple.head is grapple.end:  # grapple is attached to a wall
                 input_velocity += grapple_acceleration(grapple)
-            player = update_player(player, input_velocity, tile_cave, delta)
+            player = update_player(player, input_velocity, tile_maps.cave, delta)
             grapple = update_grapple_start(grapple, player)  # grapple follows player
+
+            # lava collision
+            if player.rect.centery >= lava.height:
+                player = replace(player, alive=False)
 
         # player particles update
         if player.obstacle_collision:
@@ -105,13 +110,12 @@ def game(keyboard_layout: str) -> None:
         # game over
         if not player.alive:
             over_counter -= delta_time
+            if player_was_alive:
+                player_particles = spawn_player_particles(
+                    player_particles, array(player.rect.center), PLAYER_PARTICLES_SPAWN_NUMBER_DEATH
+                )
         if player.rect.centery <= 0 or over_counter <= 0:
             over = True
-        elif player.rect.centery >= lava.height and player.alive:
-            player_particles = spawn_player_particles(
-                player_particles, array(player.rect.center), PLAYER_PARTICLES_SPAWN_NUMBER_DEATH
-            )
-            player = replace(player, alive=False)
 
         # Display ------------------------------------------------------------------------------------------------------
 
@@ -119,7 +123,7 @@ def game(keyboard_layout: str) -> None:
         display_background(player, lava, shake_counter, camera, screen)
 
         # tiles, also spawns obstacle particles
-        obstacle_particles = _display_tiles(tile_cave, obstacle_particles, camera, screen)
+        obstacle_particles = _display_tile_maps(tile_maps, obstacle_particles, camera, screen)
 
         # player
         if events.clicking and player.alive:
@@ -163,7 +167,7 @@ def _update_events(events: GameEvents) -> GameEvents:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 pygame.quit()
-                sys.exit("Game ended by player.")
+                sys.exit("Game ended by user.")
 
         # mouse click
         elif event.type == MOUSEBUTTONDOWN and event.button == 1:
@@ -200,8 +204,8 @@ def _key_input_velocity(player: Player, grapple: Grapple, keyboard_layout: str) 
     return input_velocity
 
 
-def _display_tiles(
-        tile_cave: ndarray,
+def _display_tile_maps(
+        tile_maps: TileMaps,
         particles: ObstacleParticles,
         camera: Camera,
         screen: Surface
@@ -210,7 +214,6 @@ def _display_tiles(
     Displays the tiles of the tile_cave.
     When an obstacle is on screen, spawns its particles randomly.
 
-    :param tile_cave: tile cave
     :param particles: obstacle particles
     :param camera: camera data
     :param screen: screen surface
@@ -218,25 +221,40 @@ def _display_tiles(
     """
     particles_: ObstacleParticles = particles
 
-    visible_tiles: ndarray = visible_grid(tile_cave, camera)
-    for _, tile in ndenumerate(visible_tiles):
-        if tile:
-            screen.blit(tile.sprite, around(tile.rect.topleft + camera.offset))
+    visible_cave: ndarray = visible_grid(tile_maps.cave, camera)
+    visible_decoration: ndarray = visible_grid(tile_maps.decoration, camera)
+
+    # displaying all tile maps in one loop to reduce process time
+    for (i, j), _ in ndenumerate(visible_cave):
+
+        # cave map
+        if visible_cave[i, j]:
+            screen.blit(
+                visible_cave[i, j].sprite,
+                around(visible_cave[i, j].rect.topleft + camera.offset)
+            )
 
             # generates random particles on obstacles
-            if isinstance(tile, Obstacle) and random_sample() < OBSTACLE_PARTICLE_SPAWN_RATE:
+            if isinstance(visible_cave[i, j], Obstacle) and random_sample() < OBSTACLE_PARTICLE_SPAWN_RATE:
 
-                if tile.type is ObstacleType.MUSHROOM:
+                if visible_cave[i, j].type is ObstacleType.MUSHROOM:
                     particles_ = replace(particles_, mushroom=spawn_obstacle_particle(
                         particles_.mushroom,
-                        array(tile.rect.center)
+                        array(visible_cave[i, j].rect.center)
                     ))
-                elif tile.type is ObstacleType.AMETHYST:
+                elif visible_cave[i, j].type is ObstacleType.AMETHYST:
                     particles_ = replace(particles_, amethyst=spawn_obstacle_particle(
                         particles_.amethyst,
-                        array(tile.rect.center)
+                        array(visible_cave[i, j].rect.center)
                     ))
                 else:
                     raise ValueError("Unknown obstacle type.")
+
+        # decoration map
+        if visible_decoration[i, j]:
+            screen.blit(
+                visible_decoration[i, j].sprite,
+                around(visible_decoration[i, j].rect.topleft + camera.offset)
+            )
 
     return particles_

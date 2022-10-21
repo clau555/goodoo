@@ -1,4 +1,3 @@
-import sys
 from dataclasses import replace
 
 import pygame
@@ -38,22 +37,24 @@ def display_player(player: Player, screen: Surface, camera: Camera, timer: float
         screen.blit(flip(sprite, True, False), player_screen_pos)
 
 
-def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, delta: float) -> Player:
+def update_player(player: Player, input_velocity: ndarray, cave: ndarray, delta: float) -> Player:
     """
     Moves the player according to the input velocity then collide with the tiles.
     If any collision occurs, the player is moved to the appropriate position, and its velocity is updated accordingly.
 
     :param player: player data
     :param input_velocity: velocity inputted by user
-    :param tile_cave: world tile grid
+    :param cave: world tile grid
     :param delta: delta between two frames
     :return: updated player data
     """
+    alive: bool = player.alive
+
     player_pos: ndarray = array(player.pos)
     player_rect: Rect = Rect(player.rect)
     obstacle_collision: bool = False
 
-    neighbor_tiles: ndarray = _neighbor_tiles(player, tile_cave)
+    neighbor_tiles: ndarray = _neighbor_tiles(player, cave)
     v: ndarray = _update_velocity(player, input_velocity, delta)
     v = clamp_vec(v, PLAYER_MAX_V)
 
@@ -70,10 +71,9 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
             if isinstance(tile, Obstacle):
                 if tile.type is ObstacleType.MUSHROOM:
                     obstacle_collision = True
-                    obstacle_impulse = -v[0] * MUSHROOM_BUMP_FACTOR
+                    obstacle_impulse = v[0] * MUSHROOM_BUMP_FACTOR
                 elif tile.type is ObstacleType.AMETHYST:
-                    pygame.quit()
-                    sys.exit("You've been impaled!")
+                    alive = False
                 else:
                     raise ValueError("Unknown obstacle type.")
 
@@ -110,10 +110,9 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
                 if isinstance(tile, Obstacle):
                     if tile.type is ObstacleType.MUSHROOM:
                         obstacle_collision = True
-                        obstacle_impulse = -v[1] * MUSHROOM_BUMP_FACTOR
+                        obstacle_impulse = v[1] * MUSHROOM_BUMP_FACTOR
                     elif tile.type is ObstacleType.AMETHYST:
-                        pygame.quit()
-                        sys.exit("You've been impaled!")
+                        alive = False
                     else:
                         raise ValueError("Unknown obstacle type.")
 
@@ -139,7 +138,8 @@ def update_player(player: Player, input_velocity: ndarray, tile_cave: ndarray, d
         rect=player_rect,
         velocity=v,
         on_ground=on_ground,
-        obstacle_collision=obstacle_collision
+        obstacle_collision=obstacle_collision,
+        alive=alive
     )
 
 
