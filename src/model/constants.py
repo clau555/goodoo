@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict
 import pygame.font
 from numpy import array, ndarray
 from pygame import Surface, Rect
-from pygame.constants import K_LEFT, K_RIGHT, K_a, K_d, K_q
+from pygame.constants import K_LEFT, K_RIGHT, K_a, K_d, K_q, K_p
 from pygame.font import Font
 from pygame.image import load
 from pygame.transform import scale
@@ -168,10 +168,12 @@ KEY_MAPS: Dict[str, Dict[str, List[int]]] = {
     "QWERTY": {
         "left": [K_LEFT, K_a],
         "right": [K_RIGHT, K_d],
+        "pause": [K_p],
     },
     "AZERTY": {
         "left": [K_LEFT, K_q],
         "right": [K_RIGHT, K_d],
+        "pause": [K_p],
     },
 }
 
@@ -183,7 +185,13 @@ FONT_TEXT = Font(RESOURCES_PATH / "Retro Gaming.ttf", TILE_EDGE)
 FONT_TITLE = Font(RESOURCES_PATH / "Retro Gaming.ttf", TILE_EDGE * 4)
 
 # menu
-MENU_TITLE: str = "GOODOO"
-MENU_START: str = "Press any key to start"
+MENU_TITLE: Surface = FONT_TITLE.render("GOODOO", False, WHITE)
+MENU_START: Surface = FONT_TEXT.render("Press any key to start", False, WHITE)
 MENU_PARTICLE_SPAWN_RATE: float = 0.05
 MENU_TEXT_BLINK_SPEED: float = 0.5
+
+# pause
+GRAY_LAYER: Surface = Surface(SCREEN_SIZE)
+GRAY_LAYER.fill(BLACK)
+GRAY_LAYER.set_alpha(128)
+PAUSE_TEXT: Surface = FONT_TEXT.render("PAUSE", False, WHITE)

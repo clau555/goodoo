@@ -122,6 +122,7 @@ class GameEvents:
     """
     click: bool = False  # true when left mouse button has just been pressed
     clicking: bool = False  # true when left mouse button is being pressed
+    pause: bool = False  # true when pause key has just been pressed
 
 
 @dataclass(frozen=True)

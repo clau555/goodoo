@@ -23,7 +23,8 @@ from src.game.gameplay.player import update_player, display_player
 from src.generation.generation import generate_world
 from src.model.constants import FPS, CURSOR_SPRITE, TILE_EDGE, CURSOR_SIZE, LAVA_WARNING_DURATION, TARGET_FPS, \
     GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, OBSTACLE_PARTICLE_SPAWN_RATE, ObstacleType, \
-    PLAYER_PARTICLES_SPAWN_NUMBER_COLLISION, PLAYER_PARTICLES_SPAWN_NUMBER_DEATH, GAME_OVER_DURATION
+    PLAYER_PARTICLES_SPAWN_NUMBER_COLLISION, PLAYER_PARTICLES_SPAWN_NUMBER_DEATH, GAME_OVER_DURATION, KEY_MAPS, \
+    GRAY_LAYER, PAUSE_TEXT, SCREEN_SIZE
 from src.model.dataclasses import Camera, Grapple, Lava, Obstacle, PlayerParticle, Player, GameEvents, \
     ObstacleParticles, TileMaps
 from src.model.utils import visible_grid, is_pressed
@@ -60,14 +61,18 @@ def game(keyboard_layout: str) -> None:
     while not over:
         clock.tick(FPS)  # limit fps
 
+        # pygame events
+        events: GameEvents = _update_events(events, keyboard_layout)
+
+        # pause loop
+        if events.pause:
+            last_time = _pause(keyboard_layout, screen)
+
         # delta update using time module because pygame is less accurate
         now: float = time.time()
         delta_time: float = (now - last_time)
         delta: float = delta_time * TARGET_FPS
         last_time = now
-
-        # pygame events
-        events: GameEvents = _update_events(events)
 
         # key actions
         input_velocity: ndarray = _key_input_velocity(player, grapple, keyboard_layout)
@@ -152,7 +157,7 @@ def game(keyboard_layout: str) -> None:
         timer += delta_time
 
 
-def _update_events(events: GameEvents) -> GameEvents:
+def _update_events(events: GameEvents, keyboard_layout: str) -> GameEvents:
     """
     Update events from pygame event queue inside game screen.
 
@@ -161,6 +166,7 @@ def _update_events(events: GameEvents) -> GameEvents:
     """
     clicking: bool = events.clicking
     click: bool = False
+    pause: bool = False
 
     for event in pygame.event.get():
 
@@ -168,6 +174,8 @@ def _update_events(events: GameEvents) -> GameEvents:
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit("Game ended by user.")
+            elif event.key in KEY_MAPS[keyboard_layout]["pause"]:
+                pause = True
 
         # mouse click
         elif event.type == MOUSEBUTTONDOWN and event.button == 1:
@@ -180,7 +188,7 @@ def _update_events(events: GameEvents) -> GameEvents:
             pygame.quit()
             sys.exit()
 
-    return replace(events, click=click, clicking=clicking)
+    return replace(events, click=click, clicking=clicking, pause=pause)
 
 
 def _key_input_velocity(player: Player, grapple: Grapple, keyboard_layout: str) -> ndarray:
@@ -258,3 +266,43 @@ def _display_tile_maps(
             )
 
     return particles_
+
+
+def _pause(keyboard_layout: str, screen: Surface) -> float:
+    """
+    Pauses the game by blocking the main loop.
+    Displays a pause screen and waits for the user to press the pause key again.
+    Return the time at which the pause ends for delta time calculation.
+
+    :param keyboard_layout: keyboard layout string
+    :param screen: screen surface
+    :return: time at which the pause ends
+    """
+    screen.blit(GRAY_LAYER, (0, 0))
+    screen.blit(
+        PAUSE_TEXT,
+        (SCREEN_SIZE[0] / 2 - PAUSE_TEXT.get_width() / 2,
+         SCREEN_SIZE[1] / 2 - PAUSE_TEXT.get_height() / 2)
+    )
+    pygame.display.flip()
+
+    paused: bool = True
+    while paused:
+        for event in pygame.event.get():
+
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    _end_program()
+                elif event.key in KEY_MAPS[keyboard_layout]["pause"]:
+                    paused = False
+
+            elif event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+    return time.time()
+
+
+def _end_program():
+    pygame.quit()
+    sys.exit("Game ended by user.")
