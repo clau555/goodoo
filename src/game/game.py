@@ -27,7 +27,7 @@ from src.model.constants import FPS, CURSOR_SPRITE, TILE_EDGE, CURSOR_SIZE, LAVA
     GRAY_LAYER, PAUSE_TEXT, SCREEN_SIZE
 from src.model.dataclasses import Camera, Grapple, Lava, Obstacle, PlayerParticle, Player, GameEvents, \
     ObstacleParticles, TileMaps
-from src.model.utils import visible_grid, is_pressed
+from src.model.utils import visible_grid, is_pressed, end_program
 
 
 def game(keyboard_layout: str) -> None:
@@ -63,6 +63,10 @@ def game(keyboard_layout: str) -> None:
 
         # pygame events
         events: GameEvents = _update_events(events, keyboard_layout)
+
+        # back to menu
+        if events.escape:
+            over = True
 
         # pause loop
         if events.pause:
@@ -167,13 +171,13 @@ def _update_events(events: GameEvents, keyboard_layout: str) -> GameEvents:
     clicking: bool = events.clicking
     click: bool = False
     pause: bool = False
+    escape: bool = False
 
     for event in pygame.event.get():
 
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
-                pygame.quit()
-                sys.exit("Game ended by user.")
+                escape = True
             elif event.key in KEY_MAPS[keyboard_layout]["pause"]:
                 pause = True
 
@@ -188,7 +192,7 @@ def _update_events(events: GameEvents, keyboard_layout: str) -> GameEvents:
             pygame.quit()
             sys.exit()
 
-    return replace(events, click=click, clicking=clicking, pause=pause)
+    return replace(events, click=click, clicking=clicking, pause=pause, escape=escape)
 
 
 def _key_input_velocity(player: Player, grapple: Grapple, keyboard_layout: str) -> ndarray:
@@ -292,17 +296,11 @@ def _pause(keyboard_layout: str, screen: Surface) -> float:
 
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    _end_program()
+                    end_program()
                 elif event.key in KEY_MAPS[keyboard_layout]["pause"]:
                     paused = False
 
             elif event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+                end_program()
 
     return time.time()
-
-
-def _end_program():
-    pygame.quit()
-    sys.exit("Game ended by user.")

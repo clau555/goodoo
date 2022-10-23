@@ -1,18 +1,19 @@
-import sys
 import time
 from dataclasses import replace
 from random import random
-from typing import Tuple, List
+from typing import List
 
 import pygame
-from pygame import KEYDOWN, K_ESCAPE, QUIT, MOUSEBUTTONDOWN
+from numpy import ndarray, array
+from pygame import KEYDOWN, K_ESCAPE, QUIT, K_DOWN, K_UP, K_RETURN
 from pygame.surface import Surface
 from pygame.time import Clock
 
 from src.menu.menu_particles import spawn_menu_particle, update_display_menu_particles
-from src.model.constants import BLACK, SCREEN_SIZE, MENU_TITLE, MENU_START, TARGET_FPS, \
-    FPS, MENU_PARTICLE_SPAWN_RATE, MENU_TEXT_BLINK_SPEED
+from src.model.constants import BLACK, SCREEN_SIZE, MENU_TITLE, TARGET_FPS, \
+    FPS, MENU_PARTICLE_SPAWN_RATE, MENU_BUTTONS_LABELS, MENU_BUTTON_MARGIN, FONT_TEXT, WHITE
 from src.model.dataclasses import MenuEvents, MenuParticle
+from src.model.utils import end_program
 
 
 def menu() -> None:
@@ -30,6 +31,8 @@ def menu() -> None:
     last_time: float = time.time()
     timer: float = 0
 
+    idx: int = 0  # current selected button index
+
     while not over:
 
         clock.tick(FPS)
@@ -40,8 +43,17 @@ def menu() -> None:
         last_time = now
 
         events: MenuEvents = _update_events(events)
-        if events.start:
-            over = True
+        if events.up:
+            idx = max(0, idx - 1)
+        elif events.down:
+            idx = min(len(MENU_BUTTONS_LABELS) - 1, idx + 1)
+
+        elif events.enter:
+            # TODO add settings screen
+            if idx == 0:
+                over = True
+            elif idx == 2:
+                end_program()
 
         if random() < MENU_PARTICLE_SPAWN_RATE:
             menu_particles = spawn_menu_particle(menu_particles)
@@ -49,10 +61,7 @@ def menu() -> None:
         screen.fill(BLACK)
         menu_particles = update_display_menu_particles(menu_particles, screen, delta)
         _display_title(screen)
-
-        # blinking text
-        if timer % 1 < MENU_TEXT_BLINK_SPEED:
-            _display_start(screen)
+        _display_buttons(screen, idx, timer)
 
         pygame.display.flip()
         timer += delta_time
@@ -65,25 +74,26 @@ def _update_events(events: MenuEvents) -> MenuEvents:
     :param events: events data
     :return: updated events data
     """
-    start: bool = False
+    up: bool = False
+    down: bool = False
+    enter: bool = False
 
     for event in pygame.event.get():
 
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
-                pygame.quit()
-                sys.exit("Game ended by user.")
-            else:
-                start = True
-
-        elif event.type == MOUSEBUTTONDOWN:
-            start = True
+                end_program()
+            elif event.key == K_UP:
+                up = True
+            elif event.key == K_DOWN:
+                down = True
+            elif event.key == K_RETURN:
+                enter = True
 
         elif event.type == QUIT:
-            pygame.quit()
-            sys.exit()
+            end_program()
 
-    return replace(events, start=start)
+    return replace(events, up=up, down=down, enter=enter)
 
 
 def _display_title(screen: Surface) -> None:
@@ -99,14 +109,28 @@ def _display_title(screen: Surface) -> None:
     )
 
 
-def _display_start(screen: Surface) -> None:
+def _display_buttons(screen: Surface, idx: int, timer: float) -> None:
     """
-    Displays start text on screen.
+    Displays buttons on screen.
 
+    :type timer:
     :param screen: screen surface
+    :param idx: index of the button to highlight
     """
-    pos: Tuple[int, int] = (
-        SCREEN_SIZE[0] // 2 - MENU_START.get_rect().w // 2,
-        SCREEN_SIZE[1] * 2 / 3 - MENU_START.get_rect().h
-    )
-    screen.blit(MENU_START, pos)
+    height = SCREEN_SIZE[1] // 2
+
+    for i, label in enumerate(MENU_BUTTONS_LABELS):
+
+        label_: str = label
+        if i == idx:
+            if timer % 1 < 0.5:
+                label_ = f"[ {label} ]"
+            else:
+                label_ = f"[  {label}  ]"
+
+        button: Surface = FONT_TEXT.render(label_, False, WHITE)
+        pos: ndarray = array((SCREEN_SIZE[0] // 2 - button.get_rect().w // 2, height))
+
+        screen.blit(button, pos)
+
+        height += button.get_rect().h + MENU_BUTTON_MARGIN

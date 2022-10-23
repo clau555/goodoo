@@ -1,5 +1,7 @@
+import sys
 from typing import List, Sequence
 
+import pygame
 from numpy import ndarray
 from numpy.linalg import norm
 from pygame import Surface
@@ -118,3 +120,11 @@ def clamp_vec(vec: ndarray, maximum: float) -> ndarray:
     if norm(vec) > maximum:
         return scale_vec(vec, maximum)
     return vec
+
+
+def end_program():
+    """
+    Ends the program.
+    """
+    pygame.quit()
+    sys.exit()

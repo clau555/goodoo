@@ -24,7 +24,6 @@ SPIKES_PATH: Path = SPRITES_PATH / "spikes"
 WINDOW_ICON: Surface = load(RESOURCES_PATH / "icon.png")
 WINDOW_TITLE: str = "Goodoo"
 SCREEN_SIZE: ndarray = array((384, 216))
-SCREEN_RECT: Rect = Rect(0, 0, *SCREEN_SIZE)
 
 # basic colors
 BLACK: Tuple[int, int, int] = (0, 0, 0)
@@ -186,9 +185,9 @@ FONT_TITLE = Font(RESOURCES_PATH / "Retro Gaming.ttf", TILE_EDGE * 4)
 
 # menu
 MENU_TITLE: Surface = FONT_TITLE.render("GOODOO", False, WHITE)
-MENU_START: Surface = FONT_TEXT.render("Press any key to start", False, WHITE)
+MENU_BUTTONS_LABELS: List[str] = ["START", "SETTINGS", "QUIT"]
+MENU_BUTTON_MARGIN: int = 8
 MENU_PARTICLE_SPAWN_RATE: float = 0.05
-MENU_TEXT_BLINK_SPEED: float = 0.5
 
 # pause
 GRAY_LAYER: Surface = Surface(SCREEN_SIZE)

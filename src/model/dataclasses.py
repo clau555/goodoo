@@ -123,6 +123,7 @@ class GameEvents:
     click: bool = False  # true when left mouse button has just been pressed
     clicking: bool = False  # true when left mouse button is being pressed
     pause: bool = False  # true when pause key has just been pressed
+    escape: bool = False  # true when escape key has just been pressed
 
 
 @dataclass(frozen=True)
@@ -130,7 +131,9 @@ class MenuEvents:
     """
     Boolean of events that can occurs in the menu screen.
     """
-    start: bool = False  # true when any key is down
+    up: bool = False  # true when up key is down
+    down: bool = False  # true when down key is down
+    enter: bool = False  # true when enter key is down
 
 
 @dataclass(frozen=True)
