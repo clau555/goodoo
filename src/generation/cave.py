@@ -16,6 +16,7 @@ from src.model.utils import moore_neighborhood
 def generate_cave(grid: ndarray) -> ndarray:
     """
     Returns a grid with the corresponding tile data for each cell.
+    Adds to it the obstacle tiles.
 
     :param grid: boolean grid
     :return: tile grid
@@ -158,7 +159,7 @@ def generate_cave_grid() -> ndarray:
 
 def generate_connections(cave: ndarray, connections_points: ndarray) -> ndarray:
     """
-    Generates the connections between the rooms.
+    Digs the connections between the rooms.
 
     https://youtu.be/7RiGikVLS3c
 

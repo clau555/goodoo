@@ -4,7 +4,7 @@
 
 ---
 
-Goodoo is an experimental 2D platformer video game which started as a broken student project and is built with
+Goodoo is a procedural 2D platformer video game which started as a broken student project and is built with
 [Pygame](https://github.com/pygame/pygame).  
 Its name has been chosen randomly and has no specific meaning.
 This game is the result of many redesigns through the years by an inexperienced developer who has no idea how game
@@ -12,21 +12,31 @@ design works.
 And yes, I commit on master, I should burn in hell for that (and don't look at the commit history it's an absolute mess)
 .
 
-## Requirements
+## Running from sources
 
+This program requires python installed.
+
+First download the repository or clone it to your computer.
+
+```bash
+git clone https://github.com/clau555/goodoo.git
 ```
+
+You can use pip to install the required libraries.
+
+```bash
 pip install -r requirements.txt
 ```
 
-## Use
+Then run the main file.
 
-```
+```bash
 python3 goodoo.py
 ```
 
 You can run with AZERTY keys with:
 
-```
+```bash
 python3 goodoo.py AZERTY
 ```
 
@@ -37,14 +47,34 @@ of the cave to escape.
 You've got to do this quickly as lava will start to rise once a certain height is reached.  
 Be careful on your way as mushrooms will bump you in the opposite way and pointy minerals will kill you instantly.
 
-You can click to project yourself on the walls like a true Spider-Man and move yourself around while you're doing it by
-using the following keys.
+You can click to project yourself on the walls like a true Spider-Man and move yourself from left to right while you're
+in the air.
 
-| Action       | Key (QWERTY)  |
+### Default keys
+
+| Action       |      Key      |
 |--------------|:-------------:|
 | fire grapple | `left click`  |
 | left         | `a` / `left`  |
 | right        | `d` / `right` |
+| pause        |      `p`      |
+| end game     |   `escape`    |
+
+## Cave generation
+
+The goal is to generate a tile cave only opened at the top, where the player can climb to.
+
+The map generation works as grid where we play a cave generator cellular automaton, which creates several rooms inside
+the map.  
+We then dig connections between neighboring rooms to make sure any rooms can be accessible starting from any other
+room.  
+A hardcoded hole is dig at the top of the map to create a finish line for the player.
+
+Obstacle tiles are generated randomly on walls, with free space in front of them guaranteeing the player will not be
+stuck in its progression.
+
+Non physic tiles, called "decorations" are placed randomly in a separated map, with each decoration type satisfying
+its own generation constraint.
 
 ## I don't like OOP :(
 

@@ -14,7 +14,7 @@ from src.model.dataclasses import Player, TileMaps
 
 def generate_world() -> Tuple[TileMaps, Player]:
     """
-    Returns a world grid containing the wall tiles, and none for the empty tiles.
+    Returns tile maps of the world, one for the physical tiles, one for the decorations.
     Returns also the player.
 
     :return: tile grid and player data
