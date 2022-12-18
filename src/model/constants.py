@@ -1,6 +1,4 @@
-from enum import Enum
 from pathlib import Path
-from typing import List, Tuple, Dict
 
 import pygame.font
 from numpy import array, ndarray
@@ -26,21 +24,21 @@ WINDOW_TITLE: str = "Goodoo"
 SCREEN_SIZE: ndarray = array((384, 216))
 
 # basic colors
-BLACK: Tuple[int, int, int] = (0, 0, 0)
-WHITE: Tuple[int, int, int] = (255, 255, 255)
+BLACK: tuple[int, int, int] = (0, 0, 0)
+WHITE: tuple[int, int, int] = (255, 255, 255)
 
 # tiles
 TILE_EDGE: int = 12  # tile edge size in pixels
 TILE_SIZE: ndarray = array((TILE_EDGE, TILE_EDGE))
 
 
-def load_tiles_from_sheet() -> List[Surface]:
+def load_tiles_from_sheet() -> list[Surface]:
     """
     Loads the different tile sprites from `tile_sheet.png`.
 
     :return: list of tile sprites
     """
-    tiles: List[Surface] = []
+    tiles: list[Surface] = []
     sheet: Surface = load(SPRITES_PATH / "tile_sheet.png")
     for j in range(0, sheet.get_size()[1], TILE_EDGE):
         for i in range(0, sheet.get_size()[0], TILE_EDGE):
@@ -48,42 +46,36 @@ def load_tiles_from_sheet() -> List[Surface]:
     return tiles
 
 
-TILE_SPRITES: List[Surface] = load_tiles_from_sheet()
+TILE_SPRITES: list[Surface] = load_tiles_from_sheet()
 
 # fossil tiles
-FOSSIL_SPRITES: List[Surface] = [load(FOSSILS_PATH / f"fossil_{i}.png") for i in range(1, 7)]
+FOSSIL_SPRITES: list[Surface] = [load(FOSSILS_PATH / f"fossil_{i}.png") for i in range(1, 7)]
 FOSSIL_DENSITY: float = 0.025  # chance for a fossil tile to appear on a full tile
-SPIKE_SPRITES: List[Surface] = [load(SPIKES_PATH / f"spike_{i}.png") for i in range(1, 4)]
+SPIKE_SPRITES: list[Surface] = [load(SPIKES_PATH / f"spike_{i}.png") for i in range(1, 4)]
 SPIKE_DENSITY: float = 0.6  # chance for a spike tile to appear on a full tile
 
-
 # obstacle tiles
-class ObstacleType(Enum):
-    MUSHROOM = "mushroom"
-    AMETHYST = "amethyst"
-
-
 OBSTACLE_MAX_DENSITY: float = 0.3  # probability of an obstacle to spawn on a tile at highest map height
 AMETHYST_SPRITE: Surface = load(SPRITES_PATH / "amethyst.png")
-AMETHYST_DENSITY: float = 0.95  # probability of an obstacle to be an amethyst
+AMETHYST_DENSITY: float = 0.05  # probability of an obstacle to be an amethyst
 MUSHROOM_SPRITE: Surface = load(SPRITES_PATH / "mushroom.png")
 MUSHROOM_BUMP_FACTOR: float = -0.9  # factor by which the player's speed is multiplied when hitting a mushroom
-OBSTACLE_SPRITES: Dict[ObstacleType, Surface] = {
-    ObstacleType.MUSHROOM: MUSHROOM_SPRITE,
-    ObstacleType.AMETHYST: AMETHYST_SPRITE
-}
 
 # obstacle particles
 OBSTACLE_PARTICLE_SPAWN_RATE: float = 0.01  # probability of a particle to spawn on an obstacle in one frame
-AMETHYST_PARTICLE_SPRITES: List[Surface] = [
+AMETHYST_PARTICLE_SPRITES: list[Surface] = [
     load(AMETHYST_PARTICLE_PATH / f"amethyst_particle_{i}.png") for i in range(1, 5)
 ]
 MUSHROOM_PARTICLE_LIFESPAN: float = 0.3  # in seconds
 MUSHROOM_PARTICLE_VELOCITY_NORM: float = TILE_EDGE / 10
 MUSHROOM_PARTICLE_RADIUS: float = 1.5
-MUSHROOM_PARTICLE_COLOR: Tuple[int, int, int] = (218, 255, 0)
+MUSHROOM_PARTICLE_COLOR: tuple[int, int, int] = (218, 255, 0)
 MUSHROOM_PARTICLE_LIGHT_RADIUS: int = 3
 MUSHROOM_PARTICLE_LIGHT_TRANSPARENCY: int = 100
+
+MUSHROOM_HEALTH_POINTS: int = 3
+MUSHROOM_SHAKE_DURATION: float = 0.3  # time in second a mushroom shakes when hit
+MUSHROOM_SHAKE_OFFSET: int = 2
 
 # world grid
 GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
@@ -100,8 +92,8 @@ SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] /
 # player
 PLAYER_SIZE: ndarray = array((8, 8))
 PLAYER_SPRITE: Surface = load(PLAYER_PATH / "player_jump.png")
-PLAYER_GROUND_SPRITES: List[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
-PLAYER_COLOR: Tuple[int, int, int] = (40, 134, 185)
+PLAYER_GROUND_SPRITES: list[Surface] = [load(PLAYER_PATH / f"player_ground_{i}.png") for i in range(1, 5)]
+PLAYER_COLOR: tuple[int, int, int] = (40, 134, 185)
 PLAYER_MAX_V: float = TILE_EDGE - TILE_EDGE / 6
 PLAYER_INPUT_V: float = TILE_EDGE / 100
 
@@ -135,11 +127,11 @@ GRAPPLE_THICKNESS: int = 3
 GRAPPLE_HEAD_RADIUS: int = 4
 
 # lava
-LAVA_SPRITES: List[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]
+LAVA_SPRITES: list[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]
 LAVA_SPEED: float = TILE_EDGE / 10
 LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - 64
 LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake when triggering lava
-LAVA_COLOR: Tuple[int, int, int] = (254, 56, 7)
+LAVA_COLOR: tuple[int, int, int] = (254, 56, 7)
 
 # jauge
 JAUGE_SIZE: ndarray = array((2, 128))  # in screen space
@@ -160,10 +152,10 @@ BACKGROUND_SPRITE: Surface = scale(load(SPRITES_PATH / "background.png"), SCREEN
 BACKGROUND_LAVA_SPRITE: Surface = scale(load(SPRITES_PATH / "background_lava.png"), SCREEN_SIZE)
 # distance between lava and player at which background starts to change to lava background
 LAVA_WARNING_DISTANCE: int = SCREEN_SIZE[1] * 2
-WALL_COLOR: Tuple[int, int, int] = (50, 37, 29)
+WALL_COLOR: tuple[int, int, int] = (50, 37, 29)
 
 # key maps
-KEY_MAPS: Dict[str, Dict[str, List[int]]] = {
+KEY_MAPS: dict[str, dict[str, list[int]]] = {
     "QWERTY": {
         "left": [K_LEFT, K_a],
         "right": [K_RIGHT, K_d],
@@ -185,7 +177,7 @@ FONT_TITLE = Font(RESOURCES_PATH / "Retro Gaming.ttf", TILE_EDGE * 4)
 
 # menu
 MENU_TITLE: Surface = FONT_TITLE.render("GOODOO", False, WHITE)
-MENU_BUTTONS_LABELS: List[str] = ["START", "SETTINGS", "QUIT"]
+MENU_BUTTONS_LABELS: list[str] = ["START", "QUIT"]
 MENU_BUTTON_MARGIN: int = 8
 MENU_PARTICLE_SPAWN_RATE: float = 0.05
 

@@ -8,8 +8,8 @@ from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
 from src.model.constants import GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_WIDTH, TILE_SPRITES, TILE_SIZE, \
-    OBSTACLE_MAX_DENSITY, GRID_HEIGHT, ObstacleType, AMETHYST_DENSITY, OBSTACLE_SPRITES
-from src.model.dataclasses import Tile, Obstacle
+    OBSTACLE_MAX_DENSITY, GRID_HEIGHT, AMETHYST_DENSITY, AMETHYST_SPRITE, MUSHROOM_SPRITE
+from src.model.dataclasses import Tile, Amethyst, Mushroom
 from src.model.utils import moore_neighborhood
 
 
@@ -47,13 +47,14 @@ def generate_cave(grid: ndarray) -> ndarray:
         # adding randomly obstacle on empty tile
         # the higher the tile the more it's likely to spawn
         elif random_sample() < OBSTACLE_MAX_DENSITY * (GRID_HEIGHT - j) / GRID_HEIGHT and angle:
-            type_: ObstacleType = ObstacleType.AMETHYST if random_sample() > AMETHYST_DENSITY else ObstacleType.MUSHROOM
-            sprite: Surface = OBSTACLE_SPRITES[type_]
-            tile_cave[i, j] = Obstacle(
-                Rect(idx * TILE_SIZE, tuple(TILE_SIZE)),
-                rotate(sprite, angle),
-                type_
-            )
+
+            rect: Rect = Rect(idx * TILE_SIZE, tuple(TILE_SIZE))
+
+            if random_sample() < AMETHYST_DENSITY:
+                tile_cave[i, j] = Amethyst(rect, rotate(AMETHYST_SPRITE, angle))
+            else:
+                tile_cave[i, j] = Mushroom(rect, rotate(MUSHROOM_SPRITE, angle))
+
             grid_with_obstacles[i, j] = 2  # marking this tile as occupied by an obstacle
 
         else:

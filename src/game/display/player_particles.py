@@ -1,5 +1,4 @@
 from dataclasses import replace
-from typing import List
 
 from numpy import ndarray, around
 from numpy.random import rand, choice
@@ -11,10 +10,10 @@ from src.model.dataclasses import PlayerParticle, Camera
 
 
 def spawn_player_particles(
-        particles: List[PlayerParticle],
+        particles: list[PlayerParticle],
         pos: ndarray,
         particles_number: int
-) -> List[PlayerParticle]:
+) -> list[PlayerParticle]:
     """
     Spawns a player at the given position, with a random velocity.
 
@@ -23,7 +22,7 @@ def spawn_player_particles(
     :param particles_number: number of particles that will be spawned
     :return: updated player data list
     """
-    particles_: List[PlayerParticle] = particles.copy()
+    particles_: list[PlayerParticle] = particles.copy()
     for _ in range(particles_number):
         velocity: ndarray = rand(2) * PLAYER_PARTICLE_INIT_VELOCITY * choice(a=(-1, 1), size=2)
         particles_.append(PlayerParticle(pos, velocity))
@@ -31,11 +30,11 @@ def spawn_player_particles(
 
 
 def update_display_player_particles(
-        particles: List[PlayerParticle],
+        particles: list[PlayerParticle],
         screen: Surface,
         camera: Camera,
         delta: float
-) -> List[PlayerParticle]:
+) -> list[PlayerParticle]:
     """
     Updates then display player particles, decreasing its radius and being affected by gravity.
 
@@ -45,7 +44,7 @@ def update_display_player_particles(
     :param delta: delta between two frames
     :return: updated player data
     """
-    particles_: List[PlayerParticle] = particles.copy()
+    particles_: list[PlayerParticle] = particles.copy()
 
     for i, _ in enumerate(particles_):
 

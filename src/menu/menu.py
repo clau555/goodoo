@@ -1,18 +1,17 @@
 import time
-from dataclasses import replace
 from random import random
-from typing import List
 
 import pygame
-from numpy import ndarray, array
-from pygame import KEYDOWN, K_ESCAPE, QUIT, K_DOWN, K_UP, K_RETURN
+from numpy import array, ndarray
+from pygame import KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_RETURN, QUIT
 from pygame.surface import Surface
 from pygame.time import Clock
 
 from src.menu.menu_particles import spawn_menu_particle, update_display_menu_particles
 from src.model.constants import BLACK, SCREEN_SIZE, MENU_TITLE, TARGET_FPS, \
-    FPS, MENU_PARTICLE_SPAWN_RATE, MENU_BUTTONS_LABELS, MENU_BUTTON_MARGIN, FONT_TEXT, WHITE
-from src.model.dataclasses import MenuEvents, MenuParticle
+    FPS, MENU_PARTICLE_SPAWN_RATE, MENU_BUTTONS_LABELS, FONT_TEXT, WHITE, MENU_BUTTON_MARGIN
+from src.model.dataclasses import MenuParticle
+from src.model.types import MenuEvent
 from src.model.utils import end_program
 
 
@@ -20,12 +19,10 @@ def menu() -> None:
     """
     Handles menu screen logic.
     """
-
-    events: MenuEvents = MenuEvents()
     screen: Surface = pygame.display.get_surface()
     over: bool = False
 
-    menu_particles: List[MenuParticle] = []
+    menu_particles: list[MenuParticle] = []
 
     clock: Clock = Clock()
     last_time: float = time.time()
@@ -42,17 +39,13 @@ def menu() -> None:
         delta: float = delta_time * TARGET_FPS
         last_time = now
 
-        events: MenuEvents = _update_events(events)
-        if events.up:
-            idx = max(0, idx - 1)
-        elif events.down:
-            idx = min(len(MENU_BUTTONS_LABELS) - 1, idx + 1)
+        event: MenuEvent = _menu_event()
+        idx = _update_button_idx(idx, event, len(MENU_BUTTONS_LABELS))
 
-        elif events.enter:
-            # TODO add settings screen
+        if event == MenuEvent.ENTER:
             if idx == 0:
                 over = True
-            elif idx == 2:
+            elif idx == 1:
                 end_program()
 
         if random() < MENU_PARTICLE_SPAWN_RATE:
@@ -61,39 +54,48 @@ def menu() -> None:
         screen.fill(BLACK)
         menu_particles = update_display_menu_particles(menu_particles, screen, delta)
         _display_title(screen)
-        _display_buttons(screen, idx, timer)
+        _display_buttons(MENU_BUTTONS_LABELS, SCREEN_SIZE[1] // 2, screen, idx, timer)
 
         pygame.display.flip()
         timer += delta_time
 
 
-def _update_events(events: MenuEvents) -> MenuEvents:
+def _menu_event() -> MenuEvent:
     """
-    Update events from pygame event queue inside menu screen.
+    Get current frame menu event.
 
-    :param events: events data
-    :return: updated events data
+    :return: menu event enum
     """
-    up: bool = False
-    down: bool = False
-    enter: bool = False
-
     for event in pygame.event.get():
 
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 end_program()
-            elif event.key == K_UP:
-                up = True
-            elif event.key == K_DOWN:
-                down = True
-            elif event.key == K_RETURN:
-                enter = True
+            if event.key == K_UP:
+                return MenuEvent.UP
+            if event.key == K_DOWN:
+                return MenuEvent.DOWN
+            if event.key == K_RETURN:
+                return MenuEvent.ENTER
 
         elif event.type == QUIT:
             end_program()
 
-    return replace(events, up=up, down=down, enter=enter)
+
+def _update_button_idx(idx: int, event: MenuEvent, n: int) -> int:
+    """
+    Update button index based on frame event.
+
+    :param idx: current button index
+    :param event: menu event enum
+    :param n: number of buttons
+    :return: updated button index
+    """
+    if event == MenuEvent.UP:
+        return max(0, idx - 1)
+    if event == MenuEvent.DOWN:
+        return min(n - 1, idx + 1)
+    return idx
 
 
 def _display_title(screen: Surface) -> None:
@@ -109,17 +111,19 @@ def _display_title(screen: Surface) -> None:
     )
 
 
-def _display_buttons(screen: Surface, idx: int, timer: float) -> None:
+def _display_buttons(buttons_labels: list[str], starting_height: int, screen: Surface, idx: int, timer: float) -> None:
     """
-    Displays buttons on screen.
+    Displays button list on screen.
 
-    :type timer:
+    :param buttons_labels: list of buttons labels
+    :param starting_height: height of the most upper button
+    :type timer: game timer
     :param screen: screen surface
     :param idx: index of the button to highlight
     """
-    height = SCREEN_SIZE[1] // 2
+    height: int = starting_height
 
-    for i, label in enumerate(MENU_BUTTONS_LABELS):
+    for i, label in enumerate(buttons_labels):
 
         label_: str = label
         if i == idx:

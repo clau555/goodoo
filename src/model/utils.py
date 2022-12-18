@@ -1,5 +1,5 @@
 import sys
-from typing import List, Sequence
+from typing import Sequence
 
 import pygame
 from numpy import ndarray
@@ -21,7 +21,7 @@ def scale_vec(v: ndarray, length: float) -> ndarray:
     return v / norm(v) * length
 
 
-def animation_frame(sprites: List[Surface], timer: float) -> Surface:
+def animation_frame(sprites: list[Surface], timer: float) -> Surface:
     """
     Returns current frame of an animation based on the given timer.
 

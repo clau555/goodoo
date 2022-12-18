@@ -7,8 +7,8 @@ from pygame.rect import Rect
 from pygame.transform import flip
 
 from src.model.constants import GRAVITY, PLAYER_MAX_V, PLAYER_SPRITE, \
-    PLAYER_GROUND_SPRITES, MUSHROOM_BUMP_FACTOR, ObstacleType
-from src.model.dataclasses import Camera, Player, Obstacle
+    PLAYER_GROUND_SPRITES, MUSHROOM_BUMP_FACTOR
+from src.model.dataclasses import Camera, Player, Mushroom, Amethyst
 from src.model.utils import world_to_grid, moore_neighborhood, idx_inside_grid, animation_frame, clamp_vec
 
 
@@ -52,7 +52,7 @@ def update_player(player: Player, input_velocity: ndarray, cave: ndarray, delta:
 
     player_pos: ndarray = array(player.pos)
     player_rect: Rect = Rect(player.rect)
-    obstacle_collision: bool = False
+    colliding_mushroom: list[Mushroom] = []
 
     neighbor_tiles: ndarray = _neighbor_tiles(player, cave)
     v: ndarray = _update_velocity(player, input_velocity, delta)
@@ -68,14 +68,11 @@ def update_player(player: Player, input_velocity: ndarray, cave: ndarray, delta:
 
             # obstacle repulsion
             obstacle_impulse: float = 0
-            if isinstance(tile, Obstacle):
-                if tile.type is ObstacleType.MUSHROOM:
-                    obstacle_collision = True
-                    obstacle_impulse = v[0] * MUSHROOM_BUMP_FACTOR
-                elif tile.type is ObstacleType.AMETHYST:
-                    alive = False
-                else:
-                    raise ValueError("Unknown obstacle type.")
+            if isinstance(tile, Mushroom):
+                colliding_mushroom.append(tile)
+                obstacle_impulse = v[0] * MUSHROOM_BUMP_FACTOR
+            elif isinstance(tile, Amethyst):
+                alive = False
 
             # collision correction
             if v[0] > 0:
@@ -107,14 +104,11 @@ def update_player(player: Player, input_velocity: ndarray, cave: ndarray, delta:
 
                 # obstacle repulsion
                 obstacle_impulse: float = 0
-                if isinstance(tile, Obstacle):
-                    if tile.type is ObstacleType.MUSHROOM:
-                        obstacle_collision = True
-                        obstacle_impulse = v[1] * MUSHROOM_BUMP_FACTOR
-                    elif tile.type is ObstacleType.AMETHYST:
-                        alive = False
-                    else:
-                        raise ValueError("Unknown obstacle type.")
+                if isinstance(tile, Mushroom):
+                    colliding_mushroom.append(tile)
+                    obstacle_impulse = v[1] * MUSHROOM_BUMP_FACTOR
+                elif isinstance(tile, Amethyst):
+                    alive = False
 
                 # collision correction
                 if v[1] > 0:
@@ -138,7 +132,7 @@ def update_player(player: Player, input_velocity: ndarray, cave: ndarray, delta:
         rect=player_rect,
         velocity=v,
         on_ground=on_ground,
-        obstacle_collision=obstacle_collision,
+        colliding_mushrooms=colliding_mushroom,
         alive=alive
     )
 

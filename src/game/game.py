@@ -1,11 +1,11 @@
 import sys
 import time
 from dataclasses import replace
-from typing import Sequence, List
+from typing import Sequence
 
 import pygame
 from numpy import ndarray, array, ndenumerate, around, zeros
-from numpy.random import random_sample
+from numpy.random import random_sample, randint
 from pygame import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 from pygame.surface import Surface
 from pygame.time import Clock
@@ -14,19 +14,21 @@ from src.game.display.background import display_background
 from src.game.display.camera import update_camera, shake_camera
 from src.game.display.jauge import display_jauge
 from src.game.display.obstacle_particles import update_display_amethyst_particles, spawn_obstacle_particle, \
-    update_display_mushroom_particles
+    update_display_mushroom_particles, spawn_colliding_mushrooms_particles
 from src.game.display.player_particles import spawn_player_particles, update_display_player_particles
 from src.game.gameplay.grapple import update_grapple_start, grapple_acceleration, display_grapple, \
     update_grapple
 from src.game.gameplay.lava import display_lava, update_lava
+from src.game.gameplay.mushroom import update_shaking_mushrooms, add_mushrooms, damage_mushroom
 from src.game.gameplay.player import update_player, display_player
 from src.generation.generation import generate_world
 from src.model.constants import FPS, CURSOR_SPRITE, TILE_EDGE, CURSOR_SIZE, LAVA_WARNING_DURATION, TARGET_FPS, \
-    GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, OBSTACLE_PARTICLE_SPAWN_RATE, ObstacleType, \
+    GRID_HEIGHT, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, OBSTACLE_PARTICLE_SPAWN_RATE, \
     PLAYER_PARTICLES_SPAWN_NUMBER_COLLISION, PLAYER_PARTICLES_SPAWN_NUMBER_DEATH, GAME_OVER_DURATION, KEY_MAPS, \
-    GRAY_LAYER, PAUSE_TEXT, SCREEN_SIZE
-from src.model.dataclasses import Camera, Grapple, Lava, Obstacle, PlayerParticle, Player, GameEvents, \
-    ObstacleParticles, TileMaps
+    GRAY_LAYER, PAUSE_TEXT, SCREEN_SIZE, MUSHROOM_SHAKE_OFFSET
+from src.model.dataclasses import Camera, Grapple, Lava, PlayerParticle, Player, GameEvents, \
+    ObstacleParticles, TileMaps, Amethyst, Mushroom
+from src.model.types import CaveTile
 from src.model.utils import visible_grid, is_pressed, end_program
 
 
@@ -43,7 +45,8 @@ def game(keyboard_layout: str) -> None:
     camera: Camera = Camera(array(player.rect.center))
 
     obstacle_particles: ObstacleParticles = ObstacleParticles()
-    player_particles: List[PlayerParticle] = []
+    player_particles: list[PlayerParticle] = []
+    shaking_mushrooms: list[Mushroom] = []
 
     screen: Surface = pygame.display.get_surface()
     events: GameEvents = GameEvents()
@@ -62,7 +65,7 @@ def game(keyboard_layout: str) -> None:
         clock.tick(FPS)  # limit fps
 
         # pygame events
-        events: GameEvents = _update_events(events, keyboard_layout)
+        events = _update_events(events, keyboard_layout)
 
         # back to menu
         if events.escape:
@@ -110,11 +113,18 @@ def game(keyboard_layout: str) -> None:
             if player.rect.centery >= lava.height:
                 player = replace(player, alive=False)
 
-        # player particles update
-        if player.obstacle_collision:
+        # player collision with mushroom
+        if len(player.colliding_mushrooms) > 0:
             player_particles = spawn_player_particles(
                 player_particles, array(player.rect.center), PLAYER_PARTICLES_SPAWN_NUMBER_COLLISION
             )
+            obstacle_particles = spawn_colliding_mushrooms_particles(player, obstacle_particles)
+
+        # list mushroom for shaking animation
+        shaking_mushrooms = add_mushrooms(shaking_mushrooms, player)
+        shaking_mushrooms = update_shaking_mushrooms(shaking_mushrooms, delta_time)
+
+        tile_maps = damage_mushroom(tile_maps, player)
 
         # game over
         if not player.alive:
@@ -132,7 +142,7 @@ def game(keyboard_layout: str) -> None:
         display_background(player, lava, shake_counter, camera, screen)
 
         # tiles, also spawns obstacle particles
-        obstacle_particles = _display_tile_maps(tile_maps, obstacle_particles, camera, screen)
+        obstacle_particles = _display_tile_maps(tile_maps, shaking_mushrooms, obstacle_particles, camera, screen)
 
         # player
         if events.clicking and player.alive:
@@ -218,18 +228,21 @@ def _key_input_velocity(player: Player, grapple: Grapple, keyboard_layout: str) 
 
 def _display_tile_maps(
         tile_maps: TileMaps,
+        shaking_mushrooms: list[Mushroom],
         particles: ObstacleParticles,
         camera: Camera,
-        screen: Surface
+        screen: Surface,
 ) -> ObstacleParticles:
     """
     Displays the tiles of the tile_cave.
     When an obstacle is on screen, spawns its particles randomly.
 
-    :param particles: obstacle particles
+    :param tile_maps: tile maps data
+    :param shaking_mushrooms: list of shaking mushrooms
+    :param particles: obstacle particles data
     :param camera: camera data
     :param screen: screen surface
-    :return: updated particles
+    :return: updated obstacle particles data
     """
     particles_: ObstacleParticles = particles
 
@@ -241,35 +254,69 @@ def _display_tile_maps(
 
         # cave map
         if visible_cave[i, j]:
-            screen.blit(
-                visible_cave[i, j].sprite,
-                around(visible_cave[i, j].rect.topleft + camera.offset)
-            )
+            tile: CaveTile = visible_cave[i, j]
 
             # generates random particles on obstacles
-            if isinstance(visible_cave[i, j], Obstacle) and random_sample() < OBSTACLE_PARTICLE_SPAWN_RATE:
+            if random_sample() < OBSTACLE_PARTICLE_SPAWN_RATE:
+                particles_ = _create_particles(tile, particles_)
 
-                if visible_cave[i, j].type is ObstacleType.MUSHROOM:
-                    particles_ = replace(particles_, mushroom=spawn_obstacle_particle(
-                        particles_.mushroom,
-                        array(visible_cave[i, j].rect.center)
-                    ))
-                elif visible_cave[i, j].type is ObstacleType.AMETHYST:
-                    particles_ = replace(particles_, amethyst=spawn_obstacle_particle(
-                        particles_.amethyst,
-                        array(visible_cave[i, j].rect.center)
-                    ))
-                else:
-                    raise ValueError("Unknown obstacle type.")
+            # non-zero when tile is a shaking mushroom
+            shake_offset = _shaking_offset(tile, shaking_mushrooms)
+
+            # cave tile display
+            screen.blit(
+                tile.sprite,
+                around(tile.rect.topleft + camera.offset + shake_offset)
+            )
 
         # decoration map
         if visible_decoration[i, j]:
+            tile: Mushroom | Amethyst | None = visible_decoration[i, j]
             screen.blit(
-                visible_decoration[i, j].sprite,
-                around(visible_decoration[i, j].rect.topleft + camera.offset)
+                tile.sprite,
+                around(tile.rect.topleft + camera.offset)
             )
 
     return particles_
+
+
+def _create_particles(tile: CaveTile, particles: ObstacleParticles) -> ObstacleParticles:
+    """
+    Create a new particle corresponding to an obstacle tile.
+
+    :param tile: tile in tile map
+    :param particles: list of shaking mushrooms
+    :return: updated particles data
+    """
+    if isinstance(tile, Mushroom):
+        return replace(particles, mushroom=spawn_obstacle_particle(
+            particles.mushroom,
+            array(tile.rect.center)
+        ))
+
+    if isinstance(tile, Amethyst):
+        return replace(particles, amethyst=spawn_obstacle_particle(
+            particles.amethyst,
+            array(tile.rect.center)
+        ))
+
+    return particles
+
+
+def _shaking_offset(tile: CaveTile, shaking_mushrooms: list[Mushroom]) -> ndarray:
+    """
+    Offset of a tile used for shaking animation.
+    Applies to mushrooms who had been hit by player.
+    Return a zero array if no offset has to be applied.
+
+    :param tile: tile in tile map
+    :param shaking_mushrooms: list of shaking mushrooms
+    :return: tile offset for shaking effect
+    """
+    shake_offset: ndarray = zeros(2)
+    if tile in shaking_mushrooms:
+        shake_offset = randint(-MUSHROOM_SHAKE_OFFSET, MUSHROOM_SHAKE_OFFSET, 2)
+    return shake_offset
 
 
 def _pause(keyboard_layout: str, screen: Surface) -> float:

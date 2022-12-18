@@ -1,54 +1,48 @@
-<p align="center">
-    <img src="resources/title.png" alt="title" />
-</p>
-
----
-
 Goodoo is a procedural 2D platformer video game which started as a broken student project and is built with
 [Pygame](https://github.com/pygame/pygame).  
 Its name has been chosen randomly and has no specific meaning.
 This game is the result of many redesigns through the years by an inexperienced developer who has no idea how game
 design works.  
-And yes, I commit on master, I should burn in hell for that (and don't look at the commit history it's an absolute mess)
-.
+And yes, I commit on master, I should burn in hell for that (and don't look at the commit history it's an absolute
+mess).
 
-## Running from sources
+## :computer: Running from sources
 
-This program requires python installed.
+### Requirements
 
-First download the repository or clone it to your computer.
-
-```bash
-git clone https://github.com/clau555/goodoo.git
-```
-
+This program requires python 3.10 or above.  
 You can use pip to install the required libraries.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Then run the main file.
+### Run
 
 ```bash
 python3 goodoo.py
 ```
 
-You can run with AZERTY keys with:
+The keyboard layout is in QWERTY by default, you can run with AZERTY keys with:
 
 ```bash
 python3 goodoo.py AZERTY
 ```
 
-## Gameplay
+## :video_game: Gameplay
 
 You're an animated small ball of goo that fell into a cave full of lava at the bottom and your goal is to reach the top
 of the cave to escape.  
-You've got to do this quickly as lava will start to rise once a certain height is reached.  
-Be careful on your way as mushrooms will bump you in the opposite way and pointy minerals will kill you instantly.
+You've got to do this quickly as lava will start to rise once a certain height is reached.
 
-You can click to project yourself on the walls like a true Spider-Man and move yourself from left to right while you're
+Because you're just a ball of goo, you can't move by yourself.  
+One click will project your goo material on the walls like a true Spider-Man, and move yourself from left to right while
+you're
 in the air.
+
+Be careful on your way as mushrooms will bump you in the opposite way. Luckily, they can be destroyed if you hit them
+several times.  
+There's also pointy purple minerals that will kill you instantly, so watch your steps around them.
 
 ### Default keys
 
@@ -60,7 +54,7 @@ in the air.
 | pause        |      `p`      |
 | end game     |   `escape`    |
 
-## Cave generation
+## :volcano: Cave generation
 
 The goal is to generate a tile cave only opened at the top, where the player can climb to.
 
@@ -76,7 +70,7 @@ stuck in its progression.
 Non physic tiles, called "decorations" are placed randomly in a separated map, with each decoration type satisfying
 its own generation constraint.
 
-## I don't like OOP :(
+## :frowning_face: I don't like OOP
 
 Object-Oriented is cool for API frameworks and (sometimes) polymorphism, and all, but when having a linear execution
 it's just overkill and added complexity for nothing, with attributes modified anywhere just like they're global

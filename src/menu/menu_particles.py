@@ -1,6 +1,5 @@
 from dataclasses import replace
 from random import random, getrandbits
-from typing import List
 
 from numpy import around, ndarray, array
 from pygame import Rect
@@ -12,14 +11,14 @@ from src.model.dataclasses import MenuParticle
 from src.model.utils import clamp_vec
 
 
-def spawn_menu_particle(particles: List[MenuParticle]) -> List[MenuParticle]:
+def spawn_menu_particle(particles: list[MenuParticle]) -> list[MenuParticle]:
     """
     Spawns a menu particle at a random position on top of the screen.
 
     :param particles: menu particle data
     :return: updated menu particles list
     """
-    particles_: List[MenuParticle] = particles.copy()
+    particles_: list[MenuParticle] = particles.copy()
 
     pos: ndarray = array((
         random() * SCREEN_SIZE[0] - PLAYER_SIZE[0],
@@ -36,7 +35,7 @@ def spawn_menu_particle(particles: List[MenuParticle]) -> List[MenuParticle]:
     return particles_
 
 
-def update_display_menu_particles(particles: List[MenuParticle], screen: Surface, delta: float) -> List[MenuParticle]:
+def update_display_menu_particles(particles: list[MenuParticle], screen: Surface, delta: float) -> list[MenuParticle]:
     """
     Updates then display on screen a menu particles list.
 
@@ -45,7 +44,7 @@ def update_display_menu_particles(particles: List[MenuParticle], screen: Surface
     :param delta: delta between two frames
     :return: updated menu particles list
     """
-    particles_: List[MenuParticle] = particles.copy()
+    particles_: list[MenuParticle] = particles.copy()
     for i, _ in enumerate(particles_):
 
         particles_[i] = _update_particle(particles_[i], delta)

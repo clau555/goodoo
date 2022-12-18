@@ -1,20 +1,19 @@
 from dataclasses import replace
 from random import random
-from typing import List
 
 from numpy import around, ndarray, array
-from numpy.random import rand, choice
+from numpy.random import rand, choice, random_sample
 from pygame import draw
 from pygame.surface import Surface
 
 from src.model.constants import ANIMATION_SPEED, AMETHYST_PARTICLE_SPRITES, TILE_SIZE, MUSHROOM_PARTICLE_LIFESPAN, \
     MUSHROOM_PARTICLE_VELOCITY_NORM, MUSHROOM_PARTICLE_RADIUS, MUSHROOM_PARTICLE_COLOR, \
     MUSHROOM_PARTICLE_LIGHT_RADIUS, MUSHROOM_PARTICLE_LIGHT_TRANSPARENCY, BLACK
-from src.model.dataclasses import ObstacleParticle, Camera, ObstacleParticles
+from src.model.dataclasses import ObstacleParticle, Camera, ObstacleParticles, Player
 from src.model.utils import scale_vec
 
 
-def spawn_obstacle_particle(particles: List[ObstacleParticle], pos: ndarray) -> List[ObstacleParticle]:
+def spawn_obstacle_particle(particles: list[ObstacleParticle], pos: ndarray) -> list[ObstacleParticle]:
     """
     Spawns a particle in a particle list at the given world position.
 
@@ -22,10 +21,30 @@ def spawn_obstacle_particle(particles: List[ObstacleParticle], pos: ndarray) -> 
     :param pos: world position
     :return: updated particles data list
     """
-    particles_: List[ObstacleParticle] = particles.copy()
+    particles_: list[ObstacleParticle] = particles.copy()
     particle_pos: ndarray = pos + rand(2) * choice([-1, 1], 2) * TILE_SIZE / 2
     particles_.append(ObstacleParticle(particle_pos))
     return particles_
+
+
+def spawn_colliding_mushrooms_particles(
+        player: Player,
+        obstacle_particles: ObstacleParticles
+) -> ObstacleParticles:
+    """
+    Returns the obstacle particles data with mushroom particles spawned at the mushroom's position.
+
+    :param player: player data
+    :param obstacle_particles: obstacle particles data
+    :return: updated obstacle particles data
+    """
+    for mushroom in player.colliding_mushrooms:
+        for _ in range(5):
+            obstacle_particles = replace(obstacle_particles, mushroom=spawn_obstacle_particle(
+                obstacle_particles.mushroom,
+                array(mushroom.rect.center) + (random_sample(2) - 0.5) * 20
+            ))
+    return obstacle_particles
 
 
 def update_display_amethyst_particles(
@@ -44,7 +63,7 @@ def update_display_amethyst_particles(
     :param delta_time: delta time between two frames
     :return: updated particles data list
     """
-    particles_: List[ObstacleParticle] = particles.amethyst
+    particles_: list[ObstacleParticle] = particles.amethyst
     for i, _ in enumerate(particles_):
 
         particles_[i] = replace(particles_[i], timer=particles_[i].timer + delta_time)
@@ -75,7 +94,7 @@ def update_display_mushroom_particles(
     :param delta_time: delta time between two frames
     :return: updated particles data list
     """
-    particles_: List[ObstacleParticle] = particles.mushroom
+    particles_: list[ObstacleParticle] = particles.mushroom
     for i, _ in enumerate(particles_):
 
         # particle goes up in random direction

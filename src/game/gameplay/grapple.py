@@ -43,7 +43,9 @@ def update_grapple(
         delta: float
 ) -> Grapple:
     """
-    Updates the grapple data.
+    Sets grapple target position (end) on player click.
+    Updates grapple head position (head) one step toward the end when clicking.
+    Resets grapple head position (head) to the player's position when releasing the click.
 
     :param grapple: grapple data
     :param events: pygame events
@@ -54,13 +56,20 @@ def update_grapple(
     """
     grapple_ = replace(grapple)
 
-    if events.click:
+    if events.click \
+            or events.clicking and not _colliding(grapple_.end, tile_cave):
         grapple_ = _fire(grapple_, tile_cave, camera)
 
     if events.clicking:
+        # updating grapple head position towards the end
         return _update_grapple_head(grapple_, delta)
 
     return _reset_grapple_head(grapple_)
+
+
+def _colliding(point: ndarray, tile_grid: ndarray) -> bool:
+    idx: ndarray = world_to_grid(point)
+    return tile_grid[idx[0], idx[1]]
 
 
 def update_grapple_start(grapple: Grapple, player: Player) -> Grapple:
@@ -93,18 +102,11 @@ def _fire(grapple: Grapple, tile_cave: ndarray, camera: Camera) -> Grapple:
     if norm(step) != 0:
 
         step = scale_vec(step, GRAPPLE_VECTOR_STEP)
-
-        collide: bool = False
         inside_grid: bool = True
-
         end += step
 
         # increasing vector until it collides with a tile or goes out of screen
-        while not collide and inside_grid:
-
-            idx: ndarray = world_to_grid(end)
-            if tile_cave[idx[0], idx[1]]:
-                collide = True
+        while not _colliding(end, tile_cave) and inside_grid:
             end += step
             inside_grid = pos_inside_grid(end)
 
@@ -140,7 +142,12 @@ def _reset_grapple_head(grapple: Grapple) -> Grapple:
     :param grapple: grapple data
     :return: updated grapple data
     """
-    return replace(grapple, head=grapple.start, head_velocity=zeros(2), head_start=grapple.start)
+    return replace(
+        grapple,
+        head=grapple.start,
+        head_velocity=zeros(2),
+        head_start=grapple.start
+    )
 
 
 def grapple_acceleration(grapple: Grapple) -> ndarray:

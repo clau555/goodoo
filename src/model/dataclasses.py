@@ -1,10 +1,9 @@
 from dataclasses import dataclass, field
-from typing import List
 
 from numpy import ndarray, zeros
 from pygame import Rect, Surface
 
-from src.model.constants import ObstacleType, PLAYER_PARTICLE_INIT_RADIUS
+from src.model.constants import PLAYER_PARTICLE_INIT_RADIUS, MUSHROOM_SHAKE_DURATION, MUSHROOM_HEALTH_POINTS
 
 
 @dataclass(frozen=True)
@@ -28,13 +27,25 @@ class TileMaps:
 
 
 @dataclass(frozen=True)
-class Obstacle:
+class Mushroom:
     """
-    Tile with special behavior when colliding with player.
+    Mushroom obstacle, makes the player bounce on it on collision.
+    It needs a hit counter to be destroyed.
     """
     rect: Rect
     sprite: Surface
-    type: ObstacleType
+    health: int = field(default=MUSHROOM_HEALTH_POINTS, compare=False)
+    alive: bool = field(default=True, compare=False)
+    shake_counter: float = field(default=MUSHROOM_SHAKE_DURATION, compare=False)
+
+
+@dataclass(frozen=True)
+class Amethyst:
+    """
+    Amethyst obstacle, kills the player on collision.
+    """
+    rect: Rect
+    sprite: Surface
 
 
 @dataclass(frozen=True)
@@ -50,10 +61,10 @@ class ObstacleParticle:
 @dataclass(frozen=True)
 class ObstacleParticles:
     """
-    Contains list of currently displayed obstacle particles.
+    Contains the lists of currently displayed obstacle particles.
     """
-    amethyst: List[ObstacleParticle] = field(default_factory=lambda: [])
-    mushroom: List[ObstacleParticle] = field(default_factory=lambda: [])
+    amethyst: list[ObstacleParticle] = field(default_factory=lambda: [])
+    mushroom: list[ObstacleParticle] = field(default_factory=lambda: [])
 
 
 @dataclass(frozen=True)
@@ -66,7 +77,7 @@ class Player:
     rect: Rect
     velocity: ndarray = zeros(2)
     on_ground: bool = False
-    obstacle_collision: bool = False
+    colliding_mushrooms: list[Mushroom] = field(default_factory=lambda: [])
     alive: bool = True
 
 
@@ -90,9 +101,9 @@ class Grapple:
     """
     start: ndarray = zeros(2)  # start position of the grapple (=player position) in world space
     end: ndarray = zeros(2)  # end position of the grapple in world space
+    head_start: ndarray = zeros(2)  # position at which the head is fired
     head: ndarray = zeros(2)  # actual grapple head position
     head_velocity: ndarray = zeros(2)  # speed of the head
-    head_start: ndarray = zeros(2)  # point at which the head is fired
 
 
 @dataclass(frozen=True)
@@ -127,19 +138,9 @@ class GameEvents:
 
 
 @dataclass(frozen=True)
-class MenuEvents:
-    """
-    Boolean of events that can occurs in the menu screen.
-    """
-    up: bool = False  # true when up key is down
-    down: bool = False  # true when down key is down
-    enter: bool = False  # true when enter key is down
-
-
-@dataclass(frozen=True)
 class MenuParticle:
     """
-    Falling sprite in the background of the menu screen.
+    Falling player sprite in the background of the menu screen.
     All of its coordinate system is in screen space.
     """
     pos: ndarray
