@@ -75,7 +75,7 @@ class Player:
     """
     pos: ndarray  # in world space
     rect: Rect
-    velocity: ndarray = zeros(2)
+    velocity: ndarray = field(default_factory=lambda: zeros(2))
     on_ground: bool = False
     colliding_mushrooms: list[Mushroom] = field(default_factory=lambda: [])
     alive: bool = True
@@ -99,11 +99,16 @@ class Grapple:
     A head can be fired from the player position to go to the target position, at a certain speed.
     The grapple provides an output velocity that applied to the player when it reached its target.
     """
-    start: ndarray = zeros(2)  # start position of the grapple (=player position) in world space
-    end: ndarray = zeros(2)  # end position of the grapple in world space
-    head_start: ndarray = zeros(2)  # position at which the head is fired
-    head: ndarray = zeros(2)  # actual grapple head position
-    head_velocity: ndarray = zeros(2)  # speed of the head
+    # start position of the grapple (=player position) in world space
+    start: ndarray = field(default_factory=lambda: zeros(2))
+    # end position of the grapple in world space
+    end: ndarray = field(default_factory=lambda: zeros(2))
+    # position at which the head is fired
+    head_start: ndarray = field(default_factory=lambda: zeros(2))
+    # actual grapple head position
+    head: ndarray = field(default_factory=lambda: zeros(2))
+    # speed of the head
+    head_velocity: ndarray = field(default_factory=lambda: zeros(2))
 
 
 @dataclass(frozen=True)
@@ -121,9 +126,12 @@ class Camera:
     """
     Determine the boundaries and offset to apply to displayed sprites to follow a target during game.
     """
-    center: ndarray  # world position on which the camera is centered
-    top_left: ndarray = zeros(2)  # world position of the top left corner of the camera
-    offset: ndarray = zeros(2)  # offset to apply to a sprite position to get its screen position
+    # world position on which the camera is centered
+    center: ndarray
+    # world position of the top left corner of the camera
+    top_left: ndarray = field(default_factory=lambda: zeros(2))
+    # offset to apply to a sprite position to get its screen position
+    offset: ndarray = field(default_factory=lambda: zeros(2))
 
 
 @dataclass(frozen=True)
