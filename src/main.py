@@ -1,9 +1,9 @@
 import pygame
-from pygame import FULLSCREEN, SCALED, QUIT, KEYDOWN, MOUSEBUTTONUP, MOUSEBUTTONDOWN
+from pygame import QUIT, KEYDOWN, MOUSEBUTTONUP, MOUSEBUTTONDOWN, FULLSCREEN, SCALED
 
-from src.game.game import game
-from src.menu.menu import menu
-from src.model.constants import WINDOW_ICON, WINDOW_TITLE, SCREEN_SIZE
+from src.game import Game
+from src.menu.menu import Menu
+from src.utils.constants import WINDOW_ICON, WINDOW_TITLE, SCREEN_SIZE
 
 
 def main(keyboard_layout: str) -> None:
@@ -14,13 +14,13 @@ def main(keyboard_layout: str) -> None:
     """
     _create_window()
     while True:
-        menu()
-        game(keyboard_layout)
+        Menu().run()
+        Game(keyboard_layout).run()
 
 
 def _create_window() -> None:
     """
-    Creates the window with the proper settings.
+    Creates the window with its proper settings.
     """
     pygame.init()
     pygame.display.set_icon(WINDOW_ICON)

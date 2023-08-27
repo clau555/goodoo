@@ -1,3 +1,5 @@
+<img src="resources/title.png" alt="game title" />
+
 Goodoo is a procedural 2D platformer video game which started as a broken student project and is built with
 [Pygame](https://github.com/pygame/pygame).  
 Its name has been chosen randomly and has no specific meaning.
@@ -10,7 +12,7 @@ mess).
 
 ### Requirements
 
-This program requires python 3.10 or above.  
+This program has been tested on python 3.11.  
 You can use pip to install the required libraries.
 
 ```bash
@@ -31,6 +33,8 @@ python3 goodoo.py AZERTY
 
 ## :video_game: Gameplay
 
+<img src="resources/gameplay.gif" alt="gameplay recording" width="500" />
+
 You're an animated small ball of goo that fell into a cave full of lava at the bottom and your goal is to reach the top
 of the cave to escape.  
 You've got to do this quickly as lava will start to rise once a certain height is reached.
@@ -40,25 +44,24 @@ One click will project your goo material on the walls like a true Spider-Man, an
 you're
 in the air.
 
-Be careful on your way as mushrooms will bump you in the opposite way. Luckily, they can be destroyed if you hit them
-several times.  
+Be careful on your way as mushrooms will bump you in the opposite way.
 There's also pointy purple minerals that will kill you instantly, so watch your steps around them.
 
 ### Default keys
 
-| Action       |      Key      |
-|--------------|:-------------:|
-| fire grapple | `left click`  |
-| left         | `a` / `left`  |
-| right        | `d` / `right` |
-| pause        |      `p`      |
-| end game     |   `escape`    |
+| Action             |      Key      |
+|--------------------|:-------------:|
+| fire grapple       | `left click`  |
+| left (in the air)  | `a` / `left`  |
+| right (in the air) | `d` / `right` |
+| pause              |      `p`      |
+| end game           |   `escape`    |
 
 ## :volcano: Cave generation
 
 The goal is to generate a tile cave only opened at the top, where the player can climb to.
 
-The map generation works as grid where we play a cave generator cellular automaton, which creates several rooms inside
+The map generation works as a grid where we play a cave generator cellular automaton, which creates several rooms inside
 the map.  
 We then dig connections between neighboring rooms to make sure any rooms can be accessible starting from any other
 room.  
@@ -70,27 +73,6 @@ stuck in its progression.
 Non physic tiles, called "decorations" are placed randomly in a separated map, with each decoration type satisfying
 its own generation constraint.
 
-## :frowning_face: I don't like OOP
-
-Object-Oriented is cool for API frameworks and (sometimes) polymorphism, and all, but when having a linear execution
-it's just overkill and added complexity for nothing, with attributes modified anywhere just like they're global
-variables.  
-In that case, instead of going straight for OOP without thinking, consider using functions, and even more functions,
-please :cry:
-
-This project tries to implement **some** principles of the Data-Oriented Programming paradigm
-[described by Yehonathan Sharvit](https://blog.klipse.tech/dop/2022/06/22/principles-of-dop.html).  
-So this program respects :
-
-- **Data and code separation** - to free the program from any object dependency graph or spaghetti code, and making it a
-  bit more linear to read than OOP.
-- **Immutable data** - to minimize side effects and forcing the use of pure functions. This is achieved by using
-  python's frozen [dataclasses](https://docs.python.org/3/library/dataclasses.html).
-
-In the end the code looks like procedural programming with structs and functions, but this is where the idea
-came from, and it took me a lot of effort to figure it out in my head, ok ??  
-Ok that's enough of me raging over a paradigm and justifying my code.
-
 ---
 
-<img src="resources/goodoo.gif" alt="gif">&nbsp;*That's all folks!*</img>
+<img src="resources/goodoo.gif" alt="happy goodoo">&nbsp;*That's all folks!*</img>

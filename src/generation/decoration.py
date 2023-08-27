@@ -5,8 +5,8 @@ from numpy.random import choice, randint
 from pygame import Rect
 from scipy.ndimage import maximum_filter, minimum_filter
 
-from src.model.constants import GRID_SIZE, FOSSIL_DENSITY, TILE_SIZE, FOSSIL_SPRITES, SPIKE_SPRITES, SPIKE_DENSITY
-from src.model.dataclasses import Tile
+from src.tiles.tile import Tile
+from src.utils.constants import GRID_SIZE, FOSSIL_DENSITY, FOSSIL_SPRITES, SPIKE_SPRITES, SPIKE_DENSITY, TILE_SIZE
 
 
 def generate_decoration(cave: ndarray) -> ndarray:
