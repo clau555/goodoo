@@ -1,140 +1,115 @@
-import time
 from random import random
 
 import pygame
 from numpy import array, ndarray
 from pygame import KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_RETURN, QUIT
 from pygame.surface import Surface
-from pygame.time import Clock
 
-from src.menu.menu_particles import spawn_menu_particle, update_display_menu_particles
-from src.model.constants import BLACK, SCREEN_SIZE, MENU_TITLE, TARGET_FPS, \
-    FPS, MENU_PARTICLE_SPAWN_RATE, MENU_BUTTONS_LABELS, FONT_TEXT, WHITE, MENU_BUTTON_MARGIN
-from src.model.dataclasses import MenuParticle
-from src.model.types import MenuEvent
-from src.model.utils import end_program
+from src.menu.menu_particles import MenuParticle
+from src.utils.constants import BLACK, SCREEN_SIZE, FONT_TEXT, WHITE, MENU_TITLE, MENU_BUTTONS_LABELS, \
+    MENU_BUTTON_MARGIN, MENU_PARTICLE_SPAWN_RATE
+from src.utils.game_timer import GameTimer
+from src.utils.utils import end_program
 
 
-def menu() -> None:
+class Menu:
     """
-    Handles menu screen logic.
+    Handles the program when running the menu screen.
     """
-    screen: Surface = pygame.display.get_surface()
-    over: bool = False
 
-    menu_particles: list[MenuParticle] = []
+    def __init__(self):
+        self._is_running: bool = True
+        self._screen: Surface = pygame.display.get_surface()
+        self._particles: list[MenuParticle] = []
+        self._selected_index: int = 0
+        self._timer = GameTimer()
 
-    clock: Clock = Clock()
-    last_time: float = time.time()
-    timer: float = 0
+    def run(self) -> None:
+        while self._is_running:
+            self._timer.update()
+            self._update(self._timer.delta)
+            self._display()
 
-    idx: int = 0  # current selected button index
+    def _update(self, delta: float) -> None:
+        self._update_from_events()
+        if Menu._can_spawn_particle():
+            self._particles.append(MenuParticle())
+        self._update_particles(delta)
 
-    while not over:
-
-        clock.tick(FPS)
-
-        now: float = time.time()
-        delta_time: float = (now - last_time)
-        delta: float = delta_time * TARGET_FPS
-        last_time = now
-
-        event: MenuEvent = _menu_event()
-        idx = _update_button_idx(idx, event, len(MENU_BUTTONS_LABELS))
-
-        if event == MenuEvent.ENTER:
-            if idx == 0:
-                over = True
-            elif idx == 1:
+    def _update_from_events(self) -> None:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                self._update_from_input(event.key)
+            elif event.type == QUIT:
                 end_program()
 
-        if random() < MENU_PARTICLE_SPAWN_RATE:
-            menu_particles = spawn_menu_particle(menu_particles)
+    def _update_from_input(self, input_key: int) -> None:
+        if input_key == K_UP:
+            self._update_button_up()
 
-        screen.fill(BLACK)
-        menu_particles = update_display_menu_particles(menu_particles, screen, delta)
-        _display_title(screen)
-        _display_buttons(MENU_BUTTONS_LABELS, SCREEN_SIZE[1] // 2, screen, idx, timer)
+        elif input_key == K_DOWN:
+            self._update_button_down()
 
-        pygame.display.flip()
-        timer += delta_time
-
-
-def _menu_event() -> MenuEvent:
-    """
-    Get current frame menu event.
-
-    :return: menu event enum
-    """
-    for event in pygame.event.get():
-
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
+        elif input_key == K_RETURN:
+            if self._selected_index == 0:
+                self._is_running = False  # pass to the next screen
+            elif self._selected_index == 1:
                 end_program()
-            if event.key == K_UP:
-                return MenuEvent.UP
-            if event.key == K_DOWN:
-                return MenuEvent.DOWN
-            if event.key == K_RETURN:
-                return MenuEvent.ENTER
 
-        elif event.type == QUIT:
+        elif input_key == K_ESCAPE:
             end_program()
 
+    def _update_button_up(self) -> None:
+        self._selected_index = max(0, self._selected_index - 1)
 
-def _update_button_idx(idx: int, event: MenuEvent, n: int) -> int:
-    """
-    Update button index based on frame event.
+    def _update_button_down(self) -> None:
+        self._selected_index = min(len(MENU_BUTTONS_LABELS) - 1, self._selected_index + 1)
 
-    :param idx: current button index
-    :param event: menu event enum
-    :param n: number of buttons
-    :return: updated button index
-    """
-    if event == MenuEvent.UP:
-        return max(0, idx - 1)
-    if event == MenuEvent.DOWN:
-        return min(n - 1, idx + 1)
-    return idx
+    @staticmethod
+    def _can_spawn_particle() -> bool:
+        return random() < MENU_PARTICLE_SPAWN_RATE
 
+    def _update_particles(self, delta: float) -> None:
+        for _, particle in enumerate(self._particles):
+            particle: MenuParticle
+            particle.update(delta)
 
-def _display_title(screen: Surface) -> None:
-    """
-    Displays title on screen.
+            if particle.is_outside_screen():
+                index: int = self._particles.index(particle)
+                self._particles.pop(index)
 
-    :param screen: screen surface
-    """
-    screen.blit(
-        MENU_TITLE,
-        (SCREEN_SIZE[0] // 2 - MENU_TITLE.get_rect().w // 2,
-         SCREEN_SIZE[1] / 3 - MENU_TITLE.get_rect().h)
-    )
+    def _display(self):
+        self._screen.fill(BLACK)
+        self._display_particles()
+        self._display_title()
+        self._display_buttons()
+        pygame.display.flip()
 
+    def _display_title(self) -> None:
+        x: int = SCREEN_SIZE[0] // 2 - MENU_TITLE.get_rect().w // 2
+        y: int = SCREEN_SIZE[1] / 3 - MENU_TITLE.get_rect().h
+        self._screen.blit(MENU_TITLE, (x, y))
 
-def _display_buttons(buttons_labels: list[str], starting_height: int, screen: Surface, idx: int, timer: float) -> None:
-    """
-    Displays button list on screen.
+    def _display_buttons(self) -> None:
+        y: int = int(SCREEN_SIZE[1]) // 2
 
-    :param buttons_labels: list of buttons labels
-    :param starting_height: height of the most upper button
-    :type timer: game timer
-    :param screen: screen surface
-    :param idx: index of the button to highlight
-    """
-    height: int = starting_height
+        for i, label in enumerate(MENU_BUTTONS_LABELS):
 
-    for i, label in enumerate(buttons_labels):
+            button_text: str = label
+            if i == self._selected_index:
+                if self._timer.time_elapsed % 1 < 0.5:
+                    button_text = f"[ {label} ]"
+                else:
+                    button_text = f"[  {label}  ]"
 
-        label_: str = label
-        if i == idx:
-            if timer % 1 < 0.5:
-                label_ = f"[ {label} ]"
-            else:
-                label_ = f"[  {label}  ]"
+            button: Surface = FONT_TEXT.render(button_text, False, WHITE)
+            x: int = SCREEN_SIZE[0] // 2 - button.get_rect().w // 2
+            position: ndarray = array((x, y))
 
-        button: Surface = FONT_TEXT.render(label_, False, WHITE)
-        pos: ndarray = array((SCREEN_SIZE[0] // 2 - button.get_rect().w // 2, height))
+            self._screen.blit(button, position)
+            y += button.get_rect().h + MENU_BUTTON_MARGIN
 
-        screen.blit(button, pos)
-
-        height += button.get_rect().h + MENU_BUTTON_MARGIN
+    def _display_particles(self) -> None:
+        for _, particle in enumerate(self._particles):
+            particle: MenuParticle
+            particle.display(self._screen)

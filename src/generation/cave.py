@@ -3,14 +3,15 @@ from typing import List
 from numpy import ndarray, argwhere, invert, zeros, amin, array, sign, empty, int8, ndenumerate
 from numpy.random import choice, random_sample
 from pygame import Surface, Rect
-from pygame.transform import rotate
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
-from src.model.constants import GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_WIDTH, TILE_SPRITES, TILE_SIZE, \
-    OBSTACLE_MAX_DENSITY, GRID_HEIGHT, AMETHYST_DENSITY, AMETHYST_SPRITE, MUSHROOM_SPRITE
-from src.model.dataclasses import Tile, Amethyst, Mushroom
-from src.model.utils import moore_neighborhood
+from src.tiles.amethyst import Amethyst
+from src.tiles.mushroom import Mushroom
+from src.tiles.tile import Tile
+from src.utils.constants import GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_WIDTH, TILE_SPRITES, \
+    OBSTACLE_MAX_DENSITY, GRID_HEIGHT, TILE_SIZE, AMETHYST_DENSITY
+from src.utils.utils import moore_neighborhood
 
 
 def generate_cave(grid: ndarray) -> ndarray:
@@ -42,18 +43,17 @@ def generate_cave(grid: ndarray) -> ndarray:
         if cell:
             # choosing tile sprite depending on neighborhood
             sprite: Surface = TILE_SPRITES[neighbor_patterns.index(list(neumann_neighbors))]
-            tile_cave[i, j] = Tile(Rect(idx * TILE_SIZE, tuple(TILE_SIZE)), sprite)
+            rect: Rect = Rect(idx * TILE_SIZE, tuple(TILE_SIZE))
+            tile_cave[i, j] = Tile(rect, sprite)
 
-        # adding randomly obstacle on empty tile
-        # the higher the tile the more it's likely to spawn
-        elif random_sample() < OBSTACLE_MAX_DENSITY * (GRID_HEIGHT - j) / GRID_HEIGHT and angle:
-
+        # adding randomly an obstacle on empty tile, the obstacle should be facing down
+        elif should_spawn_obstacle(j) and angle:
             rect: Rect = Rect(idx * TILE_SIZE, tuple(TILE_SIZE))
 
             if random_sample() < AMETHYST_DENSITY:
-                tile_cave[i, j] = Amethyst(rect, rotate(AMETHYST_SPRITE, angle))
+                tile_cave[i, j] = Amethyst(rect, angle)
             else:
-                tile_cave[i, j] = Mushroom(rect, rotate(MUSHROOM_SPRITE, angle))
+                tile_cave[i, j] = Mushroom(rect, angle)
 
             grid_with_obstacles[i, j] = 2  # marking this tile as occupied by an obstacle
 
@@ -61,6 +61,16 @@ def generate_cave(grid: ndarray) -> ndarray:
             tile_cave[i, j] = None
 
     return tile_cave
+
+
+def should_spawn_obstacle(height: int) -> bool:
+    """
+    Tells randomly to place an obstacle tile or not depending the height on the map.
+    The higher the height the more it's likely to spawn.
+
+    :param height: height of the obstacle to spawn
+    """
+    return random_sample() < OBSTACLE_MAX_DENSITY * (GRID_HEIGHT - height) / GRID_HEIGHT
 
 
 def _cartesian_list() -> List:

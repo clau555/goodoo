@@ -7,28 +7,27 @@ from pygame import Rect
 from src.generation.cave import generate_cave_grid, rooms_connections_points, generate_connections, generate_exit, \
     generate_cave
 from src.generation.decoration import generate_decoration
-from src.model.constants import TILE_SIZE, GRID_HEIGHT, \
-    PLAYER_SIZE
-from src.model.dataclasses import Player, TileMaps
+from src.player.player import Player
+from src.utils.constants import GRID_HEIGHT, TILE_SIZE, PLAYER_SIZE
 
 
-def generate_world() -> Tuple[TileMaps, Player]:
+def generate_world() -> Tuple[ndarray, ndarray, Player]:
     """
     Returns tile maps of the world, one for the physical tiles, one for the decorations.
     Returns also the player.
 
-    :return: tile grid and player data
+    :return: tile maps and player data
     """
     cave_grid: ndarray = generate_cave_grid()
     cave_grid = generate_exit(cave_grid)
     cave_grid = generate_connections(cave_grid, rooms_connections_points(cave_grid))
+    cave_map: ndarray = generate_cave(cave_grid)
+    decoration_map: ndarray = generate_decoration(cave_grid)
 
-    tile_maps: TileMaps = TileMaps(generate_cave(cave_grid), generate_decoration(cave_grid))
-
-    if tile_maps.cave.shape != tile_maps.decoration.shape:
+    if cave_map.shape != decoration_map.shape:
         raise ValueError("Generated tile maps don't have same shapes.")
 
-    return tile_maps, _spawn_player(cave_grid)
+    return cave_map, decoration_map, _spawn_player(cave_grid)
 
 
 def _spawn_player(cave: ndarray) -> Player:
@@ -57,4 +56,5 @@ def _spawn_player(cave: ndarray) -> Player:
 
     player_idx: ndarray = array((x, spawn_height))  # grid space
     player_pos: ndarray = player_idx * TILE_SIZE + TILE_SIZE / 2 - PLAYER_SIZE / 2  # world space
-    return Player(player_pos, Rect(tuple(player_pos), tuple(PLAYER_SIZE)))
+    player_rect: Rect = Rect(tuple(player_pos), tuple(PLAYER_SIZE))
+    return Player(player_pos, player_rect)
