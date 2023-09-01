@@ -3,7 +3,7 @@ import time
 from numpy import ndarray, around
 from pygame import Surface
 
-from src.tile_particles.tile_particle import TileParticle
+from src.game.tile_particles.tile_particle import TileParticle
 from src.utils.constants import ANIMATION_SPEED, AMETHYST_PARTICLE_SPRITES
 
 

@@ -96,6 +96,11 @@ class Grapple:
             self._update_static()
 
     def _update_moving(self, delta: float) -> None:
+        """
+        Behavior of the grapple when the player is firing it.
+
+        :param delta: delta between two frames
+        """
         head: ndarray = self._head + self._head_velocity * delta
         diff: ndarray = absolute(self._end - self._head_start) - absolute(head - self._head_start)
         if diff[0] < 0 or diff[1] < 0:
@@ -103,6 +108,10 @@ class Grapple:
         self._head = head
 
     def _update_static(self) -> None:
+        """
+        Behavior of the grapple when the player is not firing it.
+        It simply follows the player position and has no length.
+        """
         self._head = self._start
         self._head_start = self._start
 
@@ -112,12 +121,6 @@ class Grapple:
         return tile_grid[idx[0], idx[1]] is not None
 
     def display(self, player_alive: bool, screen: Surface, camera_offset: ndarray) -> None:
-        """
-        Displays the grapple on the screen.
-
-        :param screen: screen surface
-        :param camera_offset: camera data
-        """
         if not player_alive:
             return
         self._draw_line(screen, camera_offset)

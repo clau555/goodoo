@@ -5,7 +5,7 @@ from numpy.random import choice, randint
 from pygame import Rect
 from scipy.ndimage import maximum_filter, minimum_filter
 
-from src.tiles.tile import Tile
+from src.game.tiles.tile import Tile
 from src.utils.constants import GRID_SIZE, FOSSIL_DENSITY, FOSSIL_SPRITES, SPIKE_SPRITES, SPIKE_DENSITY, TILE_SIZE
 
 
@@ -24,17 +24,15 @@ def generate_decoration(cave: ndarray) -> ndarray:
 
         # fossil
         if fossil_grid[i, j]:
-            decoration_grid[i, j] = Tile(
-                Rect(array((i, j)) * TILE_SIZE, tuple(TILE_SIZE)),
-                FOSSIL_SPRITES[randint(0, len(FOSSIL_SPRITES))]
-            )
+            fossil_position = Rect(array((i, j)) * TILE_SIZE, tuple(TILE_SIZE))
+            fossil_sprite = FOSSIL_SPRITES[randint(0, len(FOSSIL_SPRITES))]
+            decoration_grid[i, j] = Tile(fossil_position, fossil_sprite)
 
         # spike
         elif spike_grid[i, j] and random() < SPIKE_DENSITY:
-            decoration_grid[i, j] = Tile(
-                Rect(array((i, j)) * TILE_SIZE, tuple(TILE_SIZE)),
-                SPIKE_SPRITES[randint(0, len(SPIKE_SPRITES))]
-            )
+            spike_position = Rect(array((i, j)) * TILE_SIZE, tuple(TILE_SIZE))
+            spike_sprite = SPIKE_SPRITES[randint(0, len(SPIKE_SPRITES))]
+            decoration_grid[i, j] = Tile(spike_position, spike_sprite)
 
         else:
             decoration_grid[i, j] = None

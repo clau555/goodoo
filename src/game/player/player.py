@@ -5,7 +5,7 @@ from numpy import ndarray, array, around, ndenumerate, round
 from pygame import Rect, Surface
 from pygame.transform import flip
 
-from src.tiles.tile import Tile
+from src.game.tiles.tile import Tile
 from src.utils.constants import GRAVITY, PLAYER_SPRITE, PLAYER_GROUND_SPRITES, PLAYER_MAX_V
 from src.utils.utils import world_to_screen, animation_frame, world_to_grid, idx_inside_grid, moore_neighborhood, \
     clamp_vec, new_array
@@ -44,14 +44,13 @@ class Player:
 
     def update(self, input_velocity: ndarray, cave: ndarray, delta: float) -> None:
         """
-        Moves the player according to the input velocity then collide with the tiles.
-        If any collision occurs, the player is moved to the appropriate position,
-        and its velocity is updated accordingly.
+        Moves the player according to the input velocity then collide with the tiles of the cave.
+        If any collision occurs, the player is moved to the appropriate position, and its velocity is updated
+        accordingly.
 
         :param input_velocity: velocity inputted by user
         :param cave: world tile grid
         :param delta: delta between two frames
-        :return: updated player data
         """
         if not self._alive:
             return None
@@ -145,8 +144,8 @@ class Player:
         """
         Displays the player on the screen. The player is oriented towards the mouse.
 
-        :param screen: screen surface
-        :param camera_offset: camera data
+        :param screen: main screen surface
+        :param camera_offset: camera object
         :param time_elapsed: real time elapsed since start of the game
         """
         if not self._alive:

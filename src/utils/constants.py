@@ -139,7 +139,7 @@ GRAY_LAYER.set_alpha(128)
 PAUSE_TEXT: Surface = FONT_TEXT.render("PAUSE", False, WHITE)
 
 LAVA_SPRITES: list[Surface] = [load(LAVA_PATH / f"lava_{i}.png") for i in range(1, 5)]
-LAVA_SPEED: float = TILE_EDGE / 10
+LAVA_SPEED: float = TILE_EDGE / 8
 LAVA_TRIGGER_HEIGHT: int = GRID_HEIGHT - 64
 LAVA_WARNING_DURATION: float = 2.25  # number of seconds the screen must shake when triggering lava
 LAVA_COLOR: tuple[int, int, int] = (254, 56, 7)

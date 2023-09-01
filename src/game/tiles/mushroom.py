@@ -7,9 +7,9 @@ from pygame import Surface, Rect
 from pygame.event import Event, post
 from pygame.transform import rotate
 
-from src.tile_particles.mushroom_particle import MushroomParticle
-from src.tile_particles.tile_particle import TileParticle
-from src.tiles.tile import Tile
+from src.game.tile_particles.mushroom_particle import MushroomParticle
+from src.game.tile_particles.tile_particle import TileParticle
+from src.game.tiles.tile import Tile
 from src.utils.constants import MUSHROOM_SPRITE, MUSHROOM_BUMP_FACTOR, MUSHROOM_SHAKE_DURATION, MUSHROOM_SHAKING_OFFSET
 from src.utils.events import MUSHROOM_BUMPED
 

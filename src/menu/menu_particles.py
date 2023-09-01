@@ -32,7 +32,6 @@ class MenuParticle:
         Makes the menu particle fall.
 
         :param delta: delta between two frames
-        :return: updated menu particle data
         """
         velocity: ndarray = self._velocity + GRAVITY * delta
         self._velocity = clamp_vec(velocity, PLAYER_MAX_V)
@@ -43,7 +42,7 @@ class MenuParticle:
         """
         Displays a menu particle on screen that has the appearance of a player sprite.
 
-        :param screen: screen surface
+        :param screen: main screen surface
         """
         sprite: Surface = PLAYER_SPRITE if not self._flipped else flip(PLAYER_SPRITE, True, False)
         screen.blit(sprite, around(self._rect.topleft))

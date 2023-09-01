@@ -28,7 +28,6 @@ class Lava:
 
         :param player_y: player's y coordinates in world space
         :param delta: delta between two frames
-        :return: updated lava data
         """
         # lava is triggered when player reached a certain height
         if not self._triggered and self._is_player_above_trigger(player_y):
@@ -53,7 +52,7 @@ class Lava:
         Displays lava on screen.
 
         :param screen: screen surface
-        :param camera_offset: camera data
+        :param camera_offset: camera object
         :param time_elapsed: real time elapsed since start of the game
         """
         height_offset: float = float(around(self._y + camera_offset[1]))  # needs to be rounded to match display

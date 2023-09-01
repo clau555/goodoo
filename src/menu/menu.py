@@ -25,10 +25,13 @@ class Menu:
         self._timer = GameTimer()
 
     def run(self) -> None:
+
         while self._is_running:
             self._timer.update()
             self._update(self._timer.delta)
             self._display()
+
+    # update -----------------------------------------------------------------------------------------------------------
 
     def _update(self, delta: float) -> None:
         self._update_from_events()
@@ -77,6 +80,8 @@ class Menu:
             if particle.is_outside_screen():
                 index: int = self._particles.index(particle)
                 self._particles.pop(index)
+
+    # display ----------------------------------------------------------------------------------------------------------
 
     def _display(self):
         self._screen.fill(BLACK)
