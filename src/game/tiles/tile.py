@@ -4,7 +4,7 @@ from typing import Optional
 from numpy import ndarray
 from pygame import Rect, Surface
 
-from src.tile_particles.tile_particle import TileParticle
+from src.game.tile_particles.tile_particle import TileParticle
 from src.utils.utils import world_to_screen
 
 

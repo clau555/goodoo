@@ -6,9 +6,9 @@ from pygame import Surface, Rect
 from scipy.ndimage.measurements import label
 from scipy.spatial.distance import cdist
 
-from src.tiles.amethyst import Amethyst
-from src.tiles.mushroom import Mushroom
-from src.tiles.tile import Tile
+from src.game.tiles.amethyst import Amethyst
+from src.game.tiles.mushroom import Mushroom
+from src.game.tiles.tile import Tile
 from src.utils.constants import GRID_SIZE, NOISE_DENSITY, AUTOMATON_ITERATION, GRID_WIDTH, TILE_SPRITES, \
     OBSTACLE_MAX_DENSITY, GRID_HEIGHT, TILE_SIZE, AMETHYST_DENSITY
 from src.utils.utils import moore_neighborhood
@@ -16,7 +16,7 @@ from src.utils.utils import moore_neighborhood
 
 def generate_cave(grid: ndarray) -> ndarray:
     """
-    Returns a grid with the corresponding tile data for each cell.
+    Returns a grid with the corresponding tile object for each cell.
     Adds to it the obstacle tiles.
 
     :param grid: boolean grid
@@ -47,7 +47,7 @@ def generate_cave(grid: ndarray) -> ndarray:
             tile_cave[i, j] = Tile(rect, sprite)
 
         # adding randomly an obstacle on empty tile, the obstacle should be facing down
-        elif should_spawn_obstacle(j) and angle:
+        elif _should_spawn_obstacle(j) and angle:
             rect: Rect = Rect(idx * TILE_SIZE, tuple(TILE_SIZE))
 
             if random_sample() < AMETHYST_DENSITY:
@@ -63,7 +63,7 @@ def generate_cave(grid: ndarray) -> ndarray:
     return tile_cave
 
 
-def should_spawn_obstacle(height: int) -> bool:
+def _should_spawn_obstacle(height: int) -> bool:
     """
     Tells randomly to place an obstacle tile or not depending the height on the map.
     The higher the height the more it's likely to spawn.

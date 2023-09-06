@@ -1,7 +1,7 @@
 import pygame
 from pygame import QUIT, KEYDOWN, MOUSEBUTTONUP, MOUSEBUTTONDOWN, FULLSCREEN, SCALED
 
-from src.game import Game
+from src.game.game import Game
 from src.menu.menu import Menu
 from src.utils.constants import WINDOW_ICON, WINDOW_TITLE, SCREEN_SIZE
 

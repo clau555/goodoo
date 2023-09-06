@@ -43,7 +43,7 @@ class Camera:
 
     def update(self, focus_pos: ndarray, delta: float) -> None:
         """
-        Update the camera position based on a focused position.
+        Updates the camera position based on a focused position.
 
         :param focus_pos: screen space position on which the camera should be centered
         :param delta: delta between two frames

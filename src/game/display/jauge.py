@@ -1,8 +1,8 @@
 from numpy import ndarray, array, around
 from pygame import Surface, draw, Rect
 
-from src.lava import Lava
-from src.player.player import Player
+from src.game.lava import Lava
+from src.game.player.player import Player
 from src.utils.constants import JAUGE_RECT, GRID_HEIGHT, JAUGE_POS, JAUGE_SIZE, JAUGE_PLAYER_SIZE, \
     BLACK, JAUGE_OUTLINE_SURFACE, JAUGE_OUTLINE_POS, TILE_EDGE, LAVA_COLOR, PLAYER_COLOR
 

@@ -4,10 +4,10 @@ from numpy import ndarray, array, argwhere
 from numpy.random import randint
 from pygame import Rect
 
+from src.game.player.player import Player
 from src.generation.cave import generate_cave_grid, rooms_connections_points, generate_connections, generate_exit, \
     generate_cave
 from src.generation.decoration import generate_decoration
-from src.player.player import Player
 from src.utils.constants import GRID_HEIGHT, TILE_SIZE, PLAYER_SIZE
 
 
@@ -16,7 +16,7 @@ def generate_world() -> Tuple[ndarray, ndarray, Player]:
     Returns tile maps of the world, one for the physical tiles, one for the decorations.
     Returns also the player.
 
-    :return: tile maps and player data
+    :return: cave map, decoration map, and player
     """
     cave_grid: ndarray = generate_cave_grid()
     cave_grid = generate_exit(cave_grid)

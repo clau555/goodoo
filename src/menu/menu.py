@@ -3,11 +3,12 @@ from random import random
 import pygame
 from numpy import array, ndarray
 from pygame import KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_RETURN, QUIT
+from pygame.mixer import music, Sound
 from pygame.surface import Surface
 
 from src.menu.menu_particles import MenuParticle
 from src.utils.constants import BLACK, SCREEN_SIZE, FONT_TEXT, WHITE, MENU_TITLE, MENU_BUTTONS_LABELS, \
-    MENU_BUTTON_MARGIN, MENU_PARTICLE_SPAWN_RATE
+    MENU_BUTTON_MARGIN, MENU_PARTICLE_SPAWN_RATE, MENU_MUSIC_PATH, SELECT_CHANGE_SOUND, SELECT_SOUND
 from src.utils.game_timer import GameTimer
 from src.utils.utils import end_program
 
@@ -25,10 +26,18 @@ class Menu:
         self._timer = GameTimer()
 
     def run(self) -> None:
+
+        music.load(MENU_MUSIC_PATH)
+        music.play(-1)
+
         while self._is_running:
             self._timer.update()
             self._update(self._timer.delta)
             self._display()
+
+        music.stop()
+
+    # update -----------------------------------------------------------------------------------------------------------
 
     def _update(self, delta: float) -> None:
         self._update_from_events()
@@ -45,12 +54,15 @@ class Menu:
 
     def _update_from_input(self, input_key: int) -> None:
         if input_key == K_UP:
+            Sound.play(SELECT_CHANGE_SOUND)
             self._update_button_up()
 
         elif input_key == K_DOWN:
+            Sound.play(SELECT_CHANGE_SOUND)
             self._update_button_down()
 
         elif input_key == K_RETURN:
+            Sound.play(SELECT_SOUND)
             if self._selected_index == 0:
                 self._is_running = False  # pass to the next screen
             elif self._selected_index == 1:
@@ -77,6 +89,8 @@ class Menu:
             if particle.is_outside_screen():
                 index: int = self._particles.index(particle)
                 self._particles.pop(index)
+
+    # display ----------------------------------------------------------------------------------------------------------
 
     def _display(self):
         self._screen.fill(BLACK)
