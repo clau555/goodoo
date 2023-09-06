@@ -2,10 +2,11 @@ from pathlib import Path
 
 import pygame.font
 from numpy import array, ndarray
-from pygame import Surface, Rect
+from pygame import Surface, Rect, mixer
 from pygame.constants import K_LEFT, K_RIGHT, K_a, K_d, K_q, K_p
 from pygame.font import Font
 from pygame.image import load
+from pygame.mixer import Sound
 from pygame.transform import scale
 
 """
@@ -15,11 +16,30 @@ they all have to be centralized into this file, and no other object can be acces
 
 DIR_PATH: Path = Path(__file__).parents[2]  # pointing on main directory
 RESOURCES_PATH: Path = DIR_PATH / "resources"
+AUDIO_PATH: Path = RESOURCES_PATH / "audio"
 SPRITES_PATH: Path = RESOURCES_PATH / "sprites"
 PLAYER_PATH: Path = SPRITES_PATH / "player"
 LAVA_PATH: Path = SPRITES_PATH / "lava"
 FOSSILS_PATH: Path = SPRITES_PATH / "fossils"
 SPIKES_PATH: Path = SPRITES_PATH / "spikes"
+
+MENU_MUSIC_PATH: Path = AUDIO_PATH / "rachmaninov_prelude_g_minor.mp3"
+GAME_MUSIC_PATH: Path = AUDIO_PATH / "flight_of_the_bumble_bee.mp3"
+
+SELECT_CHANGE_SOUND_PATH: Path = AUDIO_PATH / "select_change.wav"
+SELECT_SOUND_PATH: Path = AUDIO_PATH / "select.wav"
+BUMP_SOUND_PATH: Path = AUDIO_PATH / "bump.wav"
+DEATH_SOUND_PATH: Path = AUDIO_PATH / "over.wav"
+LAVA_SOUND_PATH: Path = AUDIO_PATH / "lava.wav"
+LAVA_TRIGGERED_SOUND_PATH: Path = AUDIO_PATH / "lava_trigger.wav"
+
+mixer.init()
+SELECT_SOUND: Sound = Sound(SELECT_SOUND_PATH)
+SELECT_CHANGE_SOUND: Sound = Sound(SELECT_CHANGE_SOUND_PATH)
+BUMP_SOUND: Sound = Sound(BUMP_SOUND_PATH)
+DEATH_SOUND: Sound = Sound(DEATH_SOUND_PATH)
+LAVA_SOUND: Sound = Sound(LAVA_SOUND_PATH)
+LAVA_TRIGGERED_SOUND: Sound = Sound(LAVA_TRIGGERED_SOUND_PATH)
 
 WINDOW_ICON: Surface = load(RESOURCES_PATH / "icon.png")
 WINDOW_TITLE: str = "Goodoo"
@@ -41,7 +61,7 @@ MENU_BUTTON_MARGIN: int = 8
 MENU_PARTICLE_SPAWN_RATE: float = 0.05
 
 SCREEN_GRID_SIZE: ndarray = array((SCREEN_SIZE[0] // TILE_EDGE, SCREEN_SIZE[1] // TILE_EDGE))
-GRID_SIZE: ndarray = array((32, 512))  # world size in tiles
+GRID_SIZE: ndarray = array((32, 450))  # world size in tiles
 GRID_WIDTH: int = int(GRID_SIZE[0])
 GRID_HEIGHT: int = int(GRID_SIZE[1])
 

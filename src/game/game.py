@@ -7,6 +7,7 @@ from numpy import ndarray, array, ndenumerate, zeros
 from numpy.random import random_sample
 from pygame.constants import K_ESCAPE, K_p, QUIT, KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 from pygame.event import post, Event
+from pygame.mixer import music, Sound, Channel
 from pygame.surface import Surface
 
 from src.game.display.background import Background
@@ -23,7 +24,8 @@ from src.game.tiles.tile import Tile
 from src.generation.generation import generate_world
 from src.utils.constants import CURSOR_SPRITE, CURSOR_SIZE, OBSTACLE_PARTICLE_SPAWN_RATE, GAME_OVER_DURATION, \
     GRAY_LAYER, PAUSE_TEXT, SCREEN_SIZE, KEY_MAPS, LAVA_WARNING_DURATION, CAMERA_TARGET_OFFSET, PLAYER_INPUT_V, \
-    PLAYER_PARTICLES_COLLISION_SPAWN_COUNT, PLAYER_PARTICLES_DEATH_SPAWN_COUNT, MUSHROOM_BUMP_PARTICLES_COUNT
+    PLAYER_PARTICLES_COLLISION_SPAWN_COUNT, PLAYER_PARTICLES_DEATH_SPAWN_COUNT, MUSHROOM_BUMP_PARTICLES_COUNT, \
+    GAME_MUSIC_PATH, DEATH_SOUND, LAVA_TRIGGERED_SOUND, BUMP_SOUND, LAVA_SOUND, LAVA_WARNING_DISTANCE
 from src.utils.events import MUSHROOM_BUMPED, PLAYER_DIES, PLAYER_WINS, LAVA_TRIGGERED
 from src.utils.game_timer import GameTimer
 from src.utils.utils import visible_grid, is_pressed, end_program
@@ -53,6 +55,8 @@ class Game:
         self._tile_particles: list[TileParticle] = []
         self._player_particles: list[PlayerParticle] = []
 
+        self._lava_sound: Channel = Sound.play(LAVA_SOUND, loops=-1)
+
         self._global_timer: GameTimer = GameTimer()
         self._over_timer: Timer = self._new_over_timer()
         self._warning_timer: Timer = Timer(LAVA_WARNING_DURATION, self._finish_game)
@@ -64,6 +68,7 @@ class Game:
             self._update_from_events()
             self._update()
             self._display()
+        self._reset_sounds()
 
     def _finish_game(self) -> None:
         self._is_running = False
@@ -75,6 +80,10 @@ class Game:
         self._over_timer.cancel()
         self._over_timer = self._new_over_timer()
         self._over_timer.start()
+
+    def _reset_sounds(self) -> None:
+        self._lava_sound.stop()
+        music.set_volume(1)
 
     # events -----------------------------------------------------------------------------------------------------------
 
@@ -114,17 +123,28 @@ class Game:
         if event.type == PLAYER_DIES or event.type == PLAYER_WINS:
             self._spawn_death_particles()
             self._player.kill()
-            self._over_timer.start()
+            if not self._over_timer.is_alive():
+                self._over_timer.start()
+            music.stop()
+            Sound.play(DEATH_SOUND)
 
     def _update_from_lava_triggered_event(self, event: Event) -> None:
         if event.type == LAVA_TRIGGERED:
             self._background_image.start_warning()
             self._camera.start_shaking()
+            self._start_music()
+            Sound.play(LAVA_TRIGGERED_SOUND)
+
+    @staticmethod
+    def _start_music() -> None:
+        music.load(GAME_MUSIC_PATH)
+        music.play(-1)
 
     def _update_from_mushroom_bumped_event(self, event: Event) -> None:
         if event.type == MUSHROOM_BUMPED:
             self._spawn_mushroom_particles(event.dict["mushroom"])
             self._spawn_collision_particles()
+            Sound.play(BUMP_SOUND)
 
     def _spawn_death_particles(self) -> None:
         for _ in range(PLAYER_PARTICLES_DEATH_SPAWN_COUNT):
@@ -161,6 +181,7 @@ class Game:
         self._player.update(input_velocity, self._cave_map, delta)
         self._grapple.update(self._player.rect.center, delta)
 
+        self._set_lava_volume()
         self._check_player_above_lava()
         self._check_win()
 
@@ -179,6 +200,12 @@ class Game:
             if not particle.alive:
                 index: int = self._player_particles.index(particle)
                 self._player_particles.pop(index)
+
+    def _set_lava_volume(self) -> None:
+        player_distance: float = abs(self._player.world_position[1] - self._lava.y)
+        lava_volume: float = 1 - player_distance / LAVA_WARNING_DISTANCE
+        self._lava_sound.set_volume(lava_volume)
+        music.set_volume(1 - lava_volume)
 
     def _check_player_above_lava(self) -> None:
         if self._player.rect.centery >= self._lava.y and not self._over_timer.is_alive():
@@ -286,6 +313,8 @@ def _pause(screen: Surface) -> None:
 
     :param screen: main screen surface
     """
+    music.pause()
+
     screen.blit(GRAY_LAYER, (0, 0))
 
     x: int = SCREEN_SIZE[0] // 2 - PAUSE_TEXT.get_width() // 2
@@ -306,3 +335,5 @@ def _pause(screen: Surface) -> None:
 
             elif event.type == pygame.QUIT:
                 end_program()
+
+    music.unpause()
